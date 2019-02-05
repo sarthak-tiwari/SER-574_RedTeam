@@ -1,0 +1,13 @@
+<begin-mom>
+<date>02/01/2019</date>
+<attendees>
+1. Alice
+2. Bob
+3. Charlie
+</attendees>
+<agenda>
+1. Discussed Alpha
+2. Achieved Beta
+3. Postponed Delta
+<agenda>
+<end-mom>
