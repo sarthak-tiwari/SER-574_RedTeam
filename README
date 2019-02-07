@@ -1,3 +1,11 @@
 This repository belongs to Red Team in class SER 574.
 
 The repository will be used by Team 2 (GitHub) and Team 3 (Taiga).
+
+The directory structure is as follows:
+
+documentation :- Contains all the design and requirement documents created or used by both the teams.
+
+gitHub_module :- Contains all the source code by the github team to implement github related functionalities.
+
+taiga_module :- Contains all the source code by the taiga team to implement taiga related functionalities.
