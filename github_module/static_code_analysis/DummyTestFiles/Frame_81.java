@@ -72,6 +72,8 @@ public class Frame_81 extends JFrame {
         addTabs(tabbedPane);
 
         fixChildSizes(tabbedPane);
+		
+		if(1 == 1 && 2 == 2 || 3 == 3){}
 
         this.getContentPane().add(tabbedPane);
  
