@@ -19,7 +19,7 @@ VALID_TAGS = ["ADD, CHANGE, REMOVE, BUGFIX"]
 COMMENT_MAX_LENGTH = 80
 
 
-def compute_quality(github_repo, commit_hash):
+def compute_quality(github, commit_hash):
     """
     Returns a quality index for a commit in a git repository. The measure is
     between -100 and 100, where 0 is an empty message, -100 is a misleading
@@ -30,7 +30,7 @@ def compute_quality(github_repo, commit_hash):
 
     Assumes valid git repo and commit hash.
 
-    :param github_repo: name of a git repository (string).
+    :param github: name of a git repository (string).
     :param commit_hash: hash of a git commit (string).
     :return: A quality score (integer between -100 and 100).
     """
