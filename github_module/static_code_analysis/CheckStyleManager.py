@@ -6,19 +6,27 @@
 
 import subprocess
 
-command = ['java', '-jar', 'checkstyle-8.17-all.jar', '-c',
-           './custom_checks.xml', './DummyTestFiles/Frame_81.java']
-output = subprocess.run(command, capture_output=True, universal_newlines=True).stdout
+class CheckStyleManager:
 
-metrics = {'BooleanExpressionComplexity':0, 'ClassFanOutComplexity':0, 'CyclomaticComplexity':0,
-           'JavaNCSS':0, 'NPathComplexity':0, 'ClassDataAbstractionCoupling':0}
+    @staticmethod
+    def getStaticComplexityMetrices():
 
-for line in output.split('\n'):
+        command = ['java', '-jar', 'checkstyle-8.17-all.jar', '-c',
+                   './custom_checks.xml', './DummyTestFiles/Frame_81.java']
+        output = subprocess.run(command, capture_output=True, universal_newlines=True).stdout
 
-    if(line[1:6] == "ERROR"):
-        complexityParameter = line[line.rfind('[')+1:line.rfind(']')]
-        complexityMeasure = line[line.find(' is ')+4:line.find(' (max allowed is')]
+        metrics = {'BooleanExpressionComplexity':0, 'ClassFanOutComplexity':0, 'CyclomaticComplexity':0,
+                   'JavaNCSS':0, 'NPathComplexity':0, 'ClassDataAbstractionCoupling':0}
+
+        for line in output.split('\n'):
+
+            if(line[1:6] == "ERROR"):
+                complexityParameter = line[line.rfind('[')+1:line.rfind(']')]
+                complexityMeasure = line[line.find(' is ')+4:line.find(' (max allowed is')]
         
-        metrics[complexityParameter] = max(metrics[complexityParameter], int(complexityMeasure))
+                metrics[complexityParameter] = max(metrics[complexityParameter], int(complexityMeasure))
 
+        return metrics
+
+metrics = CheckStyleManager.getStaticComplexityMetrices()
 print(metrics)
