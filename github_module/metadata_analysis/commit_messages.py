@@ -26,7 +26,7 @@ def compute_quality(github, commit_hash):
     message, and 100 is a useful message.
 
     A useful message is one that is descriptive (uses tags, valid links to
-    taiga, relates to files) and concise (less than message length threshold).
+    taiga) and concise (less than message length threshold).
 
     Assumes valid git repo and commit hash.
 
@@ -74,17 +74,6 @@ def __get_tagia_alignment(commit_metadata):
 
     :param commit_metadata: commit metadata (a dictionary)
     :return: A quality measure fore taiga alignment.
-    """
-    raise NotImplementedError
-
-
-def __get_filename_alignment(commit_metadata):
-    """
-    Computes a quality measure for filenames. Checks if keywords from filenames
-    are mentioned in comment. Never returns a negative value.
-
-    :param commit_metadata: commit metadata (a dictionary)
-    :return: A quality measure for filename tag alignment.
     """
     raise NotImplementedError
 
