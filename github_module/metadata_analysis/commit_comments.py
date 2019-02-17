@@ -74,7 +74,7 @@ def __get_readability(comment_metadata):
 def __get_thoroughness(comment_metadata):
     """
     Computes a quality measure for length of a comment. As the comment gets
-    longer, a better score will be produce with the assumption that more text is
+    longer, a better score will be produced with the assumption that more text is
     more information.
 
     :param comment_metadata: comment metadata (a dictionary)

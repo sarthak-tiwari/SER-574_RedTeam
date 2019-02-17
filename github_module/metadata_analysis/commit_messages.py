@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+################################################################################
 
 """
 Implementation of an internal API for analyzing commit message quality for a
@@ -15,8 +16,15 @@ message that may be analyzed. Analysis results in one of three possible values:
 __author__    = "Ruben Acuna"
 __copyright__ = "Copyright 2019, SER574 Red Team"
 
-VALID_TAGS = ["ADD, CHANGE, REMOVE, BUGFIX"]
-COMMENT_MAX_LENGTH = 80
+#A list of tags which may occur in a comment.
+VALID_TAGS = ["ADD", "CHANGE", "REMOVE", "BUGFIX"]
+
+#the hard upper limit for the length of a comment.
+COMMENT_MAX_LENGTH = 70
+
+#[0, 1] representing a margin where a comment's length may be too short or too
+#long, but which should not be penalized.
+COMMENT_MARGIN = .1
 
 
 def compute_quality(github, commit_hash):
@@ -35,14 +43,31 @@ def compute_quality(github, commit_hash):
     :return: A quality score (integer between -100 and 100).
     """
 
-    commit_metadata = {"hash": None,
-                       "comment": None,
-                       "timestamp": None,
-                       "username": None,
-                       "filenames": None}
+    #TODO: interface with database to retrieve commit metadata.
+    commit_metadata = None
 
-    raise NotImplementedError
+    return __compute_quality(commit_metadata)
 
+
+def __compute_quality(commit_metadata):
+    """
+    See compute_quality for more information. This function serves as an
+    internal helper so that functionality can be tested independently of database.
+
+    :param commit_metadata: commit metadata (a dictionary)
+    :return: A quality score (integer between -100 and 100).
+    """
+    tag = __get_tag_alignment(commit_metadata)
+    tagia = 0 #TODO: see __get_tagia_alignment
+    conciseness = __get_conciseness(commit_metadata)
+
+    #RA: this is silly.
+    internal_score = tag * 20 + tagia * 50 + conciseness * 50
+
+    if internal_score > 100:
+        return 100
+    else:
+        return internal_score
 
 
 # The following are internal functions which are meant to compute various
@@ -64,7 +89,11 @@ def __get_tag_alignment(commit_metadata):
     :param commit_metadata: commit metadata (a dictionary)
     :return: A quality measure for tag alignment.
     """
-    raise NotImplementedError
+
+    #if comment contains any tag, then return 1, else return zero
+    used_tags = [tag for tag in VALID_TAGS if tag in commit_metadata["comment"]]
+
+    return len(used_tags) > 0
 
 
 def __get_tagia_alignment(commit_metadata):
@@ -75,6 +104,9 @@ def __get_tagia_alignment(commit_metadata):
     :param commit_metadata: commit metadata (a dictionary)
     :return: A quality measure fore taiga alignment.
     """
+
+    #TODO: need to access taiga data.
+
     raise NotImplementedError
 
 
@@ -86,4 +118,14 @@ def __get_conciseness(commit_metadata):
     :param commit_metadata: commit metadata (a dictionary)
     :return: A quality measure for conciseness.
     """
-    raise NotImplementedError
+
+    first_line_len = len(commit_metadata["comment"].split("\n")[0])
+    margin = int(COMMENT_MAX_LENGTH * COMMENT_MARGIN)
+
+    if first_line_len == 0 or first_line_len > COMMENT_MAX_LENGTH:
+        return -1
+
+    if first_line_len < margin or first_line_len > COMMENT_MAX_LENGTH-margin:
+        return 0
+
+    return 1
