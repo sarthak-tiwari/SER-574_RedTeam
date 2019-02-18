@@ -3,6 +3,29 @@ import json
 #from jwkest.jwk import SYMKey
 #from jwkest.jwe import JWE
 
+def project_info_byslug(headers,data):
+	projectinfo = "https://api.taiga.io/api/v1/projects/by_slug?slug="
+	project_slug = raw_input("Enter the project slug : ")
+	response_project_data = requests.get(projectinfo+project_slug, headers=headers, data=json.dumps(data))
+	project_data = json.loads(response_project_data.content)
+
+	project_id = project_data['epic_statuses'][0]['project_id']
+	dic = {}
+	lst = []
+	#print "Member Info : "
+	for i in project_data['members']:
+		dic["full_name_display"] = i['full_name_display']
+		dic["role_name"] = i['role_name']
+		lst.append(dic)
+		dic = {}
+
+	dic = {}
+	for i in range(len(lst)):
+		dic["user " + str(i+1)] = lst[i]
+
+	return json.dumps(dic),project_id
+
+
 headers = {
     'Content-Type': 'application/json',
 }
@@ -26,10 +49,13 @@ sym_key = SYMKey(key=key, alg="A128KW")
 token=JWE().decrypt(data['auth_token'], keys=[sym_key])
 print(token)"""
 
-projectinfo = "https://api.taiga.io/api/v1/projects/by_slug?slug="
+memberinfo,project_id = project_info_byslug(headers,data)
+print memberinfo
+
+"""projectinfo = "https://api.taiga.io/api/v1/projects/by_slug?slug="
 
 project_slug = raw_input("Enter the project slug : ")
-memberno = 1
+
 response_project_data = requests.get(projectinfo+project_slug, headers=headers, data=json.dumps(data))
 project_data = json.loads(response_project_data.content)
 
@@ -39,7 +65,7 @@ print "Member Info : "
 for i in project_data['members']:
 	 
 	print "Name:       " + i['full_name_display']
-	print "  Role          " + i['role_name']
+	print "  Role          " + i['role_name']"""
 
 
 projec_milestone = "https://api.taiga.io/api/v1/milestones?project=" + str(project_id)
