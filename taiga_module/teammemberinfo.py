@@ -27,5 +27,8 @@ data = json.loads(response.content)
 for pdata in data['members']:
 	 
 	print ("Member's Name - " + pdata['full_name_display'])
+	print ("email - " + pdata['email'])
+	print ("Pid - " + pdata['id'])
 	print ("Role - " + pdata['role_name'])
+	print ("Username - " + pdata['username'])
 	print ("__________________________________________________")
