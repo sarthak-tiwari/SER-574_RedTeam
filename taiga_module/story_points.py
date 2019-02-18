@@ -28,10 +28,47 @@ def processStoryPoints(slug):
     return storyPoints
 
 
+def processDate(slug):
+    project_response = requests.get(http + "/projects/by_slug?slug="+str(slug), headers=header)
+    project = project_response.json()
+    prjId = str(project['id'])
+    us_date = list()
+
+    milestone_rsp = requests.get(http + "/milestones?project="+prjId, headers=header)
+    milestone = milestone_rsp.json()
+
+    for sprint in milestone:
+        rsp_dict = {
+                    'name': sprint['name'],
+                    'user_story': [],
+                    'sprint_start': sprint['estimated_start'],
+                    'sprint_end': sprint['estimated_finish']
+
+                    }
+        for us in sprint['user_stories']:
+
+            us_dict ={
+                'description': us['subject'],
+                'created_date': us['created_date'].split('T')[0],
+                'finish_date': us['finish_date'].split('T')[0]
+            }
+            rsp_dict['user_story'] += [us_dict]
+
+        us_date += [rsp_dict]
+
+    return us_date
+
+
 @app.route('/taiga/sprint_story_points', methods=['GET'])
 def storyPoints():
 
-    return jsonify({'story': processStoryPoints('sarthak-tiwari-ser-574_redteam_team-taiga')})
+    return jsonify({'story': processStoryPoints('svanter1-virat')})
+
+
+@app.route('/taiga/sprint_date', methods=['GET'])
+def dateInformation():
+
+    return jsonify({'date_info': processDate('svanter1-virat')})
 
 if __name__ == '__main__':
     app.run(debug=True)
