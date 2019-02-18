@@ -8,7 +8,7 @@ from datetime import datetime as dt
 
 http = 'https://api.taiga.io/api/v1/'
 
-def get_userstory_subject(headers,data,userStories):
+def get_userstory_createdate(headers,data,userStories):
 	
 	dic = {}
 	lst = []
@@ -89,6 +89,6 @@ sprint_id = sprintId["id"]
 res = requests.get(http + "userstories", headers = header, params = {"milestone": sprint_id})
 userStories = res.json()
 		
-subject = get_userstory_subject(header,data,userStories)
-print (subject)
+c_date = get_userstory_createdate(header,data,userStories)
+print (c_date)
 		
