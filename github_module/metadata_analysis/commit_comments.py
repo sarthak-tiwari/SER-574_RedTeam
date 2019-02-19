@@ -1,16 +1,14 @@
 #!/usr/bin/env python
 
 """
-01234567890123456789012345678901234567890123456789012345678901234567890123456789
-
 Implementation of an internal API for analyzing commit comment quality for a
 user in a git project.
 
-Internally, we define "quality measures", which are specific properties of a
-message that may be analyzed. Analysis results in one of three possible values:
-    1 This property increases the relevance of the comment.
-    0 This property does not impact the relevance of the comment.
-    -1 This property decreases the relevance of the comment.
+Internally, we define "text quality measures", which are specific properties of
+a message that may be analyzed. Tesults are in a internal [-1, 1], where:
+    1.0 This property increases the relevance of the comment.
+    0.0 This property does not impact the relevance of the comment.
+    -1.0 This property decreases the relevance of the comment.
 """
 
 
@@ -45,39 +43,41 @@ def compute_quality(github, commit_hash, comment_id):
 
 
 # The following are internal functions which are meant to compute various
-# quality measures used to compute the quality score. Each of them processes a
+# text quality measures used to compute the quality score. Each of them processes
 # commit comment metadata dictionary which is produced internally by
 # compute_quality and which contains the following keys:
 #   id: string
 #   text: string
-#   username: sting
+#   username: string
 
 
-def __get_filename_alignment(comment_metadata):
+def __get_filename_alignment(commit_metadata, comment_metadata):
     """
     Computes a quality measure for filenames. Checks if keywords from filenames
     are mentioned in comment. Never returns a negative value.
 
+    :param commit_metadata: commit metadata (a dictionary)
     :param comment_metadata: comment metadata (a dictionary)
-    :return: A quality measure for filename tag alignment.
+    :return: A text quality measure for filename tag alignment.
     """
     raise NotImplementedError
 
 def __get_readability(comment_metadata):
     """
+    Computes a text quality measure for a piece of text.
 
     :param comment_metadata: comment metadata (a dictionary)
-    :return: A quality measure for filename tag alignment.
+    :return: A text quality measure for filename tag alignment.
     """
     raise NotImplementedError
 
 def __get_thoroughness(comment_metadata):
     """
-    Computes a quality measure for length of a comment. As the comment gets
+    Computes a text quality measure for length of a comment. As the comment gets
     longer, a better score will be produced with the assumption that more text is
     more information.
 
     :param comment_metadata: comment metadata (a dictionary)
-    :return: A quality measure for conciseness.
+    :return: A text quality measure for conciseness.
     """
     raise NotImplementedError
