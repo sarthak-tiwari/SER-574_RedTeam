@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request
 import requests
 
 app = Flask(__name__)
@@ -61,14 +61,15 @@ def processDate(slug):
 
 @app.route('/taiga/sprint_story_points', methods=['GET'])
 def storyPoints():
+    slug = request.args.get('slug')
 
-    return jsonify({'story': processStoryPoints('svanter1-virat')})
+    return jsonify({'story': processStoryPoints(slug)})
 
 
 @app.route('/taiga/sprint_date', methods=['GET'])
 def dateInformation():
-
-    return jsonify({'date_info': processDate('svanter1-virat')})
+    slug = request.args.get('slug')
+    return jsonify({'date_info': processDate(slug)})
 
 if __name__ == '__main__':
     app.run(debug=True)
