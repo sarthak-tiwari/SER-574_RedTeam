@@ -18,5 +18,3 @@ def getWiki(projectSlug,wikiSlug):
     wiki = wikiResponse.json()
     wikiContent = wiki["content"]
     return wikiContent
-
-print(getWiki(projectSlug,"mom"))
