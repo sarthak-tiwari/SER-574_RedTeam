@@ -10,7 +10,7 @@ a message that may be analyzed. Tesults are in a internal [-1, 1], where:
     0.0 This property does not impact the relevance of the comment.
     -1.0 This property decreases the relevance of the comment.
 """
-
+import util_text_analysis
 
 __author__    = "Ruben Acuna"
 __copyright__ = "Copyright 2019, SER574 Red Team"
@@ -69,7 +69,16 @@ def __get_readability(comment_metadata):
     :param comment_metadata: comment metadata (a dictionary)
     :return: A text quality measure for filename tag alignment.
     """
-    raise NotImplementedError
+
+    ari = util_text_analysis.compute_ari(comment_metadata["text"])
+
+    if ari < 6: #sixth grade and under
+        return 0
+    elif ari < 13: #seventh grade to college
+        return 1
+    else: #professor level
+        return -1
+
 
 def __get_thoroughness(comment_metadata):
     """
