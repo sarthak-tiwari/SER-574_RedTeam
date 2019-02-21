@@ -1,5 +1,9 @@
 import xml.etree.ElementTree as xml
 
+#@Author Chiranjeevi Ramamurthy
+#@Description A sample module that creates template XML files
+
+
 filename = "/home/chiranjeevi_ram/Documents/SER574/SER-574_RedTeam/documentation/template.xml"
 
 def createXMLTemplate(location):

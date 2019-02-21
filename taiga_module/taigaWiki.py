@@ -1,5 +1,8 @@
 import requests
 
+#@author Chiranjeevi Ramamurthy
+#@description A module that downloads the contents from taiga wikipage
+
 projectSlug = "cram1206-personalized-travel-planning-platform"
 header = {'Content-Type': 'application/json'}
 projectHTTP = "https://api.taiga.io/api/v1/projects/by_slug?slug="
