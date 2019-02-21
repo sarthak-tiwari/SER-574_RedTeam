@@ -8,7 +8,25 @@ from datetime import datetime as dt
 
 http = 'https://api.taiga.io/api/v1/'
 
-def get_userstory_createdate(headers,data,userStories):
+def get_userstory_createdate(slug1,sprint_no):
+		
+		
+	sprint_no = int(sprint_no)	
+	projectinfo = "https://api.taiga.io/api/v1/projects/by_slug?slug="
+	res = requests.get(http +"projects/by_slug",headers = header, params={"slug": slug1})
+	test = res.json()
+
+	if test["name"]:
+		name = test["name"]
+		test_id = test["id"]
+	
+	res = requests.get(http + "milestones", headers = header, params = {"project": test_id})
+	sprint = res.json()
+	sprintId = sprint[sprint_no]
+	sprint_id = sprintId["id"]
+		
+	res = requests.get(http + "userstories", headers = header, params = {"milestone": sprint_id})
+	userStories = res.json()
 	
 	dic = {}
 	lst = []
@@ -29,66 +47,3 @@ def get_userstory_createdate(headers,data,userStories):
 
 header = {'Content-Type': 'application/json'}
 
-while True:
-    try:
-        username = input("Enter username: ")
-
-        password = getpass.getpass("Password: ")
-
-        data = {"password": password, "type": "normal", "username": username}
-
-        res = requests.post(http + "auth", headers = header, data = json.dumps(data))
-        test = res.json()
-
-        token = test["auth_token"]
-        break
-
-    except:
-        print("Invalid username or password\n")
-		
-projectinfo = "https://api.taiga.io/api/v1/projects/by_slug?slug="
-slug = input("Enter the project slug : ")
-res = requests.get(http +"projects/by_slug",headers = header, params={"slug": slug})
-test = res.json()
-
-if test["name"]:
-	name = test["name"]
-	test_id = test["id"]
-		
-print("Project Name: {}\n".format(name))
-	
-res = requests.get(http + "milestones", headers = header, params = {"project": test_id})
-sprint = res.json()
-	
-sprintVal = []
-	
-for sprint_name in sprint:
-	sprintVal.append(
-		{
-			"Name": sprint_name["name"]
-		}
-	)
-		
-sprintVal = list(reversed(sprintVal))
-
-print("Sprints are:\n")
-	
-for sprints in sprintVal:
-	print("Title: {}".format(sprints["Name"]))
-		
-sprintNo = int(input("Enter sprint number: "))
-if sprintNo <= 1 and sprintNo >= len(sprintVal):
-	print("Sprint does not exsist\n")
-		
-		
-sprintNo = len(sprintVal) - sprintNo
-
-sprintId = sprint[sprintNo]
-sprint_id = sprintId["id"]
-		
-res = requests.get(http + "userstories", headers = header, params = {"milestone": sprint_id})
-userStories = res.json()
-		
-c_date = get_userstory_createdate(header,data,userStories)
-print (c_date)
-		
