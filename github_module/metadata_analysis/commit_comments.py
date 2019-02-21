@@ -10,11 +10,15 @@ a message that may be analyzed. Tesults are in a internal [-1, 1], where:
     0.0 This property does not impact the relevance of the comment.
     -1.0 This property decreases the relevance of the comment.
 """
+import os
+import math
 import util_text_analysis
 
 __author__    = "Ruben Acuna"
 __copyright__ = "Copyright 2019, SER574 Red Team"
 
+# The number of characters past which descriptions are not more informative.
+DESCRIPTIVE_LIMIT = 1000  # Roughly 1/3rd page.
 
 def compute_quality(github, commit_hash, comment_id):
     """
@@ -33,14 +37,38 @@ def compute_quality(github, commit_hash, comment_id):
     :return: A quality score (integer between -100 and 100).
     """
 
-    #
+    # TODO: interface with database to retrieve metadata.
+    commit_metadata = None
     comment_metadata = {"id": None,
-                       "text": None,
-                       "author": None}
+                        "text": None,
+                        "author": None}
 
     raise NotImplementedError
 
+    return __compute_quality(commit_metadata, comment_metadata)
 
+
+def __compute_quality(commit_metadata, comment_metadata):
+    """
+    See documentation for compute_quality.
+
+    :param commit_metadata: commit metadata (a dictionary)
+    :param comment_metadata: comment metadata (a dictionary)
+    :return: A quality score (integer between -100 and 100).
+    """
+
+    filename = __get_filename_alignment(commit_metadata, comment_metadata)
+    readability = __get_readability(comment_metadata)
+    thoroughness = __get_thoroughness(comment_metadata)
+
+    score = int(readability*50+thoroughness*50+filename*20)
+
+    if score < -100:
+        score = -100
+    elif score > 100:
+        score = 100
+
+    return score
 
 # The following are internal functions which are meant to compute various
 # text quality measures used to compute the quality score. Each of them processes
@@ -60,7 +88,13 @@ def __get_filename_alignment(commit_metadata, comment_metadata):
     :param comment_metadata: comment metadata (a dictionary)
     :return: A text quality measure for filename tag alignment.
     """
-    raise NotImplementedError
+
+    fn = [x.split(os.sep)[-1] for x in commit_metadata["filenames"]]
+    found = [1 for x in fn if x in comment_metadata["text"]]
+    percent = sum(found) / len(fn)
+
+    return percent
+
 
 def __get_readability(comment_metadata):
     """
@@ -72,21 +106,25 @@ def __get_readability(comment_metadata):
 
     ari = util_text_analysis.compute_ari(comment_metadata["text"])
 
-    if ari < 6: #sixth grade and under
-        return 0
-    elif ari < 13: #seventh grade to college
-        return 1
-    else: #professor level
-        return -1
+    if ari < 6:  # sixth grade and under
+        return 0.0
+    elif ari < 13:  # seventh grade to college
+        return 1.0
+    else:  # professor level
+        return -1.0
 
 
 def __get_thoroughness(comment_metadata):
     """
     Computes a text quality measure for length of a comment. As the comment gets
     longer, a better score will be produced with the assumption that more text is
-    more information.
+    more information. Uses natural exponential decay.
 
     :param comment_metadata: comment metadata (a dictionary)
     :return: A text quality measure for conciseness.
     """
-    raise NotImplementedError
+    characters = len(comment_metadata("text"))
+
+    score = 1 - math.exp(-characters/DESCRIPTIVE_LIMIT)
+
+    return score
