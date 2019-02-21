@@ -30,31 +30,31 @@ def get_user_repos(access_token):
     return raw_content
 
 def get_repo(repo_id):
-    endpoint = 'https://api.github.com/repositories/' + repo_id
+    endpoint = 'https://api.github.com/repositories/' + str(repo_id)
     raw_content = requests.get(endpoint)
     raw_content = json.loads(raw_content.content)
     return raw_content
 
 def get_all_commits(repo_id):
-    endpoint = 'https://api.github.com/repositories/' + repo_id + '/commits'
+    endpoint = 'https://api.github.com/repositories/' + str(repo_id) + '/commits'
     raw_content = requests.get(endpoint)
     raw_content = json.loads(raw_content.content)
     return raw_content
 
 def get_commit(repo_id, commit_sha):
-    endpoint = 'https://api.github.com/repositories/' + repo_id + '/commits/' + commit_sha
+    endpoint = 'https://api.github.com/repositories/' + str(repo_id) + '/commits/' + commit_sha
     return process_get_request(endpoint)
 
 def get_all_pull_requests(repo_id):
-    endpoint = 'https://api.github.com/repositories/' + repo_id + '/pulls'
+    endpoint = 'https://api.github.com/repositories/' + str(repo_id) + '/pulls'
     return process_get_request(endpoint)
 
 def get_pull_request(repo_id, pull_number):
-    endpoint = 'https://api.github.com/repositories/' + repo_id + '/pulls/' + pull_number
+    endpoint = 'https://api.github.com/repositories/' + str(repo_id) + '/pulls/' + pull_number
     return process_get_request(endpoint)
 
 def get_collaborators(access_token, repo_id):
-    endpoint = 'https://api.github.com/repositories/' + repo_id + '/collaborators?access_token=' + access_token
+    endpoint = 'https://api.github.com/repositories/' + str(repo_id) + '/collaborators?access_token=' + access_token
     return process_get_request(endpoint)
 
 def process_get_request(endpoint):
