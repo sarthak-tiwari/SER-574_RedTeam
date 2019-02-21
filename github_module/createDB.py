@@ -16,11 +16,11 @@ class CreateDB:
     def commit_data(self):
         self.db.execute("CREATE TABLE commitData (\n"
                         "    hash TEXT,\n"
-                        "    repositoryName TEXT,\n"
+                        "    repositoryID INTEGER,\n"
                         "    author TEXT,\n"
                         "    commitMessage TEXT,\n"
                         "    timeCommitted BLOB,\n"
-                        "    fileModified TEXT,\n"
+                        "    filesModified TEXT,\n"
                         "    noOfAdditions INTEGER,\n"
                         "    noOfDeletions INTEGER\n"
                         "    )")
@@ -58,8 +58,12 @@ class CreateDB:
 if __name__ == '__main__':
     create = CreateDB()
     #create.insertValues(l='login1',n='name1',p='profile1')             #Testing
+
     create.code_complexity()
     create.user_profile()
+    create.commit_data()
+    create.pull_data()
+
     create.conn.commit()
     create.conn.close()
 
