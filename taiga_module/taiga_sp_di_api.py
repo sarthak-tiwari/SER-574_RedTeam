@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request
 import requests
+import XMLParser
 
 app = Flask(__name__)
 header = {'Content-Type': 'application/json'}
@@ -61,14 +62,21 @@ def processDate(slug):
 
 @app.route('/taiga/sprint_story_points', methods=['GET'])
 def storyPoints():
+    slug = request.args.get('slug')
 
-    return jsonify({'story': processStoryPoints('svanter1-virat')})
+    return jsonify({'story': processStoryPoints(slug)})
 
 
 @app.route('/taiga/sprint_date', methods=['GET'])
 def dateInformation():
+    slug = request.args.get('slug')
+    return jsonify({'date_info': processDate(slug)})
 
-    return jsonify({'date_info': processDate('svanter1-virat')})
+@app.route('/taiga/wikiPage', methods=['GET'])
+def wikiInformation():
+    projectSlug = request.args.get('projectslug')
+    wikiSlug = request.args.get('wiki')
+    return jsonify({'wikiContents': XMLParser.XMLParser(projectSlug,wikiSlug)})
 
 if __name__ == '__main__':
     app.run(debug=True)
