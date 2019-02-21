@@ -2,7 +2,7 @@
 
 from flask import Flask, jsonify, request
 import requests
-import XMLParser, user_story
+import XMLParser, user_story, user_task_information
 
 app = Flask(__name__)
 header = {'Content-Type': 'application/json'}
@@ -84,6 +84,11 @@ def wikiInformation():
 def taskInformation():
     projectSlug = request.args.get('projectslug')
     return jsonify({'role': user_story.project_info_byslug(projectSlug)})
+
+@app.route('/taiga/userTaskInfo', methods=['GET'])
+def usertaskInformation():
+    projectSlug = request.args.get('projectslug')
+    return jsonify({'userTaskInfo': user_task_information.user_task_info(projectSlug)})
 
 if __name__ == '__main__':
     app.run(debug=True)

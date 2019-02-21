@@ -65,5 +65,5 @@ def user_task_info(slug1):
 	dic = {}
 	for i in range(len(lst)):
 		dic['User_task ' + str(i+1)] = lst[i]
-
+	print(dic)
 	return dic
