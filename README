@@ -16,6 +16,10 @@ Step 1: Install required libraries
 
 pip install xmltodict
 
+pip install flask
+
+pip install requests
+
 Step 2 : Start the flask server to begin usage of the API by executing the taiga_sp_di_api.py file. 
 
 ./taiga_sp_di_api.py
@@ -23,7 +27,7 @@ Step 2 : Start the flask server to begin usage of the API by executing the taiga
 done.
 
 Usage:
-Once API service is available on your localhost, JSON for the requested services can be obtained via GET request
+Once API service is available on your localhost, JSON for the requested services can be obtained via GET request by using an API testing client such a Insomnia.
 
 Example 1:
 This following request takes content from the given Taiga project name and Wiki Page name
