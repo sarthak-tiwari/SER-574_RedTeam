@@ -9,3 +9,36 @@ documentation :- Contains all the design and requirement documents created or us
 gitHub_module :- Contains all the source code by the github team to implement github related functionalities.
 
 taiga_module :- Contains all the source code by the taiga team to implement taiga related functionalities.
+
+Setup and running taiga module.
+
+Step 1: Install required libraries
+
+pip install xmltodict
+
+Step 2 : Start the flask server to begin usage of the API by executing the taiga_sp_di_api.py file. 
+
+./taiga_sp_di_api.py
+
+done.
+
+Usage:
+Once API service is available on your localhost, JSON for the requested services can be obtained via GET request
+
+Example 1:
+This following request takes content from the given Taiga project name and Wiki Page name
+
+http://127.0.0.1:5000/taiga/wikiPage?projectslug=cram1206-test&wiki=samplewiki
+
+Example 2:
+This request yield usertask info from the given Taiga project name
+
+http://127.0.0.1:5000/taiga/userTaskInfo?projectslug=sarthak-tiwari-ser-574_redteam_team-taiga
+
+Example 3:
+This request gets story points from the given Taiga project name
+http://127.0.0.1:5000/taiga/sprint_story_points?slug=sarthak-tiwari-ser-574_redteam_team-taiga
+
+Example 4:
+This request gets sprint dates from the given taiga project name
+http://127.0.0.1:5000/taiga/sprint_date?slug=sarthak-tiwari-ser-574_redteam_team-taiga
