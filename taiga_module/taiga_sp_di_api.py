@@ -2,7 +2,7 @@
 
 from flask import Flask, jsonify, request
 import requests
-import XMLParser, user_story, user_task_information, userstory_create_date, taskassignedto
+import XMLParser, user_story, user_task_information, userstory_create_date, taskassignedto, task_of_userstory
 
 app = Flask(__name__)
 header = {'Content-Type': 'application/json'}
@@ -89,17 +89,23 @@ def taskInformation():
 def usertaskInformation():
     projectSlug = request.args.get('projectslug')
     return jsonify({'userTaskInfo': user_task_information.user_task_info(projectSlug)})
-	
+
 @app.route('/taiga/userStoryCreateDate', methods=['GET'])
 def userStoryCreateDateInfo():
     projectSlug = request.args.get('projectslug')
     sprintno = request.args.get('sprint')
-    return jsonify({'USERSTORY': userstory_create_date.get_userstory_createdate(projectSlug,sprintno)})
-	
+    return jsonify({'USERSTORY': userstory_create_date.get_userstory_createdate(projectSlug, sprintno)})
+
 @app.route('/taiga/taskAssignedTo', methods=['GET'])
 def taskAssignedToInfo():
     projectSlug = request.args.get('projectslug')
     return jsonify({'TASK': taskassignedto.get_task_assignedto(projectSlug)})
+
+@app.route('/taiga/task_of_userstory', methods=['GET'])
+def taskOfUserStory():
+    projectSlug = request.args.get('projectslug')
+    userStoryId = request.args.get('userstory_id')
+    return jsonify({'TASK': task_of_userstory.get_task_of_userstory(projectSlug, userStoryId)})
 
 if __name__ == '__main__':
     app.run(debug=True)
