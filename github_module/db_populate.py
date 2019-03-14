@@ -14,7 +14,7 @@ import pickle
 from pprint import pprint
 import sqlite3
 import GithubAPI
-
+# from static_code_analysis import CheckStyleManager
 
 
 def store_user_info(db, repo_id):
@@ -92,6 +92,34 @@ def store_pull_data(repo_id, pull_no):
 
     if db.fetchall():
         print("store_pull_data: unknown failure.")
+
+# def store_complexity(repo_id, fileName):
+#     data = CheckStyleManager.getStaticComplexityMetrices(fileName)
+#     #print(data)
+#
+#     # TODO: consider case where pull request already has been stored.
+#
+#     #extract data
+#     author = data["author"]["login"]                                # TEXT
+#     BooleanExpressionComplexity = data['BooleanExpressionComplexity']
+#     ClassFanOutComplexity= data['ClassFanOutComplexity']
+#     JavaNCSS = data['JavaNCSS']
+#     NPathComplexity = data['NPathComplexity']
+#     ClassDataAbstractionCoupling = data['ClassDataAbstractionCoupling']
+#
+#
+#     insert_query = "INSERT INTO code_complexity(author, repository, codeLink, booleanComplexity, dataAbstractionComplexity," \
+#                    " fanOutComplexity, cyclomaticComplexity, javaNCSSComplexity, nPathComplexity, javaWarnings ) " \
+#                    "VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
+#     insert_tuple(author, repo_id, codeLink, BooleanExpressionComplexity, ClassDataAbstractionCoupling, ClassFanOutComplexity,
+#                  cyclomaticComplexity, JavaNCSS, NPathComplexity, javaWarnings)
+#
+#     display_query = "SELECT * FROM code_complexity"
+#     db.execute(insert_query, insert_tuple)
+#     db.execute(display_query)
+#
+#     if db.fetchall():
+#         print("code_complexity: unknown failure.")
 
 
 if __name__ == "__main__":
