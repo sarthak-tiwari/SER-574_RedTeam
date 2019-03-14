@@ -1,3 +1,8 @@
+# Class to create database
+#
+# Author : Carnic
+# Email : clnu2@asu.edu
+
 import sqlite3
 
 class CreateDB:
@@ -66,4 +71,3 @@ if __name__ == '__main__':
 
     create.conn.commit()
     create.conn.close()
-
