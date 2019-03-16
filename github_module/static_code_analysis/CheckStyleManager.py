@@ -46,5 +46,14 @@ class CheckStyleManager:
 
         return result
 
+    @staticmethod
+    def getDummyComplexities(filename):
+
+        metrics = {'BooleanExpressionComplexity':2, 'ClassFanOutComplexity':10,
+                   'CyclomaticComplexity':3, 'JavaNCSS':50, 'NPathComplexity':3,
+                   'ClassDataAbstractionCoupling':6}
+
+        return metrics
+
 metrices = CheckStyleManager.getComplexities(['Frame_81.java', 'Panel_12.class', 'Panel_59.java'])
 print(metrices)
