@@ -8,9 +8,7 @@ from datetime import datetime as dt
 
 http = 'https://api.taiga.io/api/v1/'
 
-def get_userstory_createdate(slug1,sprint_no):
-		
-		
+def get_list_userstories(slug1,sprint_no):
 	sprint_no = int(sprint_no)	
 	projectinfo = "https://api.taiga.io/api/v1/projects/by_slug?slug="
 	res = requests.get(http +"projects/by_slug",headers = header, params={"slug": slug1})
@@ -19,7 +17,7 @@ def get_userstory_createdate(slug1,sprint_no):
 	if test["name"]:
 		name = test["name"]
 		test_id = test["id"]
-	
+		
 	res = requests.get(http + "milestones", headers = header, params = {"project": test_id})
 	sprint = res.json()
 	sprintId = sprint[sprint_no]
@@ -33,9 +31,6 @@ def get_userstory_createdate(slug1,sprint_no):
 	
 	for user_story in userStories:
 		dic["subject"] = user_story["subject"]
-		created = dt.strptime(user_story["created_date"], "%Y-%m-%dT%H:%M:%S.%fZ")
-		created = dt.strftime(created, "%b %d %Y")
-		dic["created on"] = created
 		lst.append(dic)
 		dic = {}
 
@@ -43,5 +38,6 @@ def get_userstory_createdate(slug1,sprint_no):
 	for i in range(len(lst)):
 		dic["User Story " + str(i+1)] = lst[i]
 
+	print(dic)
 	return dic
 
