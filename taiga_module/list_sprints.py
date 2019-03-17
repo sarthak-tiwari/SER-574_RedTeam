@@ -6,18 +6,32 @@ http = 'https://api.taiga.io/api/v1/'
 
 headers = {'Content-Type': 'application/json'}
 
-def list_sprints(slug1):
+def get_list_sprints(slug1):
 
-	project_response = requests.get(http + "/projects/by_slug?slug="+str(slug1), headers=header)
+	project_response = requests.get(http + "/projects/by_slug?slug="+str(slug1), headers=headers)
 	project = project_response.json()
 	prjId = str(project['id'])
 	
-	milestone_rsp = requests.get(http + "/milestones?project="+prjId, headers=header)
+	milestone_rsp = requests.get(http + "/milestones?project="+prjId, headers=headers)
 	milestone = milestone_rsp.json()
+	sprintVal = []
+
+	for sprint_name in milestone:
+		sprintVal.append(
+			{
+				"Name": sprint_name["name"],
+				"Date of creation": sprint_name["created_date"],
+				"Start date": sprint_name["estimated_start"],
+				"Finish date": sprint_name["estimated_finish"],
+				"Total points": sprint_name["total_points"],
+				"Closed points": sprint_name["closed_points"],
+			}
+		)
+	sprintVal = list(reversed(sprintVal))
 	dic = {}
 	lst = []
-	for sprint in milestone:
-		dic["name"] = sprint["name"]
+	for sprint in sprintVal:
+		dic["name"] = sprint["Name"]
 		lst.append(dic)
 		dic = {}
 		
@@ -25,5 +39,4 @@ def list_sprints(slug1):
 	for i in range(len(lst)):
 		dic["Sprint " + str(i+1)] = lst[i]
 
-	print(dic)
 	return dic
