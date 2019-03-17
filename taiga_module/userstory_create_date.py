@@ -7,6 +7,7 @@ from datetime import datetime as dt
 
 
 http = 'https://api.taiga.io/api/v1/'
+header = {'Content-Type': 'application/json'}
 
 def get_userstory_createdate(slug1,sprint_no):
 		

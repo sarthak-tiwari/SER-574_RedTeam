@@ -5,8 +5,8 @@ import getpass
 
 from datetime import datetime as dt
 
-
 http = 'https://api.taiga.io/api/v1/'
+header = {'Content-Type': 'application/json'}
 
 def get_list_userstories(slug1,sprint_no):
 	sprint_no = int(sprint_no)	
@@ -38,6 +38,5 @@ def get_list_userstories(slug1,sprint_no):
 	for i in range(len(lst)):
 		dic["User Story " + str(i+1)] = lst[i]
 
-	print(dic)
 	return dic
 
