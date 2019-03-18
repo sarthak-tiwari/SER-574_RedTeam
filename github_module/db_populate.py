@@ -19,7 +19,7 @@ import GithubAPI
 
 def store_user_info(db, repo_id):
     data = GithubAPI.get_user_info(repo_id)
-    #print(data)
+    print(data)
     # TODO: consider case where commit already has been stored.
 
     #extract data
@@ -28,7 +28,7 @@ def store_user_info(db, repo_id):
     profile = data["author"]["email"]                               # BLOB
 
     insert_query = "INSERT INTO user_profile(githubLogin, githubUsername, githubProfile) VALUES(%s, %s, %s)"
-    insert_tuple(author, username, profile)
+    insert_tuple = (author, username, profile)
 
     display_query = "SELECT * FROM userProfile"
 
@@ -42,6 +42,7 @@ def store_user_info(db, repo_id):
 def store_commit(db, repo_id, hash):
     data = GithubAPI.get_commit(repo_id, hash)
     #print(data)
+
     # TODO: consider case where commit already has been stored.
 
     #extract data
@@ -68,12 +69,13 @@ def store_commit(db, repo_id, hash):
 
 def store_pull_data(repo_id, pull_no):
     data = GithubAPI.get_pull_request(repo_id, pull_no)
-    #print(data)
+    # print(data)
+    # print(data["user"]["login"])
 
     # TODO: consider case where pull request already has been stored.
 
     #extract data
-    author = data["author"]["login"]                                # TEXT
+    author = data["user"]["login"]                                # TEXT
     request_title = data["commit"]["message"]                       # TEXT
     no_of_comments = data["commit"]["author"]["date"]               # BLOB
     target_branch = (repr([f["filename"] for f in data["files"]])).replace("'", "\"")  # TEXT
@@ -84,7 +86,7 @@ def store_pull_data(repo_id, pull_no):
     #                         "VALUES("str(repo_id)", '"author"', '"request_title"', " \
     #                                 "'"no_of_comments"', '"target_branch"', "no_of_reviews")"
     insert_query = "INSERT INTO pull_data(requestID, requestTitle, author, noOfComments, targetBranch, noOfReviews ) VALUES(%s, %s, %s, %s, %s)"
-    insert_tuple(repo_id, author, request_title, str(no_of_comments), target_branch, str(no_of_reviews))
+    insert_tuple = (repo_id, author, request_title, str(no_of_comments), target_branch, str(no_of_reviews))
 
     display_query = "SELECT * FROM pullData"
     db.execute(insert_query, insert_tuple)
@@ -132,7 +134,8 @@ if __name__ == "__main__":
     pull_no = 4
     newPull=str(pull_no)
 
-    store_commit(db, repo_id, sample_hash)
-    store_pull_data(repo_id, newPull)
+    # store_commit(db, repo_id, sample_hash)
+    # store_pull_data(repo_id, newPull)
+    store_user_info(db, repo_id)
 
     conn.commit()
