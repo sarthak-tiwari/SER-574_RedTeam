@@ -47,9 +47,9 @@ def get_all_commits(repo_id):
     return raw_content
 
 
-def get_commit(repo_id, commit_sha):
+def get_commit(repo_id, commit_sha, username=None, token=None):
     endpoint = 'https://api.github.com/repositories/' + str(repo_id) + '/commits/' + commit_sha
-    return process_get_request(endpoint)
+    return process_get_request(endpoint, username, token)
 
 
 def get_all_pull_requests(repo_id):
@@ -67,10 +67,14 @@ def get_collaborators(access_token, repo_id):
     return process_get_request(endpoint)
 
 
-def process_get_request(endpoint):
-    return json.loads(requests.get(endpoint).content)
+def process_get_request(endpoint, username=None, token=None):
+    if username and token:
+        return json.loads(requests.get(endpoint, auth=(username, token)).content)
+    else:
+        return json.loads(requests.get(endpoint).content)
 
 # print(get_repo("168214867"))
 # print(get_all_commits("168214867"))
-# print(get_commit("168214867", "70f13b111e1147611b70f9c9f1f76ddb00fcbe27"))
+# print(get_commit("168214867", "70f13b111e1147611b70f9c9f1f76ddb00fcbe27")
+# print(get_commit("168214867", "70f13b111e1147611b70f9c9f1f76ddb00fcbe27", "racuna1", None)
 # print(get_all_pull_requests("168214867"))
