@@ -23,16 +23,17 @@ feb_end = datetime.datetime(2019, 2, 28)
 conn = sqlite3.connect('database.db')
 db = conn.cursor()
 commit_frequency.count_in_internal(git_id, "test", feb_start, feb_end)
-print(commit_frequency.count_on_day(git_id, "test", datetime.datetime(2019, 2, 6)))
+print(commit_frequency.count_on_day(git_id, "test", datetime.datetime(2019, 2, 6))) #1
 commit_frequency.count_list_internal(git_id, "test", feb_start, feb_end)
 commit_frequency.__get_commit_freq_data(db, git_id, feb_start, feb_end)
 commit_frequency.__get_all_contributors(db,git_id)
 
-exit(0)
+
 
 ################################################################################
 #commit_messages related
-#def compute_quality(github, commit_hash):
+
+commit_messages.compute_quality(git_id, "70f13b111e1147611b70f9c9f1f76ddb00fcbe27") #50
 
 commit_metadata = {"hash": None, "comment": "US#6-TASK#16: Designed backend API for frequency analysis.", "timestamp": None, "username": None, "filenames": None}
 assert commit_messages.__compute_quality(commit_metadata) >= 50
