@@ -24,6 +24,7 @@ class CreateDB:
                         "    repositoryID INTEGER,\n"
                         "    author TEXT,\n"
                         "    commitMessage TEXT,\n"
+                        "    date INTEGER,\n"
                         "    timeCommitted BLOB,\n"
                         "    filesModified TEXT,\n"
                         "    noOfAdditions INTEGER,\n"

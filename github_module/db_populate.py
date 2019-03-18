@@ -47,6 +47,7 @@ def store_commit(db, repo_id, hash):
     #extract data
     author = data["author"]["login"]                                # TEXT
     commit_message = data["commit"]["message"]                      # TEXT
+    date = str(data["commit"]["author"]["date"][0:4])+str(data["commit"]["author"]["date"][5:7])+str(data["commit"]["author"]["date"][8:10])
     time_committed = data["commit"]["author"]["date"]               # BLOB
     files_modified = (repr([f["filename"] for f in data["files"]])).replace("'", "\"")  # TEXT
     num_additions = data["stats"]["additions"]                      # INTEGER
