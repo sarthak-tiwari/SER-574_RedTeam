@@ -75,6 +75,20 @@ def count_list_interval():
 ################################################################################
 # Comment Analysis::Commit Messages
 
+# ex: 127.0.0.1:5000/github/compute_quality?git_id=168214867&commit_hash="70f13b111e1147611b70f9c9f1f76ddb00fcbe27"
+@app.route('/github/compute_quality', methods=('GET', 'POST'))
+def api_compute_quality():
+    git_id = request.args.get('git_id', type=int)
+    commit_hash = request.args.get('commit_hash')
+
+    result = 50
+    # result = CF.compute_quality(git_id, username, date)
+    # def compute_quality(github_id, commit_hash):
+
+    header = {'Content-Type': 'application/json'}
+    data = json.dumps({"status": "unimplemented", "result": result})
+    return (data, header)
+
 ################################################################################
 # Comment Analysis::Comments
 
