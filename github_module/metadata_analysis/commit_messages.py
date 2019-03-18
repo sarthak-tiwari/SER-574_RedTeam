@@ -16,6 +16,8 @@ message that may be analyzed. Analysis results in one of three possible values:
 __author__    = "Ruben Acuna"
 __copyright__ = "Copyright 2019, SER574 Red Team"
 
+import sqlite3
+
 #A list of tags which may occur in a comment.
 VALID_TAGS = ["ADD", "CHANGE", "REMOVE", "BUGFIX"]
 
@@ -27,7 +29,7 @@ COMMENT_MAX_LENGTH = 70
 COMMENT_MARGIN = .1
 
 
-def compute_quality(github, commit_hash):
+def compute_quality(github_id, commit_hash):
     """
     Returns a quality index for a commit in a git repository. The measure is
     between -100 and 100, where 0 is an empty message, -100 is a misleading
@@ -38,13 +40,25 @@ def compute_quality(github, commit_hash):
 
     Assumes valid git repo and commit hash.
 
-    :param github: name of a git repository (string).
+    :param github_id: id of a git repository (string).
     :param commit_hash: hash of a git commit (string).
     :return: A quality score (integer between -100 and 100).
     """
 
-    #TODO: interface with database to retrieve commit metadata.
-    commit_metadata = None
+    conn = sqlite3.connect('database.db')
+    db = conn.cursor()
+
+    display_query = "SELECT commitMessage, timeCommitted, author, filesModified FROM commitData WHERE commitData.hash=\"" + commit_hash +"\""
+    db.execute(display_query)
+    found = db.fetchall()
+
+    #prepare metadata dictionary
+    commit_metadata = dict()
+    commit_metadata["hash"] = commit_hash
+    commit_metadata["comment"] = found[0][0]
+    commit_metadata["timestamp"] = found[0][1]
+    commit_metadata["username"] = found[0][2]
+    commit_metadata["filenames"] = found[0][3]
 
     return __compute_quality(commit_metadata)
 

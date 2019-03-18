@@ -10,6 +10,7 @@ __author__    = "Ruben Acuna"
 __author__    = "Carnic"
 __copyright__ = "Copyright 2019, SER574 Red Team"
 
+from collections import deque
 import pickle
 from pprint import pprint
 import sqlite3
@@ -19,7 +20,7 @@ import GithubAPI
 
 def store_user_info(db, repo_id):
     data = GithubAPI.get_user_info(repo_id)
-    print(data)
+    #print(data)
     # TODO: consider case where commit already has been stored.
 
     #extract data
@@ -28,7 +29,7 @@ def store_user_info(db, repo_id):
     profile = data["author"]["email"]                               # BLOB
 
     insert_query = "INSERT INTO user_profile(githubLogin, githubUsername, githubProfile) VALUES(%s, %s, %s)"
-    insert_tuple = (author, username, profile)
+    insert_tuple(author, username, profile)
 
     display_query = "SELECT * FROM userProfile"
 
@@ -41,19 +42,22 @@ def store_user_info(db, repo_id):
 
 def store_commit(db, repo_id, hash):
     data = GithubAPI.get_commit(repo_id, hash)
-    #print(data)
+    # print(data)
 
+    store_commit_json(db, repo_id, data)
+
+def store_commit_json(db, repo_id, data):
     # TODO: consider case where commit already has been stored.
 
     #extract data
+    hash = data["sha"]                                              # TEXT
     author = data["author"]["login"]                                # TEXT
     commit_message = data["commit"]["message"]                      # TEXT
+    date = str(data["commit"]["author"]["date"][0:4])+str(data["commit"]["author"]["date"][5:7])+str(data["commit"]["author"]["date"][8:10])
     time_committed = data["commit"]["author"]["date"]               # BLOB
     files_modified = (repr([f["filename"] for f in data["files"]])).replace("'", "\"")  # TEXT
     num_additions = data["stats"]["additions"]                      # INTEGER
     num_deletions = data["stats"]["deletions"]                      # INTEGER"
-
-
 
     query = "INSERT INTO commitData(hash, repositoryID, author, commitMessage, " \
                                    "timeCommitted, filesModified, noOfAdditions, noOfDeletions) " \
@@ -69,13 +73,12 @@ def store_commit(db, repo_id, hash):
 
 def store_pull_data(repo_id, pull_no):
     data = GithubAPI.get_pull_request(repo_id, pull_no)
-    # print(data)
-    # print(data["user"]["login"])
+    #print(data)
 
     # TODO: consider case where pull request already has been stored.
 
     #extract data
-    author = data["user"]["login"]                                # TEXT
+    author = data["author"]["login"]                                # TEXT
     request_title = data["commit"]["message"]                       # TEXT
     no_of_comments = data["commit"]["author"]["date"]               # BLOB
     target_branch = (repr([f["filename"] for f in data["files"]])).replace("'", "\"")  # TEXT
@@ -86,7 +89,7 @@ def store_pull_data(repo_id, pull_no):
     #                         "VALUES("str(repo_id)", '"author"', '"request_title"', " \
     #                                 "'"no_of_comments"', '"target_branch"', "no_of_reviews")"
     insert_query = "INSERT INTO pull_data(requestID, requestTitle, author, noOfComments, targetBranch, noOfReviews ) VALUES(%s, %s, %s, %s, %s)"
-    insert_tuple = (repo_id, author, request_title, str(no_of_comments), target_branch, str(no_of_reviews))
+    insert_tuple(repo_id, author, request_title, str(no_of_comments), target_branch, str(no_of_reviews))
 
     display_query = "SELECT * FROM pullData"
     db.execute(insert_query, insert_tuple)
@@ -124,9 +127,34 @@ def store_pull_data(repo_id, pull_no):
 #         print("code_complexity: unknown failure.")
 
 
+def store_repo(db, repo_id, branch="master"):
+
+    root = GithubAPI.get_commit(repo_id, branch)
+    root_sha = root["sha"]
+
+    seen = [root_sha]
+    q = deque()
+    q.append(root_sha)
+
+    while len(q):
+        hash = q.popleft()
+        commit = GithubAPI.get_commit(repo_id, hash)
+        store_commit_json(db, repo_id, commit)
+        if "parents" in commit:
+            for parent in commit["parents"]:
+                parent_sha = parent["sha"]
+                if not parent_sha in seen:
+                    seen.append(parent_sha)
+                    q.append(parent_sha)
+    #debug
+    print(len(seen))
+    print(seen)
+
 if __name__ == "__main__":
     conn = sqlite3.connect('database.db')
     db = conn.cursor()
+
+    #store_repo(db, 168214867)
 
     #test parameters
     repo_id = 168214867
@@ -134,8 +162,7 @@ if __name__ == "__main__":
     pull_no = 4
     newPull=str(pull_no)
 
-    # store_commit(db, repo_id, sample_hash)
-    # store_pull_data(repo_id, newPull)
-    store_user_info(db, repo_id)
+    store_commit(db, repo_id, sample_hash)
+    store_pull_data(repo_id, newPull)
 
     conn.commit()
