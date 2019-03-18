@@ -22,9 +22,9 @@ feb_end = datetime.datetime(2019, 2, 28)
 #need to test helpers
 conn = sqlite3.connect('database.db')
 db = conn.cursor()
-commit_frequency.count_in_internal(git_id, "test", feb_start, feb_end)
-print(commit_frequency.count_on_day(git_id, "test", datetime.datetime(2019, 2, 6))) #1
-commit_frequency.count_list_internal(git_id, "test", feb_start, feb_end)
+a = commit_frequency.count_in_internal(git_id, "test", feb_start, feb_end)
+b = commit_frequency.count_on_day(git_id, "test", datetime.datetime(2019, 2, 7)) #1
+c = commit_frequency.count_list_internal(git_id, "test", feb_start, feb_end)
 commit_frequency.__get_commit_freq_data(db, git_id, feb_start, feb_end)
 commit_frequency.__get_all_contributors(db,git_id)
 

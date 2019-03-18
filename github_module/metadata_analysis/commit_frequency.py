@@ -26,7 +26,7 @@ def count_in_internal(git_id, username, interval_start, interval_end):
     :return: number of commits (integer).
     """
 
-    return sum(count_list_internal(git_id, username, interval_start,
+    return sum(count_list_interval(git_id, username, interval_start,
                                    interval_end))
 
 
@@ -43,13 +43,13 @@ def count_on_day(git_id, username, date):
     :return: number of commits (integer).
     """
 
-    return count_list_internal(git_id, username, date, date)
+    return count_list_interval(git_id, username, date, date)[0]
 
 
-def count_list_internal(git_id, username, interval_start, interval_end):
+def count_list_interval(git_id, username, interval_start, interval_end):
     """
     Returns a list of commits made each day by a user in a git repository
-    during a time internal. The interval is inclusive.
+    during a time interval. The interval is inclusive.
 
     Assumes valid git repo and username.
 
