@@ -15,12 +15,12 @@ import pickle
 from pprint import pprint
 import sqlite3
 import GithubAPI
-# from static_code_analysis import CheckStyleManager
 
+# from static_code_analysis import CheckStyleManager
 
 def store_user_info(db, repo_id):
     data = GithubAPI.get_user_info(repo_id)
-    #print(data)
+    # print(data)
     # TODO: consider case where commit already has been stored.
 
     #extract data
@@ -28,8 +28,8 @@ def store_user_info(db, repo_id):
     username = data["author"]["name"]                               # TEXT
     profile = data["author"]["email"]                               # BLOB
 
-    insert_query = "INSERT INTO user_profile(githubLogin, githubUsername, githubProfile) VALUES(%s, %s, %s)"
-    insert_tuple(author, username, profile)
+    insert_query = "INSERT INTO userProfile(githubLogin, githubUsername, githubProfile) VALUES(%s, %s, %s)"
+    insert_tuple = (author, username, profile)
 
     display_query = "SELECT * FROM userProfile"
 
@@ -73,58 +73,63 @@ def store_commit_json(db, repo_id, data):
 
 def store_pull_data(repo_id, pull_no):
     data = GithubAPI.get_pull_request(repo_id, pull_no)
+    # print(data)
+    # json_name = data['repo']['branches_url']
+    #
+    # print('name : ' + json_name)
+
+    # TODO: consider case where pull request already has been stored.
+    #
+    #extract data
+
+    author = data["user"]["login"]                                # TEXT
+    request_title = data["body"]
+    no_of_comments = data["review_comments"]
+    target_branch = "some branch"
+    no_of_reviews = 4
+    # query = "INSERT INTO pull_data(requestID, requestTitle, author, noOfComments, " \
+    #                                "targetBranch, noOfReviews )" \
+    #                         "VALUES("str(repo_id)", '"author"', '"request_title"', " \
+    #                                 "'"no_of_comments"', '"target_branch"', "no_of_reviews")"
+
+    insert_query = "INSERT INTO pullData(requestID, requestTile, author, noOfComments, targetBranch, noOfReviews )" \
+                   "VALUES(?, ?, ?, ?, ?, ?)", (repo_id, request_title, author, str(no_of_comments), target_branch, str(no_of_reviews))
+                   # "VALUES("+repo_id+", "+request_title+", "+author+", "+str(no_of_comments)+", "+target_branch+", "+str(no_of_reviews)+")"
+    # insert_tuple = (repo_id, request_title, author, str(no_of_comments), target_branch, str(no_of_reviews))
+
+    # db.execute(insert_query, insert_tuple)
+    db.execute(insert_query)
+
+    if db.fetchall():
+        print("store_pull_data: unknown failure.")
+
+def store_complexity(repo_id, fileName):
+    data = CheckStyleManager.getStaticComplexityMetrices(fileName)
     #print(data)
 
     # TODO: consider case where pull request already has been stored.
 
     #extract data
-    author = data["author"]["login"]                                # TEXT
-    request_title = data["commit"]["message"]                       # TEXT
-    no_of_comments = data["commit"]["author"]["date"]               # BLOB
-    target_branch = (repr([f["filename"] for f in data["files"]])).replace("'", "\"")  # TEXT
-    no_of_reviews = data["stats"]["additions"]                      # INTEGER
-
-    # query = "INSERT INTO pull_data(requestID, requestTitle, author, noOfComments, " \
-    #                                "targetBranch, noOfReviews )" \
-    #                         "VALUES("str(repo_id)", '"author"', '"request_title"', " \
-    #                                 "'"no_of_comments"', '"target_branch"', "no_of_reviews")"
-    insert_query = "INSERT INTO pull_data(requestID, requestTitle, author, noOfComments, targetBranch, noOfReviews ) VALUES(%s, %s, %s, %s, %s)"
-    insert_tuple(repo_id, author, request_title, str(no_of_comments), target_branch, str(no_of_reviews))
-
-    display_query = "SELECT * FROM pullData"
-    db.execute(insert_query, insert_tuple)
-    db.execute(display_query)
-
-    if db.fetchall():
-        print("store_pull_data: unknown failure.")
-
-# def store_complexity(repo_id, fileName):
-#     data = CheckStyleManager.getStaticComplexityMetrices(fileName)
-#     #print(data)
-#
-#     # TODO: consider case where pull request already has been stored.
-#
-#     #extract data
-#     author = data["author"]["login"]                                # TEXT
-#     BooleanExpressionComplexity = data['BooleanExpressionComplexity']
-#     ClassFanOutComplexity= data['ClassFanOutComplexity']
-#     JavaNCSS = data['JavaNCSS']
-#     NPathComplexity = data['NPathComplexity']
-#     ClassDataAbstractionCoupling = data['ClassDataAbstractionCoupling']
-#
-#
-#     insert_query = "INSERT INTO code_complexity(author, repository, codeLink, booleanComplexity, dataAbstractionComplexity," \
-#                    " fanOutComplexity, cyclomaticComplexity, javaNCSSComplexity, nPathComplexity, javaWarnings ) " \
-#                    "VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
-#     insert_tuple(author, repo_id, codeLink, BooleanExpressionComplexity, ClassDataAbstractionCoupling, ClassFanOutComplexity,
-#                  cyclomaticComplexity, JavaNCSS, NPathComplexity, javaWarnings)
-#
-#     display_query = "SELECT * FROM code_complexity"
-#     db.execute(insert_query, insert_tuple)
-#     db.execute(display_query)
-#
-#     if db.fetchall():
-#         print("code_complexity: unknown failure.")
+    # author = data["author"]["login"]                                # TEXT
+    # BooleanExpressionComplexity = data['BooleanExpressionComplexity']
+    # ClassFanOutComplexity= data['ClassFanOutComplexity']
+    # JavaNCSS = data['JavaNCSS']
+    # NPathComplexity = data['NPathComplexity']
+    # ClassDataAbstractionCoupling = data['ClassDataAbstractionCoupling']
+    #
+    #
+    # insert_query = "INSERT INTO code_complexity(author, repository, codeLink, booleanComplexity, dataAbstractionComplexity," \
+    #                " fanOutComplexity, cyclomaticComplexity, javaNCSSComplexity, nPathComplexity, javaWarnings ) " \
+    #                "VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
+    # insert_tuple= (author, repo_id, codeLink, BooleanExpressionComplexity, ClassDataAbstractionCoupling, ClassFanOutComplexity,
+    #              cyclomaticComplexity, JavaNCSS, NPathComplexity, javaWarnings)
+    #
+    # display_query = "SELECT * FROM code_complexity"
+    # db.execute(insert_query, insert_tuple)
+    # db.execute(display_query)
+    #
+    # if db.fetchall():
+    #     print("code_complexity: unknown failure.")
 
 
 def store_repo(db, repo_id, branch="master"):
@@ -162,7 +167,13 @@ if __name__ == "__main__":
     pull_no = 4
     newPull=str(pull_no)
 
+    # connect_dbs()
     store_commit(db, repo_id, sample_hash)
     store_pull_data(repo_id, newPull)
+    store_user_info(db, repo_id)
+    display_query = "SELECT * FROM pullData"
+
+    # print(db.fetchall())
 
     conn.commit()
+    conn.close()

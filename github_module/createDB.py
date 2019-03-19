@@ -33,7 +33,7 @@ class CreateDB:
 
     def pull_data(self):
         self.db.execute("CREATE TABLE pullData(\n"
-                        "  requestID TEXT,\n"
+                        "        requestID TEXT,\n"
                         "        requestTile TEXT,\n"
                         "        author TEXT,\n"
                         "        noOfComments INTEGER,\n"
@@ -55,8 +55,8 @@ class CreateDB:
                         "        javaWarnings TEXT\n"
                         "        )")
 
-    def insertValues(self,l='',n='',p=''):
-        self.db.execute(f"INSERT INTO userProfile VALUES('{l}','{n}','{p}')")
+    def insertValues(self):
+        # self.db.execute(f"INSERT INTO userProfile VALUES('{l}','{n}','{p}')")
         self.db.execute("SELECT* FROM userProfile")
         print(self.db.fetchall())
 
@@ -65,10 +65,10 @@ if __name__ == '__main__':
     create = CreateDB()
     #create.insertValues(l='login1',n='name1',p='profile1')             #Testing
 
-    create.code_complexity()
-    create.user_profile()
-    create.commit_data()
-    create.pull_data()
+    # create.code_complexity()
+    # create.user_profile()
+    # create.commit_data()
+    # create.pull_data()
 
     create.conn.commit()
     create.conn.close()
