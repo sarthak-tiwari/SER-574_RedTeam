@@ -9,6 +9,19 @@ __author__    = "Ruben Acuna"
 __copyright__ = "Copyright 2019, SER574 Red Team"
 
 
+def initialize_repo(github_id):
+    """
+    Stores the contents of a specific github repository in the interval
+    database. Calling this function is required for all other API functions to
+    work.
+    :param github_id: id of a git repository (integer).
+    :return: Success code (boolean).
+    """
+
+    # TODO: implement this
+
+    return True
+
 def fetch_repo_hashes(github_id):
     """
     Returns a list of the hashes of all commits within a specific repository.

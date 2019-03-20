@@ -26,14 +26,33 @@ def parse_str_date(str_date):
 ################################################################################
 # General DB Access Calls
 
+
+# ex: 127.0.0.1:5000/github/core_initialize_repo?git_id=168214867
+@app.route('/github/core_initialize_repo', methods=('GET', 'POST'))
+def api_core_initialize_repo():
+    git_id = request.args.get('git_id', type=int)
+
+    if not git_id:
+        status = "error"
+        result = "Failed to parse git_id parameter."
+    else:
+        status = "unimplemented"
+        result = True
+        # result = DB.initialize_repo_data(git_id)
+
+    header = {'Content-Type': 'application/json'}
+    data = json.dumps({"status": status, "result": result})
+    return (data, header)
+
+
 # ex: 127.0.0.1:5000/github/core_fetch_repo_hashes?git_id=168214867
 @app.route('/github/core_fetch_repo_hashes', methods=('GET', 'POST'))
 def api_core_fetch_repo_hashes():
     git_id = request.args.get('git_id', type=int)
 
     if not git_id:
-        status = "Failed to parse git_id parameter."
-        result = None
+        status = "error"
+        result = "Failed to parse git_id parameter."
     else:
         status = "unimplemented"
         result = ['70f13b111e1147611b70f9c9f1f76ddb00fcbe27', '70f13b111e1147611b70f9c9f1f76ddb00fcbe28', '70f13b111e1147611b70f9c9f1f76ddb00fcbe29', '70f13b111e1147611b70f9c9f1f76ddb00fcbe2a', '70f13b111e1147611b70f9c9f1f76ddb00fcbe2b']
