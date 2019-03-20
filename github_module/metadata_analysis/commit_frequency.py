@@ -12,7 +12,7 @@ __copyright__ = "Copyright 2019, SER574 Red Team"
 import datetime
 import sqlite3
 
-def count_in_internal(git_id, username, interval_start, interval_end):
+def get_commit_count_interval(git_id, username, interval_start, interval_end):
     """
     Returns the number of commits made by a user in a git repository during a
     time internal. The interval is inclusive.
@@ -26,11 +26,11 @@ def count_in_internal(git_id, username, interval_start, interval_end):
     :return: number of commits (integer).
     """
 
-    return sum(count_list_interval(git_id, username, interval_start,
-                                   interval_end))
+    return sum(get_commit_counts_interval(git_id, username, interval_start,
+                                          interval_end))
 
 
-def count_on_day(git_id, username, date):
+def get_commit_count_day(git_id, username, date):
     """
     Returns the number of commits made by a user in a git repository on a
     specific day.
@@ -43,10 +43,10 @@ def count_on_day(git_id, username, date):
     :return: number of commits (integer).
     """
 
-    return count_list_interval(git_id, username, date, date)[0]
+    return get_commit_counts_interval(git_id, username, date, date)[0]
 
 
-def count_list_interval(git_id, username, interval_start, interval_end):
+def get_commit_counts_interval(git_id, username, interval_start, interval_end):
     """
     Returns a list of commits made each day by a user in a git repository
     during a time interval. The interval is inclusive.

@@ -29,7 +29,7 @@ COMMENT_MAX_LENGTH = 70
 COMMENT_MARGIN = .1
 
 
-def compute_quality(github_id, commit_hash):
+def compute_commit_message_quality(github_id, commit_hash):
     """
     Returns a quality index for a commit in a git repository. The measure is
     between -100 and 100, where 0 is an empty message, -100 is a misleading
