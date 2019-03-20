@@ -33,7 +33,7 @@ def get_userstory_createdate(slug1,sprint_no):
 	lst = []
 	
 	for user_story in userStories:
-		dic["subject"] = user_story["subject"]
+		dic["name"] = user_story["subject"]
 		created = dt.strptime(user_story["created_date"], "%Y-%m-%dT%H:%M:%S.%fZ")
 		created = dt.strftime(created, "%b %d %Y")
 		dic["created on"] = created

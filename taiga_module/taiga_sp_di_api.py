@@ -2,7 +2,7 @@
 
 from flask import Flask, jsonify, request
 import requests
-import XMLParser, user_story, user_task_information, userstory_create_date, taskassignedto, task_of_userstory, US_Group1, list_sprints, list_userstories
+import XMLParser, user_story, user_task_information, userstory_create_date, taskassignedto, task_of_userstory, US_Group1, list_sprints, list_userstories, task_finishdate
 
 app = Flask(__name__)
 
@@ -74,6 +74,12 @@ def listOfUserstories():
     projectSlug = request.args.get('projectslug')
     sprintno = request.args.get('sprint')
     return jsonify({'USERSTORY': list_userstories.get_list_userstories(projectSlug, sprintno)})
+	
+@app.route('/taiga/taskFinishdate', methods=['GET'])
+def taskFinishdate():
+    projectSlug = request.args.get('projectslug')
+    userStoryId = request.args.get('userstory_id')
+    return jsonify({'TASK': task_finishdate.get_task_finishdate(projectSlug, userStoryId)})
 
 if __name__ == '__main__':
     app.run(debug=True)
