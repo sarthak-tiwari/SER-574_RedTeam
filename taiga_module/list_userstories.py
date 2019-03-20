@@ -30,7 +30,8 @@ def get_list_userstories(slug1,sprint_no):
 	lst = []
 	
 	for user_story in userStories:
-		dic["subject"] = user_story["subject"]
+		dic["id"] = user_story["id"]
+		dic["name"] = user_story["subject"]
 		lst.append(dic)
 		dic = {}
 

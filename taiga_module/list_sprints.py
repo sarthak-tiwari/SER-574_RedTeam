@@ -19,12 +19,7 @@ def get_list_sprints(slug1):
 	for sprint_name in milestone:
 		sprintVal.append(
 			{
-				"Name": sprint_name["name"],
-				"Date of creation": sprint_name["created_date"],
-				"Start date": sprint_name["estimated_start"],
-				"Finish date": sprint_name["estimated_finish"],
-				"Total points": sprint_name["total_points"],
-				"Closed points": sprint_name["closed_points"],
+				"Name": sprint_name["name"]
 			}
 		)
 	sprintVal = list(reversed(sprintVal))

@@ -27,7 +27,7 @@ def get_task_of_userstory(slug1, userstory_no):
 		userstory = userstory_id["id"]
 		us = int(userstory_no)
 		if userstory == us:
-			dic["task"] = tasks["subject"]
+			dic["name"] = tasks["subject"]
 			lst.append(dic)
 			dic = {}
 
