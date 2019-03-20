@@ -60,18 +60,14 @@ def count_list_interval(git_id, username, interval_start, interval_end):
     :return: a list of commits per day (list of integers).
     """
 
-    conn = sqlite3.connect('database.db')
-    db = conn.cursor()
-
-    freq_data = __get_commit_freq_data(db, git_id, interval_start, interval_end)
+    freq_data = get_commit_freq_data(git_id, interval_start, interval_end)
     result = [x["commit_count"][username] if username in x["usernames"] else 0
               for x in freq_data]
 
     return result
 
-# The following are internal functions.
 
-def __get_commit_freq_data(db, git_id, interval_start, interval_end):
+def get_commit_freq_data(git_id, interval_start, interval_end):
     """
 
     A daily commit status dictionary contains the following keys:
@@ -86,6 +82,9 @@ def __get_commit_freq_data(db, git_id, interval_start, interval_end):
     :param interval_end: day for end of internal (date object).
     :return: commit statuses (list of commit status dictionaries).
     """
+    conn = sqlite3.connect('database.db')
+    db = conn.cursor()
+
     interval = (interval_end-interval_start).days+1
     contributors = __get_all_contributors(db, git_id)
     result = [None] * interval
@@ -111,9 +110,11 @@ def __get_commit_freq_data(db, git_id, interval_start, interval_end):
                 result[day]["commit_count"][contributor] += 1
 
     #debugging
-    assert len(result) == interval, "See __get_commit_freq_data()."
+    assert len(result) == interval, "get_commit_freq_data()::incorrect result size."
 
     return result
+
+# The following are internal functions.
 
 
 def __get_all_contributors(db, git_id):

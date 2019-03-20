@@ -14,7 +14,7 @@ from static_code_analysis.CheckStyleManager import CheckStyleManager
 app = Flask(__name__)
 
 
-# TODO: this should be somewhere else
+# TODO: these should be somewhere else
 def parse_str_date(str_date):
     year = int(str_date[0:4])
     month = int(str_date[4:6])
@@ -22,6 +22,10 @@ def parse_str_date(str_date):
 
     proper_date = datetime.datetime(year, month, day)
     return proper_date
+
+
+def dateobj_to_strdate(date):
+    return str(date.year).zfill(4) + str(date.month).zfill(2) + str(date.day).zfill(2)
 
 ################################################################################
 # General DB Access Calls
@@ -113,7 +117,7 @@ def api_count_on_day():
 
 # ex: 127.0.0.1:5000/github/count_list_interval?git_id=168214867&username="test"&interval_start=20190201&interval_end=20190228
 @app.route('/github/count_list_interval', methods=('GET', 'POST'))
-def count_list_interval():
+def api_count_list_interval():
     git_id = request.args.get('git_id', type=int)
     username = request.args.get('username')
     interval_start = parse_str_date(request.args.get('interval_start'))
@@ -125,6 +129,26 @@ def count_list_interval():
     header = {'Content-Type': 'application/json'}
     data = json.dumps({"status": "unimplemented", "result": result})
     return (data, header)
+
+
+# ex: 127.0.0.1:5000/github/get_commit_freq_data?git_id=168214867&interval_start=20190201&interval_end=20190214
+@app.route('/github/get_commit_freq_data', methods=('GET', 'POST'))
+def api_get_commit_freq_data():
+    git_id = request.args.get('git_id', type=int)
+    interval_start = parse_str_date(request.args.get('interval_start'))
+    interval_end = parse_str_date(request.args.get('interval_end'))
+
+    result = [{'usernames': ['test', 'sarthak-tiwari'], 'date': datetime.datetime(2019, 2, 1, 0, 0), 'commit_count': {'test': 0, 'sarthak-tiwari': 0}}, {'usernames': ['test', 'sarthak-tiwari'], 'date': datetime.datetime(2019, 2, 2, 0, 0), 'commit_count': {'test': 0, 'sarthak-tiwari': 0}}, {'usernames': ['test', 'sarthak-tiwari'], 'date': datetime.datetime(2019, 2, 3, 0, 0), 'commit_count': {'test': 0, 'sarthak-tiwari': 0}}, {'usernames': ['test', 'sarthak-tiwari'], 'date': datetime.datetime(2019, 2, 4, 0, 0), 'commit_count': {'test': 0, 'sarthak-tiwari': 0}}, {'usernames': ['test', 'sarthak-tiwari'], 'date': datetime.datetime(2019, 2, 5, 0, 0), 'commit_count': {'test': 0, 'sarthak-tiwari': 0}}, {'usernames': ['test', 'sarthak-tiwari'], 'date': datetime.datetime(2019, 2, 6, 0, 0), 'commit_count': {'test': 1, 'sarthak-tiwari': 0}}, {'usernames': ['test', 'sarthak-tiwari'], 'date': datetime.datetime(2019, 2, 7, 0, 0), 'commit_count': {'test': 0, 'sarthak-tiwari': 4}}, {'usernames': ['test', 'sarthak-tiwari'], 'date': datetime.datetime(2019, 2, 8, 0, 0), 'commit_count': {'test': 0, 'sarthak-tiwari': 0}}, {'usernames': ['test', 'sarthak-tiwari'], 'date': datetime.datetime(2019, 2, 9, 0, 0), 'commit_count': {'test': 0, 'sarthak-tiwari': 0}}, {'usernames': ['test', 'sarthak-tiwari'], 'date': datetime.datetime(2019, 2, 10, 0, 0), 'commit_count': {'test': 0, 'sarthak-tiwari': 0}}, {'usernames': ['test', 'sarthak-tiwari'], 'date': datetime.datetime(2019, 2, 11, 0, 0), 'commit_count': {'test': 0, 'sarthak-tiwari': 0}}, {'usernames': ['test', 'sarthak-tiwari'], 'date': datetime.datetime(2019, 2, 12, 0, 0), 'commit_count': {'test': 0, 'sarthak-tiwari': 0}}, {'usernames': ['test', 'sarthak-tiwari'], 'date': datetime.datetime(2019, 2, 13, 0, 0), 'commit_count': {'test': 0, 'sarthak-tiwari': 0}}, {'usernames': ['test', 'sarthak-tiwari'], 'date': datetime.datetime(2019, 2, 14, 0, 0), 'commit_count': {'test': 0, 'sarthak-tiwari': 0}}]
+    # result = CF.get_commit_freq_data(git_id, interval_start, interval_end)
+
+    #repack python datetime objects
+    for entry in result:
+        entry["date"] = dateobj_to_strdate(entry["date"])
+
+    header = {'Content-Type': 'application/json'}
+    data = json.dumps({"status": "unimplemented", "result": result})
+    return (data, header)
+
 
 ################################################################################
 # Comment Analysis::Commit Messages
