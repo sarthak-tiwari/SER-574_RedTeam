@@ -19,7 +19,7 @@ def count_in_internal(git_id, username, interval_start, interval_end):
 
     Assumes valid git repo and username.
 
-    :param git_id: id of a git repository (string).
+    :param git_id: id of a git repository (integer).
     :param username: username (string)
     :param interval_start: day for start of internal (date object).
     :param interval_end: day for end of internal (date object).
@@ -37,7 +37,7 @@ def count_on_day(git_id, username, date):
 
     Assumes valid git repo and username.
 
-    :param git_id: id of a git repository (string).
+    :param git_id: id of a git repository (integer).
     :param username: username (string)
     :param date: day (date object).
     :return: number of commits (integer).
@@ -53,7 +53,7 @@ def count_list_interval(git_id, username, interval_start, interval_end):
 
     Assumes valid git repo and username.
 
-    :param git_id: id of a git repository (string).
+    :param git_id: id of a git repository (integer).
     :param username: username (string)
     :param interval_start: day for start of internal (date object).
     :param interval_end: day for end of internal (date object).

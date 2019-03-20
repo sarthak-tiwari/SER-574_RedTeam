@@ -40,7 +40,7 @@ def compute_quality(github_id, commit_hash):
 
     Assumes valid git repo and commit hash.
 
-    :param github_id: id of a git repository (string).
+    :param github_id: id of a git repository (integer).
     :param commit_hash: hash of a git commit (string).
     :return: A quality score (integer between -100 and 100).
     """
