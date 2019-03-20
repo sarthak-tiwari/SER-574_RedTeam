@@ -8,7 +8,8 @@ import datetime
 import json
 
 from static_code_analysis.CheckStyleManager import CheckStyleManager
-import metadata_analysis.commit_frequency as CF
+#import metadata_analysis.commit_frequency as CF
+#import db_api as DB
 
 app = Flask(__name__)
 
@@ -21,6 +22,23 @@ def parse_str_date(str_date):
 
     proper_date = datetime.datetime(year, month, day)
     return proper_date
+
+################################################################################
+# General DB Access Calls
+
+
+# ex: 127.0.0.1:5000/github/core_fetch_commit?git_id=168214867&commit_hash="70f13b111e1147611b70f9c9f1f76ddb00fcbe27"
+@app.route('/github/core_fetch_commit', methods=('GET', 'POST'))
+def api_core_fetch_commit():
+    git_id = request.args.get('git_id', type=int)
+    commit_hash = request.args.get('commit_hash')
+
+    result = {'hash': '70f13b111e1147611b70f9c9f1f76ddb00fcbe27', 'repositoryID': 168214867, 'author': 'test', 'message': 'Added gitignore for python to the source directory', 'date': 20190206, 'timeCommitted': '2019-02-07T23:39:00Z', 'files': '[".gitignore"]', 'additions': 116, 'deletions': 0}
+    # result = DB.fetch_commit(git_id, commit_hash)
+
+    header = {'Content-Type': 'application/json'}
+    data = json.dumps({"status": "unimplemented", "result": result})
+    return (data, header)
 
 ################################################################################
 # Comment Analysis::Frequency
@@ -82,7 +100,7 @@ def api_compute_quality():
     commit_hash = request.args.get('commit_hash')
 
     result = 50
-    # result = CF.compute_quality(git_id, username, date)
+    # result = CF.compute_quality(git_id, commit_hash)
     # def compute_quality(github_id, commit_hash):
 
     header = {'Content-Type': 'application/json'}
