@@ -9,8 +9,36 @@ __author__    = "Ruben Acuna"
 __copyright__ = "Copyright 2019, SER574 Red Team"
 
 
-def fetch_commit(github_id, commit_hash):
+def fetch_repo_hashes(github_id):
+    """
+    Returns a list of the hashes of all commits within a specific repository.
 
+    :param github_id: id of a git repository (integer).
+    :return: hashes of all commits in a repository (list of string).
+    """
+    conn = sqlite3.connect('database.db')
+    db = conn.cursor()
+
+    display_query = "SELECT DISTINCT hash FROM commitData WHERE commitData.repositoryID=\"" + str(github_id) +"\""
+
+    db.execute(display_query)
+    found = db.fetchall()
+
+    return [x[0] for x in found]
+
+
+def fetch_commit(github_id, commit_hash):
+    """
+    Returns a dictionary containing information (hash, repositoryID, author,
+    message, date, time committed, files, additions, and deletions) for a
+    specific commit.
+
+    Assumes that commit_hash is the hash of commit existing in local database.
+
+    :param github_id: id of a git repository (integer).
+    :param commit_hash: hash of a git commit (string).
+    :return: a commit_metadata dictionary containing information about a commit (dictionary).
+    """
     conn = sqlite3.connect('database.db')
     db = conn.cursor()
 
@@ -34,4 +62,5 @@ def fetch_commit(github_id, commit_hash):
     return commit_metadata
 
 
+# print(fetch_repo_hashes(168214867))
 # print(fetch_commit(168214867, "70f13b111e1147611b70f9c9f1f76ddb00fcbe27"))
