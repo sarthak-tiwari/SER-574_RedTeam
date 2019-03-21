@@ -86,6 +86,11 @@ def store_pull_data(repo_id, pull_no):
     request_title = data["body"]
     no_of_comments = data["review_comments"]
     target_branch = "some branch"
+
+    # Might need to change DB to have both base and head branch names
+    # Not sure which one target_branch should be for the time being
+    base_branch = data["base"] # Usually master
+    head_branch = data["haed"] # Merges into the base
     no_of_reviews = 4
     # query = "INSERT INTO pull_data(requestID, requestTitle, author, noOfComments, " \
     #                                "targetBranch, noOfReviews )" \
