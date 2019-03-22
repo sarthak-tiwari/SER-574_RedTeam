@@ -23,7 +23,13 @@ def dateInformation():
 @app.route('/taiga/initial_task', methods=['GET'])
 def initialTaskInformation():
     slug = request.args.get('slug')
-    return jsonify({'date_info': US_Group1.processTaskCreation(slug)})
+    return jsonify({'task_info': US_Group1.processTaskCreation(slug)})
+
+
+@app.route('/taiga/sprint_user_story', methods=['GET'])
+def sprintUserStoryInformation():
+    slug = request.args.get('slug')
+    return jsonify({'sprint_user_story_info': US_Group1.processSprintUserStory(slug)})
 
 
 @app.route('/taiga/wikiPage', methods=['GET'])

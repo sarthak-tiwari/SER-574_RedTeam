@@ -4,6 +4,7 @@ import requests
 header = {'Content-Type': 'application/json'}
 http = "https://api.taiga.io/api/v1"
 
+
 def processStoryPoints(slug):
     project_response = requests.get(http + "/projects/by_slug?slug="+str(slug), headers=header)
     project = project_response.json()
@@ -66,7 +67,7 @@ def processTaskCreation(slug):
 
     for sprint in milestone:
         rsp_dict = {'name': sprint['name']}
-        sprint_start = sprint["estimated_start"]
+        sprint_start = sprint["created_date"].split("T")[0]
         user = {}
         cnt = 1
         for us in sprint['user_stories']:
@@ -86,3 +87,37 @@ def processTaskCreation(slug):
         taskCreate += [rsp_dict]
 
     return taskCreate
+
+
+def processSprintUserStory(slug):
+    project_response = requests.get(http + "/projects/by_slug?slug="+str(slug), headers=header)
+    project = project_response.json()
+    prjId = str(project['id'])
+    sprintUserStory = list()
+
+    milestone_rsp = requests.get(http + "/milestones?project="+prjId, headers=header)
+    milestone = milestone_rsp.json()
+
+    for sprint in milestone:
+        totalUS = 0
+        openUS = 0
+        closeUS = 0
+        rsp_dict = {
+                    'name': sprint['name']
+                    }
+        for us in sprint['user_stories']:
+            totalUS += 1
+            if us['finish_date'] is None:
+                openUS += 1
+            else:
+                if sprint['estimated_finish'] >= us['finish_date'].split("T")[0]:
+                    closeUS += 1
+                else:
+                    openUS += 1
+
+        rsp_dict['no_of_user_stories'] = totalUS
+        rsp_dict['open_user_stories'] = openUS
+        rsp_dict['closed_user_stories'] = closeUS
+        sprintUserStory += [rsp_dict]
+
+    return sprintUserStory
