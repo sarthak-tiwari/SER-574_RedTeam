@@ -2,11 +2,9 @@
 
 from flask import Flask, jsonify, request
 import requests
-<<<<<<< HEAD
-import XMLParser, user_story, user_task_information, userstory_create_date, taskassignedto, wikiTextParser
-=======
-import XMLParser, user_story, user_task_information, userstory_create_date, taskassignedto, task_of_userstory
->>>>>>> 6c037d8dd95d1160dab4e51d9cad6f1458e546a9
+
+import XMLParser, user_story, user_task_information, userstory_create_date, taskassignedto, task_of_userstory,wikiTextParser
+
 
 app = Flask(__name__)
 header = {'Content-Type': 'application/json'}
