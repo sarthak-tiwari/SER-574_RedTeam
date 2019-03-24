@@ -42,18 +42,19 @@ class CreateDB:
                         "        )")
 
     def code_complexity(self):
-        self.db.execute("CREATE TABLE codeComplexity(\n"
-                        "        author TEXT,\n"
-                        "        repository TEXT,\n"
-                        "        codeLink TEXT,\n"
-                        "        booleanComplexity TEXT,\n"
-                        "        dataAbstractionComplexity TEXT,\n"
-                        "        fanOutComplexity TEXT,\n"
-                        "        cyclomaticComplexity TEXT,\n"
-                        "        javaNCSSComplexity TEXT,\n"
-                        "        nPathComplexity TEXT,\n"
-                        "        javaWarnings TEXT\n"
-                        "        )")
+        self.db.execute("CREATE TABLE codeComplexity ("
+	                        "repository	TEXT NOT NULL, "
+	                        "fileName NUMERIC NOT NULL, "
+	                        "author	TEXT NOT NULL, "
+	                        "codeLink TEXT NOT NULL, "
+	                        "booleanExpressionComplexity INTEGER, "
+	                        "classFanOutComplexity INTEGER, "
+	                        "cyclomaticComplexity INTEGER, "
+	                        "javaNCSS INTEGER, "
+	                        "nPathComplexity INTEGER, "
+	                        "classDataAbstractionCoupling INTEGER, "
+	                        "javaWarnings INTEGER);"
+                        )
 
     def insertValues(self):
         # self.db.execute(f"INSERT INTO userProfile VALUES('{l}','{n}','{p}')")
