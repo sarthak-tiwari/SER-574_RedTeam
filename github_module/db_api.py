@@ -227,10 +227,5 @@ def get_complexity_of_authors_in_repo(repoName):
 
     return result
 
-
-# print(get_complexity_of_file("sarthak-tiwari/SER-574_RedTeam", "/github_module/static_code_analysis/DummyTestFiles/Frame_81.java"))
-# print(get_complexity_of_files_in_repo("sarthak-tiwari/SER-574_RedTeam"))
-# print(get_complexity_by_author("sarthak-tiwari/SER-574_RedTeam", "sarthak"))
-
 # print(fetch_repo_hashes(168214867))
 # print(fetch_commit(168214867, "70f13b111e1147611b70f9c9f1f76ddb00fcbe27"))
