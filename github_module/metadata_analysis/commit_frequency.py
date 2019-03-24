@@ -69,8 +69,8 @@ def get_commit_counts_interval(git_id, username, interval_start, interval_end):
 
 def get_commit_freq_data(git_id, interval_start, interval_end):
     """
-
-    A daily commit status dictionary contains the following keys:
+    Returns a list containing daily commit status dictionaries. Each dictionary
+    contains the the following keys:
       "usernames" : (a list of strings)
       "date" : (date object)
       "commit_count" : (a dictionary)
