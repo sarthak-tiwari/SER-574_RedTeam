@@ -3,15 +3,15 @@
 # Author: Sarthak Tiwari, Ruben Acuna
 # E-Mail: sarthak.tiwari@asu.edu, racuna1@asu.edu
 
-from flask import Flask, request
+from flask import Blueprint, Flask, request
 import datetime
 import json
 
-from static_code_analysis.CheckStyleManager import CheckStyleManager
+from .static_code_analysis.CheckStyleManager import CheckStyleManager
 #import metadata_analysis.commit_frequency as CF
-import db_api as DB
+from . import db_api as DB
 
-app = Flask(__name__)
+github_api = Blueprint('github_api', __name__,)
 
 
 # TODO: these should be somewhere else
@@ -32,7 +32,7 @@ def dateobj_to_strdate(date):
 
 
 # ex: 127.0.0.1:5000/github/core_initialize_repo?git_id=168214867
-@app.route('/github/core_initialize_repo', methods=('GET', 'POST'))
+@github_api.route('/core_initialize_repo', methods=('GET', 'POST'))
 def api_core_initialize_repo():
     git_id = request.args.get('git_id', type=int)
 
@@ -50,7 +50,7 @@ def api_core_initialize_repo():
 
 
 # ex: 127.0.0.1:5000/github/core_fetch_repo_hashes?git_id=168214867
-@app.route('/github/core_fetch_repo_hashes', methods=('GET', 'POST'))
+@github_api.route('/core_fetch_repo_hashes', methods=('GET', 'POST'))
 def api_core_fetch_repo_hashes():
     git_id = request.args.get('git_id', type=int)
 
@@ -68,7 +68,7 @@ def api_core_fetch_repo_hashes():
 
 
 # ex: 127.0.0.1:5000/github/core_fetch_commit?git_id=168214867&commit_hash="70f13b111e1147611b70f9c9f1f76ddb00fcbe27"
-@app.route('/github/core_fetch_commit', methods=('GET', 'POST'))
+@github_api.route('/core_fetch_commit', methods=('GET', 'POST'))
 def api_core_fetch_commit():
     git_id = request.args.get('git_id', type=int)
     commit_hash = request.args.get('commit_hash')
@@ -85,7 +85,7 @@ def api_core_fetch_commit():
 
 
 # ex: 127.0.0.1:5000/github/get_commit_count_interval?git_id=168214867&username="test"&interval_start=20190201&interval_end=20190228
-@app.route('/github/get_commit_count_interval', methods=('GET', 'POST'))
+@github_api.route('/get_commit_count_interval', methods=('GET', 'POST'))
 def api_get_commit_count_interval():
     git_id = request.args.get('git_id', type=int)
     username = request.args.get('username')
@@ -101,7 +101,7 @@ def api_get_commit_count_interval():
 
 
 # ex: 127.0.0.1:5000/github/get_commit_count_day?git_id=168214867&username="test"&date=20190208
-@app.route('/github/get_commit_count_day', methods=('GET', 'POST'))
+@github_api.route('/get_commit_count_day', methods=('GET', 'POST'))
 def api_get_commit_count_day():
     git_id = request.args.get('git_id', type=int)
     username = request.args.get('username')
@@ -116,7 +116,7 @@ def api_get_commit_count_day():
 
 
 # ex: 127.0.0.1:5000/github/count_list_interval?git_id=168214867&username="test"&interval_start=20190201&interval_end=20190228
-@app.route('/github/get_commit_counts_interval', methods=('GET', 'POST'))
+@github_api.route('/get_commit_counts_interval', methods=('GET', 'POST'))
 def api_get_commit_counts_interval():
     git_id = request.args.get('git_id', type=int)
     username = request.args.get('username')
@@ -132,7 +132,7 @@ def api_get_commit_counts_interval():
 
 
 # ex: 127.0.0.1:5000/github/get_commit_freq_data?git_id=168214867&interval_start=20190201&interval_end=20190214
-@app.route('/github/get_commit_freq_data', methods=('GET', 'POST'))
+@github_api.route('/get_commit_freq_data', methods=('GET', 'POST'))
 def api_get_commit_freq_data():
     git_id = request.args.get('git_id', type=int)
     interval_start = parse_str_date(request.args.get('interval_start'))
@@ -154,7 +154,7 @@ def api_get_commit_freq_data():
 # Comment Analysis::Commit Messages
 
 # ex: 127.0.0.1:5000/github/compute_commit_message_quality?git_id=168214867&commit_hash="70f13b111e1147611b70f9c9f1f76ddb00fcbe27"
-@app.route('/github/compute_commit_message_quality', methods=('GET', 'POST'))
+@github_api.route('/compute_commit_message_quality', methods=('GET', 'POST'))
 def api_compute_commit_message_quality():
     git_id = request.args.get('git_id', type=int)
     commit_hash = request.args.get('commit_hash')
@@ -176,7 +176,7 @@ def api_compute_commit_message_quality():
 
 # ex: 127.0.0.1:5000/github/complexity_of_file?repoName="someRepo"&fileName="package/another/abc.java"
 # Returns code complexity of fileName present in repoName.
-@app.route('/github/complexity_of_file', methods=('GET', 'POST'))
+@github_api.route('/complexity_of_file', methods=('GET', 'POST'))
 def api_get_complexity_of_file():
     repoName = request.args.get('reponame')
     fileName = request.args.get('filename')
@@ -188,7 +188,7 @@ def api_get_complexity_of_file():
 
 # ex: 127.0.0.1:5000/github/complexity_of_files_in_repo?repoName="someRepo"
 # Return complexity of all files in this repository.
-@app.route('/github/complexity_of_files_in_repo', methods=('GET', 'POST'))
+@github_api.route('/complexity_of_files_in_repo', methods=('GET', 'POST'))
 def api_get_complexity_of_files_in_repo():
     repoName = request.args.get('reponame')
 
@@ -199,7 +199,7 @@ def api_get_complexity_of_files_in_repo():
 
 # ex: 127.0.0.1:5000/github/complexity_by_author?repoName="someRepo"&authorname="some author"
 # Return average complexity of all files authored by specified author in this repository
-@app.route('/github/complexity_by_author', methods=('GET', 'POST'))
+@github_api.route('/complexity_by_author', methods=('GET', 'POST'))
 def api_get_complexity_by_author():
     repoName = request.args.get('reponame')
     authorName = request.args.get('authorname')
@@ -211,7 +211,7 @@ def api_get_complexity_by_author():
 
 # ex: 127.0.0.1:5000/github/complexity_of_authors_in_repo?repoName="someRepo"
 # Return complexity generated by all authors in this repository
-@app.route('/github/complexity_of_authors_in_repo', methods=('GET', 'POST'))
+@github_api.route('/complexity_of_authors_in_repo', methods=('GET', 'POST'))
 def api_get_complexity_of_authors_in_repo():
     repoName = request.args.get('reponame')
 
@@ -222,7 +222,7 @@ def api_get_complexity_of_authors_in_repo():
 
 ################################################################################
 
-@app.route('/github/', methods=('GET', 'POST'))
+@github_api.route('/', methods=('GET', 'POST'))
 def test():
     filename = request.args.get('filename')
 

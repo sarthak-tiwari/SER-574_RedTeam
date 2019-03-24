@@ -1,3 +1,3 @@
 class Constants:
 
-    DATABASE = "database.db"
+    DATABASE = '.\\github_module\\database.db'

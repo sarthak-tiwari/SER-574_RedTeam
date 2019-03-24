@@ -1,7 +1,6 @@
-import db_populate
 import sqlite3
 
-from Constants import Constants
+from .Constants import Constants
 
 """
 This file implements several basic functions for querying and updating the state
