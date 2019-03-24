@@ -11,6 +11,14 @@ class CreateDB:
         self.conn = sqlite3.connect('database.db')
         self.db = self.conn.cursor()
 
+    def repositories(self):
+        self.db.execute("CREATE TABLE repositories (\n"
+                        "    name TEXT,\n"
+                        "    owner TEXT,\n"
+                        "    id INTEGER,\n"
+                        "    PRIMARY KEY(\"id\")\n"
+                        "    )")
+
     def user_profile(self):
         self.db.execute("CREATE TABLE userProfile (\n"
                         "    githubLogin TEXT,\n"
@@ -66,6 +74,7 @@ if __name__ == '__main__':
     create = CreateDB()
     #create.insertValues(l='login1',n='name1',p='profile1')             #Testing
 
+    # create.repositories()
     # create.code_complexity()
     # create.user_profile()
     # create.commit_data()
