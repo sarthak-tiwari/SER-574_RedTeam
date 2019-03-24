@@ -175,7 +175,7 @@ if __name__ == "__main__":
     # connect_dbs()
     store_commit(db, repo_id, sample_hash)
     store_pull_data(repo_id, newPull)
-    store_user_info(db, repo_id)
+    store_user_info(db, 43050725) #sarthak-tiwari's ID
     display_query = "SELECT * FROM pullData"
 
     # print(db.fetchall())

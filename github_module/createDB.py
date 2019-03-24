@@ -14,7 +14,7 @@ class CreateDB:
     def repositories(self):
         self.db.execute("CREATE TABLE repositories (\n"
                         "    name TEXT,\n"
-                        "    owner TEXT,\n"
+                        "    owner INTEGER,\n"
                         "    id INTEGER,\n"
                         "    PRIMARY KEY(\"id\")\n"
                         "    )")
@@ -23,7 +23,8 @@ class CreateDB:
         self.db.execute("CREATE TABLE userProfile (\n"
                         "    githubLogin TEXT,\n"
                         "    githubUsername TEXT,\n"
-                        "    githubProfile TEXT\n"
+                        "    githubProfile TEXT,"
+                        "    id INTEGER\n"
                         "    )")
 
     def commit_data(self):
