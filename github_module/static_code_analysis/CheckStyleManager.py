@@ -9,6 +9,13 @@ import subprocess
 class CheckStyleManager:
 
     @staticmethod
+    def createFile(fileContent, fileName):
+
+        newFile = open('./TestFile/' + fileName, 'w')
+        newFile.write(fileContent)
+
+
+    @staticmethod
     def getStaticComplexityMetrices(fileName):
 
         command = ['java', '-jar', 'checkstyle-8.17-all.jar', '-c',
@@ -35,7 +42,7 @@ class CheckStyleManager:
 
 
     @staticmethod
-    def getComplexities(filenames):
+    def getComplexities(repoName, filenames):
 
         result = []
 
@@ -55,5 +62,5 @@ class CheckStyleManager:
 
         return metrics
 
-metrices = CheckStyleManager.getComplexities(['Frame_81.java', 'Panel_12.class', 'Panel_59.java'])
-print(metrices)
+# metrices = CheckStyleManager.getComplexities('abc', ['Frame_81.java', 'Panel_59.java'])
+# print(metrices)
