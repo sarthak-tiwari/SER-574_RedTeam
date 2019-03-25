@@ -1,4 +1,5 @@
 import sqlite3
+import db_populate
 
 from Constants import Constants
 
@@ -19,13 +20,16 @@ def initialize_repo(github_id):
     :param github_id: id of a git repository (integer).
     :return: Success code (boolean).
     """
+    conn = sqlite3.connect(Constants.DATABASE)
+    db = conn.cursor()
 
-    # TODO: implement this:
-    #0) download and store basic repository/user information
-    #1) download and store commit information.
-    #2) download and store URL information.
-    #3) download and store pull request information.
-    #4) download and store commit comment information.
+    #0) TODO: download and store basic repository/user information
+    db_populate.store_repository_info(db, github_id)
+
+    #1) TODO: download and store commit information.
+    #2) TODO: download and store URL information.
+    #3) TODO: download and store pull request information.
+    #4) TODO: download and store commit comment information.
 
     return True
 

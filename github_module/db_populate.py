@@ -18,6 +18,21 @@ import GithubAPI
 
 # from static_code_analysis import CheckStyleManager
 
+def store_repository_info(db, repo_id):
+    repo_data = GithubAPI.get_repo(repo_id)
+
+    clean_query = "DELETE FROM repositories WHERE id = " + str(repo_id)
+    db.execute(clean_query)
+
+    if db.fetchall():
+        print("store_repository_info: unknown failure when removing old data.")
+
+    insert_query = "INSERT INTO repositories(name, owner, id) VALUES(\""+repo_data["name"]+"\", "+str(repo_data["owner"]["id"])+", "+str(repo_data["id"])+")"
+    db.execute(insert_query)
+
+    if db.fetchall():
+        print("store_repository_info: unknown failure when adding new data.")
+
 def store_user_info(db, repo_id):
     data = GithubAPI.get_user_info(repo_id)
     # print(data)
@@ -173,10 +188,11 @@ if __name__ == "__main__":
     newPull=str(pull_no)
 
     # connect_dbs()
-    store_commit(db, repo_id, sample_hash)
-    store_pull_data(repo_id, newPull)
-    store_user_info(db, 43050725) #sarthak-tiwari's ID
-    display_query = "SELECT * FROM pullData"
+    store_repository_info(db, repo_id)
+    #store_commit(db, repo_id, sample_hash)
+    #store_pull_data(repo_id, newPull)
+    #store_user_info(db, 43050725) #sarthak-tiwari's ID
+    #display_query = "SELECT * FROM pullData"
 
     # print(db.fetchall())
 

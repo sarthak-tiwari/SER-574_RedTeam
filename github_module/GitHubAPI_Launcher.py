@@ -40,9 +40,8 @@ def api_core_initialize_repo():
         status = "error"
         result = "Failed to parse git_id parameter."
     else:
-        status = "unimplemented"
-        result = True
-        # result = DB.initialize_repo_data(git_id)
+        status = "wip"
+        result = DB.initialize_repo_data(git_id)
 
     header = {'Content-Type': 'application/json'}
     data = json.dumps({"status": status, "result": result})
