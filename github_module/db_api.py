@@ -1,6 +1,6 @@
 import sqlite3
 
-from .Constants import Constants
+from Constants import Constants
 
 """
 This file implements several basic functions for querying and updating the state
@@ -20,7 +20,12 @@ def initialize_repo(github_id):
     :return: Success code (boolean).
     """
 
-    # TODO: implement this
+    # TODO: implement this:
+    #0) download and store basic repository/user information
+    #1) download and store commit information.
+    #2) download and store URL information.
+    #3) download and store pull request information.
+    #4) download and store commit comment information.
 
     return True
 
@@ -69,9 +74,76 @@ def list_details(query):
     collaborators = db.fetchall()
     details["collaborators"] = [None] * len(collaborators)
     for i in range(len(collaborators)):
-        details["collaborators"][i] = {"name" : collaborators[i][0], "githubId" : collaborators[i][1]}
+        details["collaborators"][i] = {"name": collaborators[i][0], "githubId": collaborators[i][1]}
 
     return details
+
+
+def fetch_commits(github_id):
+    """
+    Returns a repository details dictionary with commit frequency data for a
+    specific repository. Assumes that query refers to a valid git repository which has already been
+    initialized.
+
+    For the contents of a repository details dictionary, see the list_details
+    function. fetch_commits adds a key called "commits" to the standard
+    repository details dictionary that is a list with the following format:
+    (each list entry corresponds to one contributor).
+        githubId: string
+        numberofCommits: integer (sum of daily commits)
+        distribution: list of daily commit data dictionary.
+
+    A daily commit data dictionary looks like:
+        date : integer (YYYYMMDD)
+        numberOfCommits : integer
+
+    :param github_id: id of a git repository (integer).
+    :return:
+    """
+
+    conn = sqlite3.connect(Constants.DATABASE)
+    db = conn.cursor()
+
+    #fetch main repo information (uses list_details but needs extra look up for id->str)
+    info_query = "SELECT name FROM repositories WHERE id=" + str(github_id)
+    db.execute(info_query)
+    repo_name = db.fetchall()[0][0]
+    result = list_details(repo_name)
+
+    #fetch commit information
+    commit_query = "SELECT authorID, commitMessage, date, timeCommitted, filesModified, noOfAdditions, noOfDeletions FROM commitData WHERE repositoryID=" + str(result["repoInternalId"])
+    db.execute(commit_query)
+    commits = db.fetchall()
+    result["commits"] = [None] * len(result["collaborators"])
+
+    for i in range(len(result["collaborators"])):
+        result["commits"][i] = {"githubId": result["collaborators"][i]["githubId"], "numberOfCommits": 0, "distribution": []}
+
+    #update commit dictionary information from actual commits
+    for i in range(len(commits)):
+        commit_authorID = commits[i][0]
+        commit_date = commits[i][2] #YYYYMMDD
+
+        #pick out which distribution/user to update
+        active_entry = None
+        for j in range(len(result["collaborators"])):
+            if result["commits"][j]["githubId"] == commit_authorID:
+                active_entry = result["commits"][j]
+                break
+
+        exists = False
+        for k in range(len(active_entry["distribution"])):
+            if active_entry["distribution"][k]["date"] == commit_date:
+                exists = True
+                active_entry["distribution"][k]["numberOfCommits"] += 1
+                active_entry["numberOfCommits"] += 1
+
+        if not exists:
+            active_entry["distribution"].append({"date": commit_date, "numberOfCommits": 1})
+            active_entry["numberOfCommits"] += 1
+
+    return result
+
 
 def fetch_repo_hashes(github_id):
     """
@@ -278,3 +350,4 @@ def get_complexity_of_authors_in_repo(repoName):
 # print(fetch_repo_hashes(168214867))
 # print(fetch_commit(168214867, "70f13b111e1147611b70f9c9f1f76ddb00fcbe27"))
 # print(list_details("SER-574_RedTeam"))
+print(fetch_commits(168214867))
