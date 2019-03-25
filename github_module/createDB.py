@@ -32,6 +32,7 @@ class CreateDB:
                         "    hash TEXT,\n"
                         "    repositoryID INTEGER,\n"
                         "    author TEXT,\n"
+                        "    authorID INTEGER, \n"
                         "    commitMessage TEXT,\n"
                         "    date INTEGER,\n"
                         "    timeCommitted BLOB,\n"
