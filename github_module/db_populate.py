@@ -18,7 +18,8 @@ import GithubAPI
 
 # from static_code_analysis import CheckStyleManager
 
-def store_repository_info(db, repo_id):
+
+def store_repository_info(db, repo_id, access_token):
     repo_data = GithubAPI.get_repo(repo_id)
 
     clean_query = "DELETE FROM repositories WHERE id = " + str(repo_id)
@@ -33,6 +34,30 @@ def store_repository_info(db, repo_id):
     if db.fetchall():
         print("store_repository_info: unknown failure when adding new data.")
 
+    # if authentication given, also update users.
+    if access_token:
+        collab_data = GithubAPI.get_collaborators(access_token, repo_id)
+
+        for collaborator in collab_data:
+            githubLogin = collaborator["login"]
+            githubUsername = collaborator["login"]
+            githubProfile = collaborator["html_url"]
+            id = collaborator["id"]
+
+            # remove any existing collaborator data
+            clean_query = "DELETE FROM userProfile WHERE id = " + str(id)
+            db.execute(clean_query)
+
+            insert_query = "INSERT INTO userProfile(githubLogin, githubUsername, githubProfile, id) VALUES(\""+githubLogin+"\", \""+githubUsername+"\", \""+githubProfile+"\", "+str(id)+")"
+
+            db.execute(insert_query)
+
+            if db.fetchall():
+                print("store_repository_info: unknown failure when adding user.")
+
+
+"""
+#deprecated
 def store_user_info(db, repo_id):
     data = GithubAPI.get_user_info(repo_id)
     # print(data)
@@ -53,7 +78,7 @@ def store_user_info(db, repo_id):
 
     if db.fetchall():
         print("store_user_info: unknown failure.")
-
+"""
 
 def store_commit(db, repo_id, hash):
     data = GithubAPI.get_commit(repo_id, hash)
@@ -188,7 +213,7 @@ if __name__ == "__main__":
     newPull=str(pull_no)
 
     # connect_dbs()
-    store_repository_info(db, repo_id)
+    store_repository_info(db, repo_id, None)
     #store_commit(db, repo_id, sample_hash)
     #store_pull_data(repo_id, newPull)
     #store_user_info(db, 43050725) #sarthak-tiwari's ID
