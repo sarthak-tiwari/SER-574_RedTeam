@@ -5,21 +5,28 @@
 # E-Mail: sarthak.tiwari@asu.edu
 
 import subprocess
-
+import http
+import requests
+import os
+from pathlib import Path
 
 class CheckStyleManager:
 
     @staticmethod
-    def createFile(fileContent, fileName):
+    def fetchAndCreateFile(fileLink):
 
-        newFile = open('./TestFile/' + fileName, 'w')
-        newFile.write(fileContent)
+        fileName = fileLink[fileLink.rfind('/')+1:]
+        fileContent = requests.get(fileLink).text
+        with open(str(Path(__file__).parent.resolve()) + '/TestFile/' + fileName, 'w+') as newFile:
+            newFile.write(fileContent)
 
     @staticmethod
     def getStaticComplexityMetrices(fileName):
 
-        command = ['java', '-jar', 'checkstyle-8.17-all.jar', '-c',
-                   './custom_checks.xml', './DummyTestFiles/' + str(fileName)]
+        path = str(Path(__file__).parent.resolve())
+
+        command = ['java', '-jar', path + '/checkstyle-8.17-all.jar', '-c',
+                   path + '/custom_checks.xml', path + '/TestFile/' + str(fileName)]
         output = subprocess.run(command, capture_output=True,
                                 universal_newlines=True).stdout
 
@@ -42,8 +49,10 @@ class CheckStyleManager:
     @staticmethod
     def getJavaWarningCount(fileName):
 
-        command = ['java', '-jar', 'checkstyle-8.17-all.jar', '-c',
-                   './sun_checks.xml', './DummyTestFiles/' + str(fileName)]
+        path = str(Path(__file__).parent.resolve())
+
+        command = ['java', '-jar', path + '/checkstyle-8.17-all.jar', '-c',
+                   path + '/sun_checks.xml', path + '/TestFile/' + str(fileName)]
         output = subprocess.run(command, capture_output=True,
                                 universal_newlines=True).stdout
 
@@ -53,19 +62,21 @@ class CheckStyleManager:
         return count
 
     @staticmethod
-    def getComplexities(repoName, filenames):
+    def getComplexity(fileLink):
 
-        result = []
+        path = str(Path(__file__).parent.resolve())
 
-        for filename in filenames:
-            if(filename[filename.rfind('.')+1:] == 'java'):
-                metrics = CheckStyleManager.getStaticComplexityMetrices(
-                    filename)
-                metrics['javaWarnings'] = CheckStyleManager.getJavaWarningCount(
-                    filename)
-                result.append((filename, metrics))
+        fileName = fileLink[fileLink.rfind('/')+1:]
 
-        return result
+        CheckStyleManager.fetchAndCreateFile(fileLink)
+
+        metrics = CheckStyleManager.getStaticComplexityMetrices(fileName)
+        metrics['JavaWarnings'] = CheckStyleManager.getJavaWarningCount(
+            fileName)
+        
+        os.remove(path + '/TestFile/' + fileName)
+
+        return metrics
 
     @staticmethod
     def getBaselineForComplexities():
@@ -79,6 +90,8 @@ class CheckStyleManager:
         return metrics
 
 
+# print(CheckStyleManager.getComplexity(
+#     'https://raw.githubusercontent.com/sarthak-tiwari/SER-574_RedTeam/master/github_module/static_code_analysis/DummyTestFiles/Frame_81.java'))
 # metrices = CheckStyleManager.getComplexities(
 #    'abc', ['Frame_81.java', 'Panel_59.java'])
 # print(metrices)
