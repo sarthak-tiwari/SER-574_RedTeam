@@ -24,6 +24,55 @@ def initialize_repo(github_id):
 
     return True
 
+
+def list_details(query):
+    """
+    Returns a repository details dictionary for a specific repository. Assumes
+    that query refers to a valid git repository which has already been
+    initialized.
+
+    A repository details dictionary contains:
+        repoName : string
+        collaborators : list of contributor details dictionaries
+        repoURL:
+        repoInternalId:
+
+        A contributor details dictionary contains:
+        name : string
+        githubID : integer
+
+    :param query: name of a git repository (string).
+    :return: A repository details dictionary
+    """
+
+    conn = sqlite3.connect(Constants.DATABASE)
+    db = conn.cursor()
+
+    #fetch main repo information
+    info_query = "SELECT name, owner, id FROM repositories WHERE name=\"" + query +"\""
+    db.execute(info_query)
+    repository_info = db.fetchall()[0]
+
+    details = dict()
+    details["repoName"] = repository_info[0]
+    details["repoInternalId"] = repository_info[2]
+
+    #fetch owner information
+    info_query = "SELECT githubUsername FROM userProfile WHERE id=\"" + str(repository_info[1]) +"\""
+    db.execute(info_query)
+    owner_info = db.fetchall()[0]
+    details["repoURL"] = "https://github.com/" + owner_info[0] + "/" + details["repoName"]
+
+    # fetch collaborators information
+    collab_query = "SELECT DISTINCT userProfile.githubUsername, userProfile.id FROM userProfile, commitData WHERE commitData.repositoryID=" + str(details["repoInternalId"]) + " AND userProfile.githubUsername=commitData.author"
+    db.execute(collab_query)
+    collaborators = db.fetchall()
+    details["collaborators"] = [None] * len(collaborators)
+    for i in range(len(collaborators)):
+        details["collaborators"][i] = {"name" : collaborators[i][0], "githubId" : collaborators[i][1]}
+
+    return details
+
 def fetch_repo_hashes(github_id):
     """
     Returns a list of the hashes of all commits within a specific repository.
@@ -228,3 +277,4 @@ def get_complexity_of_authors_in_repo(repoName):
 
 # print(fetch_repo_hashes(168214867))
 # print(fetch_commit(168214867, "70f13b111e1147611b70f9c9f1f76ddb00fcbe27"))
+# print(list_details("SER-574_RedTeam"))

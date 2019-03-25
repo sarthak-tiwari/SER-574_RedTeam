@@ -49,6 +49,23 @@ def api_core_initialize_repo():
     return (data, header)
 
 
+# ex: 127.0.0.1:5000/github/listdetails/?format=json&query=SER-574_RedTeam
+@github_api.route('/listdetails/', methods=('GET', 'POST'))
+def api_core_initialize_repo():
+
+    format = request.args.get('format')
+    query = request.args.get('query')
+
+    if format != "json":
+        return ("", "501: only json is supported for format.")
+    else:
+        result = DB.list_details(query)
+
+        header = {'Content-Type': 'application/json'}
+        data = json.dumps(result)
+        return (data, header)
+
+
 # ex: 127.0.0.1:5000/github/core_fetch_repo_hashes?git_id=168214867
 @github_api.route('/core_fetch_repo_hashes', methods=('GET', 'POST'))
 def api_core_fetch_repo_hashes():
