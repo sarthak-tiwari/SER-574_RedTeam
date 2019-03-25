@@ -6,6 +6,8 @@
 from flask import Flask, request
 import datetime
 import json
+import sqlite3
+import GithubAPI
 
 from static_code_analysis.CheckStyleManager import CheckStyleManager
 import metadata_analysis.commit_frequency as CF
@@ -75,6 +77,7 @@ def count_list_interval():
 ################################################################################
 # Comment Analysis::Commit Messages
 
+
 # ex: 127.0.0.1:5000/github/compute_quality?git_id=168214867&commit_hash="70f13b111e1147611b70f9c9f1f76ddb00fcbe27"
 @app.route('/github/compute_quality', methods=('GET', 'POST'))
 def api_compute_quality():
@@ -92,6 +95,41 @@ def api_compute_quality():
 ################################################################################
 # Comment Analysis::Comments
 
+
+@app.route('/github/pull_request', methods=('GET', 'POST'))
+def api_count_pull():
+    conn = sqlite3.connect('database.db')
+    db = conn.cursor()
+    db.execute("SELECT * FROM pullData")
+    result = db.fetchall()
+    pulls_data = []
+    for data in result:
+        pull_data = {}
+        pull_data['request_title']: data.requestTile
+        pull_data['author']: data.author
+        pull_data['no_of_comments']: data.noOfComments
+        pull_data['target_branch']: data.targetBranch
+        pull_data['no_of_reviews']: data.noOfReviews
+        pulls_data.append(pull_data)
+    return jsonify({'result': pulls_data})
+
+
+@app.route('/github/user', methods=('GET', 'POST'))
+def api_count_pull():
+    conn = sqlite3.connect('database.db')
+    db = conn.cursor()
+    db.execute("SELECT * FROM userProfile")
+    result = db.fetchall()
+    users_data = []
+    for data in result:
+        user_data = {}
+        user_data['github_login']: data.githubLogin
+        user_data['github_username']: data.githubUsername
+        user_data['github_profile']: data.githubProfile
+        users_data.append(user_data)
+    return jsonify({'result': users_data})
+
+
 @app.route('/github/', methods=('GET', 'POST'))
 def test():
     filename = request.args.get('filename')
@@ -101,5 +139,7 @@ def test():
     data = json.dumps({"filename": filename, "metrics": metrics})
     return (data, header)
 
+
 if __name__ == '__main__':
+    app.debug = True
     app.run()

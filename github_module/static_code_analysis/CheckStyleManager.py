@@ -6,6 +6,7 @@
 
 import subprocess
 
+
 class CheckStyleManager:
 
     @staticmethod
@@ -55,5 +56,6 @@ class CheckStyleManager:
 
         return metrics
 
-metrices = CheckStyleManager.getComplexities(['Frame_81.java', 'Panel_12.class', 'Panel_59.java'])
-print(metrices)
+
+# metrices = CheckStyleManager.getComplexities(['Frame_81.java', 'Panel_12.class', 'Panel_59.java'])
+# print(metrices)

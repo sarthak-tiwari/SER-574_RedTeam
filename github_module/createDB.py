@@ -24,11 +24,13 @@ class CreateDB:
                         "    repositoryID INTEGER,\n"
                         "    author TEXT,\n"
                         "    commitMessage TEXT,\n"
+                        "    commentMessage TEXT,\n"
                         "    date INTEGER,\n"
                         "    timeCommitted BLOB,\n"
                         "    filesModified TEXT,\n"
                         "    noOfAdditions INTEGER,\n"
                         "    noOfDeletions INTEGER\n"
+                        "    commentMessage TEXT\n"
                         "    )")
 
     def pull_data(self):
@@ -57,7 +59,7 @@ class CreateDB:
 
     def insertValues(self):
         # self.db.execute(f"INSERT INTO userProfile VALUES('{l}','{n}','{p}')")
-        self.db.execute("SELECT* FROM userProfile")
+        self.db.execute("SELECT* FROM commitData")
         print(self.db.fetchall())
 
 
@@ -68,7 +70,6 @@ if __name__ == '__main__':
     # create.code_complexity()
     # create.user_profile()
     # create.commit_data()
-    # create.pull_data()
 
     create.conn.commit()
     create.conn.close()

@@ -77,4 +77,4 @@ def process_get_request(endpoint, username=None, token=None):
 # print(get_all_commits("168214867"))
 # print(get_commit("168214867", "70f13b111e1147611b70f9c9f1f76ddb00fcbe27")
 # print(get_commit("168214867", "70f13b111e1147611b70f9c9f1f76ddb00fcbe27", "racuna1", None)
-# print(get_all_pull_requests("168214867"))
+print(get_pull_request("168214867", '4'))

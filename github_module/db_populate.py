@@ -87,10 +87,6 @@ def store_pull_data(repo_id, pull_no):
     no_of_comments = data["review_comments"]
     target_branch = "some branch"
     no_of_reviews = 4
-    # query = "INSERT INTO pull_data(requestID, requestTitle, author, noOfComments, " \
-    #                                "targetBranch, noOfReviews )" \
-    #                         "VALUES("str(repo_id)", '"author"', '"request_title"', " \
-    #                                 "'"no_of_comments"', '"target_branch"', "no_of_reviews")"
 
     insert_query = "INSERT INTO pullData(requestID, requestTile, author, noOfComments, targetBranch, noOfReviews )" \
                    "VALUES(?, ?, ?, ?, ?, ?)", (repo_id, request_title, author, str(no_of_comments), target_branch, str(no_of_reviews))
@@ -168,9 +164,9 @@ if __name__ == "__main__":
     newPull=str(pull_no)
 
     # connect_dbs()
-    store_commit(db, repo_id, sample_hash)
+    # store_commit(db, repo_id, sample_hash)
     store_pull_data(repo_id, newPull)
-    store_user_info(db, repo_id)
+    # store_user_info(db, repo_id)
     display_query = "SELECT * FROM pullData"
 
     # print(db.fetchall())
