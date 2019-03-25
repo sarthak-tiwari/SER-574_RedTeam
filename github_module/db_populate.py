@@ -16,9 +16,11 @@ from pprint import pprint
 import sqlite3
 import GithubAPI
 
-# from static_code_analysis import CheckStyleManager
+from .static_code_analysis.CheckStyleManager import CheckStyleManager
+from .Constants import Constants
 
-def store_repository_info(db, repo_id):
+
+def store_repository_info(db, repo_id, access_token):
     repo_data = GithubAPI.get_repo(repo_id)
 
     clean_query = "DELETE FROM repositories WHERE id = " + str(repo_id)
@@ -33,6 +35,30 @@ def store_repository_info(db, repo_id):
     if db.fetchall():
         print("store_repository_info: unknown failure when adding new data.")
 
+    # if authentication given, also update users.
+    if access_token:
+        collab_data = GithubAPI.get_collaborators(access_token, repo_id)
+
+        for collaborator in collab_data:
+            githubLogin = collaborator["login"]
+            githubUsername = collaborator["login"]
+            githubProfile = collaborator["html_url"]
+            id = collaborator["id"]
+
+            # remove any existing collaborator data
+            clean_query = "DELETE FROM userProfile WHERE id = " + str(id)
+            db.execute(clean_query)
+
+            insert_query = "INSERT INTO userProfile(githubLogin, githubUsername, githubProfile, id) VALUES(\""+githubLogin+"\", \""+githubUsername+"\", \""+githubProfile+"\", "+str(id)+")"
+
+            db.execute(insert_query)
+
+            if db.fetchall():
+                print("store_repository_info: unknown failure when adding user.")
+
+
+"""
+#deprecated
 def store_user_info(db, repo_id):
     data = GithubAPI.get_user_info(repo_id)
     # print(data)
@@ -53,7 +79,7 @@ def store_user_info(db, repo_id):
 
     if db.fetchall():
         print("store_user_info: unknown failure.")
-
+"""
 
 def store_commit(db, repo_id, hash):
     data = GithubAPI.get_commit(repo_id, hash)
@@ -107,10 +133,6 @@ def store_pull_data(repo_id, pull_no):
     head_branch = data["head"] # Merges into the base
     target_branch = head_branch["label"]
     no_of_reviews = 4
-    # query = "INSERT INTO pull_data(requestID, requestTitle, author, noOfComments, " \
-    #                                "targetBranch, noOfReviews )" \
-    #                         "VALUES("str(repo_id)", '"author"', '"request_title"', " \
-    #                                 "'"no_of_comments"', '"target_branch"', "no_of_reviews")"
 
     insert_query = "INSERT INTO pullData(requestID, requestTile, author, noOfComments, targetBranch, noOfReviews )" \
                    "VALUES(?, ?, ?, ?, ?, ?)", (repo_id, request_title, author, str(no_of_comments), target_branch, str(no_of_reviews))
@@ -123,34 +145,35 @@ def store_pull_data(repo_id, pull_no):
     if db.fetchall():
         print("store_pull_data: unknown failure.")
 
-def store_complexity(repo_id, fileName):
-    data = CheckStyleManager.getStaticComplexityMetrices(fileName)
-    #print(data)
+def store_complexity(db, repoName):
 
-    # TODO: consider case where pull request already has been stored.
+    getFileLinkQuery = 'SELECT codeLink FROM codeComplexity WHERE repository="' + repoName + '";'
+    db.execute(getFileLinkQuery)
+    fileLinks = db.fetchall()
 
-    #extract data
-    # author = data["author"]["login"]                                # TEXT
-    # BooleanExpressionComplexity = data['BooleanExpressionComplexity']
-    # ClassFanOutComplexity= data['ClassFanOutComplexity']
-    # JavaNCSS = data['JavaNCSS']
-    # NPathComplexity = data['NPathComplexity']
-    # ClassDataAbstractionCoupling = data['ClassDataAbstractionCoupling']
-    #
-    #
-    # insert_query = "INSERT INTO code_complexity(author, repository, codeLink, booleanComplexity, dataAbstractionComplexity," \
-    #                " fanOutComplexity, cyclomaticComplexity, javaNCSSComplexity, nPathComplexity, javaWarnings ) " \
-    #                "VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
-    # insert_tuple= (author, repo_id, codeLink, BooleanExpressionComplexity, ClassDataAbstractionCoupling, ClassFanOutComplexity,
-    #              cyclomaticComplexity, JavaNCSS, NPathComplexity, javaWarnings)
-    #
-    # display_query = "SELECT * FROM code_complexity"
-    # db.execute(insert_query, insert_tuple)
-    # db.execute(display_query)
-    #
-    # if db.fetchall():
-    #     print("code_complexity: unknown failure.")
+    for row in fileLinks:
+        metrics = CheckStyleManager.getComplexity(row[0])
 
+        updateQuery = 'UPDATE codeComplexity SET ' \
+            + 'booleanExpressionComplexity = ?' \
+            + ',classFanOutComplexity = ?' \
+            + ',cyclomaticComplexity = ?' \
+            + ',javaNCSS = ?' \
+            + ',nPathComplexity = ?' \
+            + ',classDataAbstractionCoupling = ?' \
+            + ',javaWarnings = ?' \
+            + ' WHERE codeLink = ?;'
+
+        updateTuple = (metrics['BooleanExpressionComplexity'],
+                        metrics['ClassFanOutComplexity'],
+                        metrics['CyclomaticComplexity'],
+                        metrics['JavaNCSS'],
+                        metrics['NPathComplexity'],
+                        metrics['ClassDataAbstractionCoupling'],
+                        metrics['JavaWarnings'],
+                        row[0])
+
+        db.execute(updateQuery, updateTuple)
 
 def store_repo(db, repo_id, branch="master"):
 
@@ -176,7 +199,7 @@ def store_repo(db, repo_id, branch="master"):
     print(seen)
 
 if __name__ == "__main__":
-    conn = sqlite3.connect('database.db')
+    conn = sqlite3.connect(Constants.DATABASE)
     db = conn.cursor()
 
     #store_repo(db, 168214867)
@@ -188,11 +211,17 @@ if __name__ == "__main__":
     newPull=str(pull_no)
 
     # connect_dbs()
-    store_repository_info(db, repo_id)
+    # store_commit(db, repo_id, sample_hash)
+    store_pull_data(repo_id, newPull)
+    # store_user_info(db, repo_id)
+    display_query = "SELECT * FROM pullData"
+    store_repository_info(db, repo_id, None)
+    # store_repository_info(db, repo_id, None)
     #store_commit(db, repo_id, sample_hash)
     #store_pull_data(repo_id, newPull)
     #store_user_info(db, 43050725) #sarthak-tiwari's ID
     #display_query = "SELECT * FROM pullData"
+    store_complexity(db, 'sarthak-tiwari/SER-574_RedTeam')
 
     # print(db.fetchall())
 

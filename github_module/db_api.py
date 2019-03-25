@@ -1,7 +1,7 @@
 import sqlite3
 import db_populate
 
-from Constants import Constants
+from .Constants import Constants
 
 """
 This file implements several basic functions for querying and updating the state
@@ -12,7 +12,7 @@ __author__    = "Sarthak Tiwari"
 __copyright__ = "Copyright 2019, SER574 Red Team"
 
 
-def initialize_repo(github_id):
+def initialize_repo(github_id, access_token=None):
     """
     Stores the contents of a specific github repository in the interval
     database. Calling this function is required for all other API functions to
@@ -23,8 +23,8 @@ def initialize_repo(github_id):
     conn = sqlite3.connect(Constants.DATABASE)
     db = conn.cursor()
 
-    #0) TODO: download and store basic repository/user information
-    db_populate.store_repository_info(db, github_id)
+    #0) download and store basic repository/user information
+    db_populate.store_repository_info(db, github_id, access_token)
 
     #1) TODO: download and store commit information.
     #2) TODO: download and store URL information.

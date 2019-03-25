@@ -34,11 +34,13 @@ class CreateDB:
                         "    author TEXT,\n"
                         "    authorID INTEGER, \n"
                         "    commitMessage TEXT,\n"
+                        "    commentMessage TEXT,\n"
                         "    date INTEGER,\n"
                         "    timeCommitted BLOB,\n"
                         "    filesModified TEXT,\n"
                         "    noOfAdditions INTEGER,\n"
                         "    noOfDeletions INTEGER\n"
+                        "    commentMessage TEXT\n"
                         "    )")
 
     def pull_data(self):
@@ -53,22 +55,22 @@ class CreateDB:
 
     def code_complexity(self):
         self.db.execute("CREATE TABLE codeComplexity ("
-	                        "repository	TEXT NOT NULL, "
-	                        "fileName NUMERIC NOT NULL, "
-	                        "author	TEXT NOT NULL, "
-	                        "codeLink TEXT NOT NULL, "
-	                        "booleanExpressionComplexity INTEGER, "
-	                        "classFanOutComplexity INTEGER, "
-	                        "cyclomaticComplexity INTEGER, "
-	                        "javaNCSS INTEGER, "
-	                        "nPathComplexity INTEGER, "
-	                        "classDataAbstractionCoupling INTEGER, "
-	                        "javaWarnings INTEGER);"
+                        "repository	TEXT NOT NULL, "
+                        "fileName NUMERIC NOT NULL, "
+                        "author	TEXT NOT NULL, "
+                        "codeLink TEXT NOT NULL, "
+                        "booleanExpressionComplexity INTEGER, "
+                        "classFanOutComplexity INTEGER, "
+                        "cyclomaticComplexity INTEGER, "
+                        "javaNCSS INTEGER, "
+                        "nPathComplexity INTEGER, "
+                        "classDataAbstractionCoupling INTEGER, "
+                        "javaWarnings INTEGER);"
                         )
 
     def insertValues(self):
         # self.db.execute(f"INSERT INTO userProfile VALUES('{l}','{n}','{p}')")
-        self.db.execute("SELECT* FROM userProfile")
+        self.db.execute("SELECT* FROM commitData")
         print(self.db.fetchall())
 
 
@@ -80,7 +82,6 @@ if __name__ == '__main__':
     # create.code_complexity()
     # create.user_profile()
     # create.commit_data()
-    # create.pull_data()
 
     create.conn.commit()
     create.conn.close()
