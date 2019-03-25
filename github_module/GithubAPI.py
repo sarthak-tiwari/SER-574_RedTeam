@@ -1,5 +1,6 @@
 import json
 import requests
+import base64
 from collections import namedtuple
 
 
@@ -61,11 +62,19 @@ def get_pull_request(repo_id, pull_number):
     endpoint = 'https://api.github.com/repositories/' + str(repo_id) + '/pulls/' + pull_number
     return process_get_request(endpoint)
 
+def get_pull_request_comments(repo_id, pull_number):
+    endpoint = 'https://api.github.com/repositories/' + str(repo_id) + '/pulls/' + pull_number + '/comments'
+    return process_get_request(endpoint)
 
 def get_collaborators(access_token, repo_id):
     endpoint = 'https://api.github.com/repositories/' + str(repo_id) + '/collaborators?access_token=' + access_token
     return process_get_request(endpoint)
 
+def get_file(repo_id, file_path):
+    endpoint = 'https://api.github.com/repositories/' + str(repo_id) + '/contents/' + file_path + '?ref=master'
+    raw_data = process_get_request(endpoint)
+    raw_data["content"] = base64.b64decode(raw_data["content"]).decode('utf-8')
+    return raw_data
 
 def process_get_request(endpoint, username=None, token=None):
     if username and token:
@@ -77,4 +86,6 @@ def process_get_request(endpoint, username=None, token=None):
 # print(get_all_commits("168214867"))
 # print(get_commit("168214867", "70f13b111e1147611b70f9c9f1f76ddb00fcbe27")
 # print(get_commit("168214867", "70f13b111e1147611b70f9c9f1f76ddb00fcbe27", "racuna1", None)
-print(get_pull_request("168214867", '4'))
+# print(get_pull_request("168214867", '4'))
+# print(get_all_pull_requests("168214867"))
+# print(get_file(168214867, 'github_module/README'))

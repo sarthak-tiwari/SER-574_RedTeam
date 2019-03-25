@@ -11,11 +11,20 @@ class CreateDB:
         self.conn = sqlite3.connect('database.db')
         self.db = self.conn.cursor()
 
+    def repositories(self):
+        self.db.execute("CREATE TABLE repositories (\n"
+                        "    name TEXT,\n"
+                        "    owner INTEGER,\n"
+                        "    id INTEGER,\n"
+                        "    PRIMARY KEY(\"id\")\n"
+                        "    )")
+
     def user_profile(self):
         self.db.execute("CREATE TABLE userProfile (\n"
                         "    githubLogin TEXT,\n"
                         "    githubUsername TEXT,\n"
-                        "    githubProfile TEXT\n"
+                        "    githubProfile TEXT,"
+                        "    id INTEGER\n"
                         "    )")
 
     def commit_data(self):
@@ -23,6 +32,7 @@ class CreateDB:
                         "    hash TEXT,\n"
                         "    repositoryID INTEGER,\n"
                         "    author TEXT,\n"
+                        "    authorID INTEGER, \n"
                         "    commitMessage TEXT,\n"
                         "    commentMessage TEXT,\n"
                         "    date INTEGER,\n"
@@ -44,18 +54,19 @@ class CreateDB:
                         "        )")
 
     def code_complexity(self):
-        self.db.execute("CREATE TABLE codeComplexity(\n"
-                        "        author TEXT,\n"
-                        "        repository TEXT,\n"
-                        "        codeLink TEXT,\n"
-                        "        booleanComplexity TEXT,\n"
-                        "        dataAbstractionComplexity TEXT,\n"
-                        "        fanOutComplexity TEXT,\n"
-                        "        cyclomaticComplexity TEXT,\n"
-                        "        javaNCSSComplexity TEXT,\n"
-                        "        nPathComplexity TEXT,\n"
-                        "        javaWarnings TEXT\n"
-                        "        )")
+        self.db.execute("CREATE TABLE codeComplexity ("
+                        "repository	TEXT NOT NULL, "
+                        "fileName NUMERIC NOT NULL, "
+                        "author	TEXT NOT NULL, "
+                        "codeLink TEXT NOT NULL, "
+                        "booleanExpressionComplexity INTEGER, "
+                        "classFanOutComplexity INTEGER, "
+                        "cyclomaticComplexity INTEGER, "
+                        "javaNCSS INTEGER, "
+                        "nPathComplexity INTEGER, "
+                        "classDataAbstractionCoupling INTEGER, "
+                        "javaWarnings INTEGER);"
+                        )
 
     def insertValues(self):
         # self.db.execute(f"INSERT INTO userProfile VALUES('{l}','{n}','{p}')")
@@ -67,6 +78,7 @@ if __name__ == '__main__':
     create = CreateDB()
     #create.insertValues(l='login1',n='name1',p='profile1')             #Testing
 
+    # create.repositories()
     # create.code_complexity()
     # create.user_profile()
     # create.commit_data()

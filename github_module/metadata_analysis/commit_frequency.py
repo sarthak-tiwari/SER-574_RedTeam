@@ -12,69 +12,65 @@ __copyright__ = "Copyright 2019, SER574 Red Team"
 import datetime
 import sqlite3
 
-def count_in_internal(git_id, username, interval_start, interval_end):
+def get_commit_count_interval(git_id, username, interval_start, interval_end):
     """
     Returns the number of commits made by a user in a git repository during a
     time internal. The interval is inclusive.
 
     Assumes valid git repo and username.
 
-    :param git_id: id of a git repository (string).
+    :param git_id: id of a git repository (integer).
     :param username: username (string)
     :param interval_start: day for start of internal (date object).
     :param interval_end: day for end of internal (date object).
     :return: number of commits (integer).
     """
 
-    return sum(count_list_interval(git_id, username, interval_start,
-                                   interval_end))
+    return sum(get_commit_counts_interval(git_id, username, interval_start,
+                                          interval_end))
 
 
-def count_on_day(git_id, username, date):
+def get_commit_count_day(git_id, username, date):
     """
     Returns the number of commits made by a user in a git repository on a
     specific day.
 
     Assumes valid git repo and username.
 
-    :param git_id: id of a git repository (string).
+    :param git_id: id of a git repository (integer).
     :param username: username (string)
     :param date: day (date object).
     :return: number of commits (integer).
     """
 
-    return count_list_interval(git_id, username, date, date)[0]
+    return get_commit_counts_interval(git_id, username, date, date)[0]
 
 
-def count_list_interval(git_id, username, interval_start, interval_end):
+def get_commit_counts_interval(git_id, username, interval_start, interval_end):
     """
     Returns a list of commits made each day by a user in a git repository
     during a time interval. The interval is inclusive.
 
     Assumes valid git repo and username.
 
-    :param git_id: id of a git repository (string).
+    :param git_id: id of a git repository (integer).
     :param username: username (string)
     :param interval_start: day for start of internal (date object).
     :param interval_end: day for end of internal (date object).
     :return: a list of commits per day (list of integers).
     """
 
-    conn = sqlite3.connect('database.db')
-    db = conn.cursor()
-
-    freq_data = __get_commit_freq_data(db, git_id, interval_start, interval_end)
+    freq_data = get_commit_freq_data(git_id, interval_start, interval_end)
     result = [x["commit_count"][username] if username in x["usernames"] else 0
               for x in freq_data]
 
     return result
 
-# The following are internal functions.
 
-def __get_commit_freq_data(db, git_id, interval_start, interval_end):
+def get_commit_freq_data(git_id, interval_start, interval_end):
     """
-
-    A daily commit status dictionary contains the following keys:
+    Returns a list containing daily commit status dictionaries. Each dictionary
+    contains the the following keys:
       "usernames" : (a list of strings)
       "date" : (date object)
       "commit_count" : (a dictionary)
@@ -86,6 +82,9 @@ def __get_commit_freq_data(db, git_id, interval_start, interval_end):
     :param interval_end: day for end of internal (date object).
     :return: commit statuses (list of commit status dictionaries).
     """
+    conn = sqlite3.connect('database.db')
+    db = conn.cursor()
+
     interval = (interval_end-interval_start).days+1
     contributors = __get_all_contributors(db, git_id)
     result = [None] * interval
@@ -111,9 +110,11 @@ def __get_commit_freq_data(db, git_id, interval_start, interval_end):
                 result[day]["commit_count"][contributor] += 1
 
     #debugging
-    assert len(result) == interval, "See __get_commit_freq_data()."
+    assert len(result) == interval, "get_commit_freq_data()::incorrect result size."
 
     return result
+
+# The following are internal functions.
 
 
 def __get_all_contributors(db, git_id):
