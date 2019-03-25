@@ -5,7 +5,7 @@ Implementation of an internal API for analyzing commit comment quality for a
 user in a git project.
 
 Internally, we define "text quality measures", which are specific properties of
-a message that may be analyzed. Tesults are in a internal [-1, 1], where:
+a message that may be analyzed. Results are in an internal [-1, 1], where:
     1.0 This property increases the relevance of the comment.
     0.0 This property does not impact the relevance of the comment.
     -1.0 This property decreases the relevance of the comment.
@@ -20,7 +20,7 @@ __copyright__ = "Copyright 2019, SER574 Red Team"
 # The number of characters past which descriptions are not more informative.
 DESCRIPTIVE_LIMIT = 1000  # Roughly 1/3rd page.
 
-def compute_quality(github, commit_hash, comment_id):
+def compute_quality(github_id, commit_hash):
     """
 
     Returns a quality index for a commit's comment in a github repository. The
@@ -32,7 +32,7 @@ def compute_quality(github, commit_hash, comment_id):
 
     Assumes valid git repo and commit hash.
 
-    :param github: name of a git repository (string).
+    :param github_id: id of a git repository (string).
     :param commit_hash: hash of a git commit (string).
     :return: A quality score (integer between -100 and 100).
     """

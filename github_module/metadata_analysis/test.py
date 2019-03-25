@@ -4,8 +4,36 @@ import commit_messages
 import pull_request
 
 ################################################################################
+# frequency related
+
+import datetime
+import sqlite3
+
+################################################################################
 #commit_messages related
-#def compute_quality(github, commit_hash):
+
+
+
+#baseline testing environment
+git_id = 168214867 #our repo
+feb_start = datetime.datetime(2019, 2, 1)
+feb_end = datetime.datetime(2019, 2, 28)
+
+#need to test helpers
+conn = sqlite3.connect('database.db')
+db = conn.cursor()
+a = commit_frequency.count_in_internal(git_id, "test", feb_start, feb_end)
+b = commit_frequency.count_on_day(git_id, "test", datetime.datetime(2019, 2, 7)) #1
+c = commit_frequency.count_list_interval(git_id, "test", feb_start, feb_end)
+print(commit_frequency.get_commit_freq_data(git_id, feb_start, datetime.datetime(2019, 2, 14)))
+commit_frequency.__get_all_contributors(db,git_id)
+
+
+
+################################################################################
+#commit_messages related
+
+commit_messages.compute_quality(git_id, "70f13b111e1147611b70f9c9f1f76ddb00fcbe27") #50
 
 commit_metadata = {"hash": None, "comment": "US#6-TASK#16: Designed backend API for frequency analysis.", "timestamp": None, "username": None, "filenames": None}
 assert commit_messages.__compute_quality(commit_metadata) >= 50
