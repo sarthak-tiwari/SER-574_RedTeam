@@ -253,6 +253,22 @@ def api_get_complexity_of_authors_in_repo():
     
     return (data, {'Content-Type': 'application/json'})
 
+# ex: 127.0.0.1:5000/github/pulls/?format=json&query=168214867
+@github_api.route('/pulls/', methods=('GET', 'POST'))
+def api_core_pulls():
+
+    fo = request.args.get('format')
+    query = request.args.get('query', type=int)
+
+    if fo != "json":
+        return ("", "501: only json is supported for format.")
+    else:
+        result = DB.fetch_pull(query)
+
+        header = {'Content-Type': 'application/json'}
+        data = json.dumps(result)
+        return (data, header)
+
 ################################################################################
 
 @github_api.route('/', methods=('GET', 'POST'))

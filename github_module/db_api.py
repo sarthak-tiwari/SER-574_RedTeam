@@ -201,6 +201,36 @@ def fetch_commit(github_id, commit_hash):
 
     return commit_metadata
 
+def fetch_pull(github_id, pull_id):
+    """
+    Returns a dictionary containing information (pull_id, repositoryID, author,
+    noOfComments, targetBranch, and noOfReviews) for a
+    specific pull request.
+
+    Assumes that pull_id is the id of pull request existing in local database.
+
+    :param github_id: id of a git repository (integer).
+    :param pull_id: pull request number of a git pull (integer).
+    :return: a pull_metadata dictionary containing information about a pull request (dictionary).
+    """
+    conn = sqlite3.connect(Constants.DATABASE)
+    db = conn.cursor()
+
+    display_query = "SELECT requestTitle, author, noOfComments, targetBranch, noOfReviews FROM pullData WHERE pullData.requestID=\"" + pull_id +"\""
+
+    db.execute(display_query)
+    found = db.fetchall()
+
+    #prepare metadata dictionary
+    pull_metadata = dict()
+    pull_metadata["requestID"] = pull_id
+    pull_metadata["repositoryID"] = github_id
+    pull_metadata["author"] = found[0][0]
+    pull_metadata["noOfComments"] = found[0][1]
+    pull_metadata["targetBranch"] = found[0][2]
+    pull_metadata["noOfReviews"] = found[0][3]
+
+    return pull_metadata
 
 # -----------------------------------------------------------------------------
 
