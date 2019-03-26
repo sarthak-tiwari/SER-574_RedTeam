@@ -10,6 +10,7 @@ import user_task_information
 import userstory_create_date
 import wikiTextParser
 import listWikiContent
+import findSprintGaps
 
 app = Flask(__name__)
 header = {'Content-Type': 'application/json'}
@@ -123,6 +124,12 @@ def taskOfUserStory():
 def listWikiPages():
     projectSlug = request.args.get('projectslug')
     return jsonify({'wikiPages': listWikiContent.getWiki(projectSlug)})
+
+
+@app.route('/taiga/listSprintDetails', methods=['GET'])
+def listSprintDetails():
+    projectSlug = request.args.get('projectslug')
+    return jsonify({'sprintDetails': findSprintGaps.findSprintGaps(projectSlug)})
 
 
 if __name__ == '__main__':
