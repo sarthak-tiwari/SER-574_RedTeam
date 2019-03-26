@@ -1,83 +1,42 @@
 #!/usr/bin/env python3
 
 import requests
+
 from flask import Flask, jsonify, request
 
-import task_of_userstory
-import taskassignedto
-import user_story
-import user_task_information
-import userstory_create_date
+
 import wikiTextParser
 import listWikiContent
 
+import user_story, user_task_information, userstory_create_date, taskassignedto, task_of_userstory, US_Group1, list_sprints, list_userstories, task_finishdate
+
+
 app = Flask(__name__)
-header = {'Content-Type': 'application/json'}
-http = "https://api.taiga.io/api/v1"
-
-
-def processStoryPoints(slug):
-    project_response = requests.get(http + "/projects/by_slug?slug="+str(slug), headers=header)
-    project = project_response.json()
-    prjId = str(project['id'])
-    storyPoints = list()
-
-    milestone_rsp = requests.get(http + "/milestones?project="+prjId, headers=header)
-    milestone = milestone_rsp.json()
-
-    for sprint in milestone:
-        rsp_dict = {
-                    'name': sprint['name'],
-                    'total_points': sprint['total_points'],
-                    'closed_points': sprint['closed_points']
-                    }
-        storyPoints += [rsp_dict]
-
-    return storyPoints
-
-
-def processDate(slug):
-    project_response = requests.get(http + "/projects/by_slug?slug="+str(slug), headers=header)
-    project = project_response.json()
-    prjId = str(project['id'])
-    us_date = list()
-
-    milestone_rsp = requests.get(http + "/milestones?project="+prjId, headers=header)
-    milestone = milestone_rsp.json()
-
-    for sprint in milestone:
-        rsp_dict = {
-                    'name': sprint['name'],
-                    'user_story': [],
-                    'sprint_start': sprint['estimated_start'],
-                    'sprint_end': sprint['estimated_finish']
-
-                    }
-        for us in sprint['user_stories']:
-
-            us_dict ={
-                'description': us['subject'],
-                'created_date': us['created_date'].split('T')[0],
-                'finish_date': us['finish_date'].split('T')[0]
-            }
-            rsp_dict['user_story'] += [us_dict]
-
-        us_date += [rsp_dict]
-
-    return us_date
 
 
 @app.route('/taiga/sprint_story_points', methods=['GET'])
 def storyPoints():
     slug = request.args.get('slug')
 
-    return jsonify({'story': processStoryPoints(slug)})
+    return jsonify({'story': US_Group1.processStoryPoints(slug)})
 
 
 @app.route('/taiga/sprint_date', methods=['GET'])
 def dateInformation():
     slug = request.args.get('slug')
-    return jsonify({'date_info': processDate(slug)})
+    return jsonify({'date_info': US_Group1.processDate(slug)})
+
+
+@app.route('/taiga/initial_task', methods=['GET'])
+def initialTaskInformation():
+    slug = request.args.get('slug')
+    return jsonify({'task_info': US_Group1.processTaskCreation(slug)})
+
+
+@app.route('/taiga/sprint_user_story', methods=['GET'])
+def sprintUserStoryInformation():
+    slug = request.args.get('slug')
+    return jsonify({'sprint_user_story_info': US_Group1.processSprintUserStory(slug)})
 
 
 @app.route('/taiga/wikiPage', methods=['GET'])
@@ -124,6 +83,25 @@ def listWikiPages():
     projectSlug = request.args.get('projectslug')
     return jsonify({'wikiPages': listWikiContent.getWiki(projectSlug)})
 
+  
+@app.route('/taiga/list_of_sprints', methods=['GET'])
+def listOfSprints():
+    projectSlug = request.args.get('projectslug')
+    return jsonify({'SPRINTS': list_sprints.get_list_sprints(projectSlug)})
+
+@app.route('/taiga/list_of_userstories', methods=['GET'])
+def listOfUserstories():
+    projectSlug = request.args.get('projectslug')
+    sprintno = request.args.get('sprint')
+    return jsonify({'USERSTORY': list_userstories.get_list_userstories(projectSlug, sprintno)})
+	
+@app.route('/taiga/taskFinishdate', methods=['GET'])
+def taskFinishdate():
+    projectSlug = request.args.get('projectslug')
+    userStoryId = request.args.get('userstory_id')
+    return jsonify({'TASK': task_finishdate.get_task_finishdate(projectSlug, userStoryId)})
+
 
 if __name__ == '__main__':
     app.run(debug=True)
+
