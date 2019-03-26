@@ -25,7 +25,6 @@ def user_task_info(slug1,sprint_no):
 		if (sprint_no == int(i['milestone_slug'][7])):
 			ut.append(i['id'])
 			utCreate_date[i['id']] = i['created_date']
-	print "UT info"
 	for i in range(len(ut)):
 		status_change_dates = {}
 		tmpList = []
@@ -49,4 +48,4 @@ def user_task_info(slug1,sprint_no):
 	return utHistory
 
 #print user_story_info(slug1,2)
-user_task_info("sarthak-tiwari-ser-574_redteam_team-taiga",2)
+#user_task_info("sarthak-tiwari-ser-574_redteam_team-taiga",2)

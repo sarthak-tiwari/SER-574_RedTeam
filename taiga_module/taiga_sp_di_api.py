@@ -1,8 +1,15 @@
 #!/usr/bin/env python3
 
-from flask import Flask, jsonify, request
 import requests
-import XMLParser, user_story, user_task_information, userstory_create_date, taskassignedto, task_of_userstory, US_Group1, list_sprints, list_userstories, task_finishdate
+
+from flask import Flask, jsonify, request
+
+
+import wikiTextParser
+import listWikiContent
+
+import user_story, user_task_information, userstory_create_date, taskassignedto, task_of_userstory, US_Group1, list_sprints, list_userstories, task_finishdate, UT_History_Info, taskAssignedTo_modified
+
 
 app = Flask(__name__)
 
@@ -36,7 +43,7 @@ def sprintUserStoryInformation():
 def wikiInformation():
     projectSlug = request.args.get('projectslug')
     wikiSlug = request.args.get('wiki')
-    return jsonify({'wikiContents': XMLParser.XMLParser(projectSlug,wikiSlug)})
+    return jsonify({'wikiContents': wikiTextParser.wikiTextParser(projectSlug,wikiSlug)})
 
 
 @app.route('/taiga/user_task', methods=['GET'])
@@ -70,6 +77,13 @@ def taskOfUserStory():
     userStoryId = request.args.get('userstory_id')
     return jsonify({'TASK': task_of_userstory.get_task_of_userstory(projectSlug, userStoryId)})
 
+
+@app.route('/taiga/listwikipages', methods=['GET'])
+def listWikiPages():
+    projectSlug = request.args.get('projectslug')
+    return jsonify({'wikiPages': listWikiContent.getWiki(projectSlug)})
+
+  
 @app.route('/taiga/list_of_sprints', methods=['GET'])
 def listOfSprints():
     projectSlug = request.args.get('projectslug')
@@ -86,6 +100,19 @@ def taskFinishdate():
     projectSlug = request.args.get('projectslug')
     userStoryId = request.args.get('userstory_id')
     return jsonify({'TASK': task_finishdate.get_task_finishdate(projectSlug, userStoryId)})
+	
+@app.route('/taiga/taskAssignedTo_modified', methods=['GET'])
+def assignedToModified():
+    projectSlug = request.args.get('projectslug')
+    sprintno = request.args.get('sprint')
+    return jsonify({'assignedToModified': taskAssignedTo_modified.get_modifiedTaskAssignedTo(projectSlug, sprintno)})
+
+@app.route('/taiga/historyOfTasks', methods=['GET'])
+def historyOfTasks():
+    projectSlug = request.args.get('projectslug')
+    sprintno = request.args.get('sprint')
+    return jsonify({'historyOfTasks': UT_History_Info.user_task_info(projectSlug, sprintno)})
+
 
 if __name__ == '__main__':
     app.run(debug=True)
