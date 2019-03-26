@@ -1,10 +1,15 @@
 #!/usr/bin/env python3
 
-from flask import Flask, jsonify, request
 import requests
+from flask import Flask, jsonify, request
 
-import XMLParser, user_story, user_task_information, userstory_create_date, taskassignedto, task_of_userstory,wikiTextParser
-
+import task_of_userstory
+import taskassignedto
+import user_story
+import user_task_information
+import userstory_create_date
+import wikiTextParser
+import listWikiContent
 
 app = Flask(__name__)
 header = {'Content-Type': 'application/json'}
@@ -87,10 +92,12 @@ def taskInformation():
     projectSlug = request.args.get('projectslug')
     return jsonify({'role': user_story.project_info_byslug(projectSlug)})
 
+
 @app.route('/taiga/userTaskInfo', methods=['GET'])
 def usertaskInformation():
     projectSlug = request.args.get('projectslug')
     return jsonify({'userTaskInfo': user_task_information.user_task_info(projectSlug)})
+
 
 @app.route('/taiga/userStoryCreateDate', methods=['GET'])
 def userStoryCreateDateInfo():
@@ -98,16 +105,25 @@ def userStoryCreateDateInfo():
     sprintno = request.args.get('sprint')
     return jsonify({'USERSTORY': userstory_create_date.get_userstory_createdate(projectSlug, sprintno)})
 
+
 @app.route('/taiga/taskAssignedTo', methods=['GET'])
 def taskAssignedToInfo():
     projectSlug = request.args.get('projectslug')
     return jsonify({'TASK': taskassignedto.get_task_assignedto(projectSlug)})
+
 
 @app.route('/taiga/task_of_userstory', methods=['GET'])
 def taskOfUserStory():
     projectSlug = request.args.get('projectslug')
     userStoryId = request.args.get('userstory_id')
     return jsonify({'TASK': task_of_userstory.get_task_of_userstory(projectSlug, userStoryId)})
+
+
+@app.route('/taiga/listwikipages', methods=['GET'])
+def listWikiPages():
+    projectSlug = request.args.get('projectslug')
+    return jsonify({'wikiPages': listWikiContent.getWiki(projectSlug)})
+
 
 if __name__ == '__main__':
     app.run(debug=True)
