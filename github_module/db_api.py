@@ -1,6 +1,6 @@
 import sqlite3
-import db_populate
 
+from . import db_populate
 from .Constants import Constants
 
 """
@@ -384,4 +384,4 @@ def get_complexity_of_authors_in_repo(repoName):
 # print(fetch_repo_hashes(168214867))
 # print(fetch_commit(168214867, "70f13b111e1147611b70f9c9f1f76ddb00fcbe27"))
 # print(list_details("SER-574_RedTeam"))
-print(fetch_commits(168214867))
+# print(fetch_commits(168214867))

@@ -7,7 +7,7 @@ from flask import Blueprint, Flask, request
 import datetime
 import json
 import sqlite3
-import GithubAPI
+from . import GithubAPI
 
 from .static_code_analysis.CheckStyleManager import CheckStyleManager
 #import metadata_analysis.commit_frequency as CF
@@ -205,7 +205,7 @@ def api_compute_commit_message_quality():
 # Comment Analysis::Comments
 
 
-@app.route('/github/pull_request', methods=('GET', 'POST'))
+@github_api.route('/pull_request', methods=('GET', 'POST'))
 def api_count_pull():
     conn = sqlite3.connect('database.db')
     db = conn.cursor()
@@ -223,8 +223,8 @@ def api_count_pull():
     return jsonify({'result': pulls_data})
 
 
-@app.route('/github/user', methods=('GET', 'POST'))
-def api_count_pull():
+@github_api.route('/user', methods=('GET', 'POST'))
+def api_count_user():
     conn = sqlite3.connect('database.db')
     db = conn.cursor()
     db.execute("SELECT * FROM userProfile")

@@ -14,8 +14,8 @@ from collections import deque
 import pickle
 from pprint import pprint
 import sqlite3
-import GithubAPI
 
+from . import GithubAPI
 from .static_code_analysis.CheckStyleManager import CheckStyleManager
 from .Constants import Constants
 
