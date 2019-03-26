@@ -6,45 +6,7 @@ from requests.auth import HTTPDigestAuth
 headers = {
     'Content-Type': 'application/json',
 }
-slug1 = "sarthak-tiwari-ser-574_redteam_team-taiga"
-
-def user_story_info(slug1,sprint_no):
-	projectinfo = "https://api.taiga.io/api/v1/projects/by_slug?slug="
-	response_project_data = requests.get(projectinfo+slug1, headers=headers)
-	project_data = json.loads(response_project_data.content)
-	project_id = project_data['epic_statuses'][0]['project_id']
-	project_milestone = "https://api.taiga.io/api/v1/milestones?project=" + str(project_id)
-	response_milestone = requests.get(project_milestone, headers=headers)
-	milestone_data = json.loads(response_milestone.content)
-	dic = {}
-	lst = []
-	sprint_no = len(milestone_data) - sprint_no
-	sprint_data = milestone_data[sprint_no]
-
-	us = []
-	for i in sprint_data['user_stories']:
-		us.append(i['id'])
-		dic['US_name'] = i['subject']
-		dic['US_created_date'] = i['created_date']
-		dic['US_finish_date'] = i['finish_date']
-		response_usid = requests.get("https://api.taiga.io/api/v1/history/userstory/" + str(i['id']), headers=headers)
-		us_data = json.loads(response_usid.content)
-		for j in us_data:
-			diff = j['diff']
-			ms = 'milestone'
-			if ms in diff:
-				diff2 = diff['milestone']
-				if diff2[1] == i['milestone']:
-					dic['US_movedToSprintDate'] = j['created_at']
-		lst.append(dic)
-		dic = {}
-
-	dic = {}
-	for i in range(len(lst)):
-		dic['US ' + str(i+1)] = lst[i]
-
-	return dic
-
+#slug1 = "sarthak-tiwari-ser-574_redteam_team-taiga"
 
 def user_task_info(slug1,sprint_no):
 	projectinfo = "https://api.taiga.io/api/v1/projects/by_slug?slug="
@@ -55,43 +17,35 @@ def user_task_info(slug1,sprint_no):
 	response_sprintTask = requests.get("http://api.taiga.io/api/v1/tasks?project=" + str(project_id) , headers=headers)
 	sprintTask_data = json.loads(response_sprintTask.content)
 	dic = {}
-	lst = []
 	ut = []
+	utHistory = {}
+	utCreate_date = {}
 	for i in sprintTask_data:
-		ut.append(i['id'])
-		extra = i['assigned_to_extra_info']
-		dic['user_task'] = i['subject']
-		dic['user_task_created_at'] = i['created_date']
-		lst.append(dic)
-		dic = {}
-
-	dic = {}
-	for i in range(len(lst)):
-		dic['User_task ' + str(i+1)] = lst[i]
-
-	project_milestone = "https://api.taiga.io/api/v1/milestones?project=" + str(project_id)
-	response_milestone = requests.get(project_milestone, headers=headers)
-	milestone_data = json.loads(response_milestone.content)
-	sprint_no = len(milestone_data) - sprint_no
-	#sprint_data = milestone_data[sprint_no]
-	#print sprint_data
-
-
-	#print(dic)
+		if (sprint_no == int(i['milestone_slug'][7])):
+			ut.append(i['id'])
+			utCreate_date[i['id']] = i['created_date']
 	print "UT info"
 	for i in range(len(ut)):
-		test = "https://api.taiga.io/api/v1/tasks/" + str(ut[i])
-		testUserTask = requests.get(test , headers=headers)
-		testData = json.loads(testUserTask.content)
-		#print testData
-		if (sprint_no == testData['milestone_slug'][8]):
-			test = "https://api.taiga.io/api/v1/history/task/" + str(ut[i])
-			testUserTask = requests.get(test , headers=headers)
-			testData = json.loads(testUserTask.content)
-			print testData
-			print '-----'
+		status_change_dates = {}
+		tmpList = []
+		test1 = "https://api.taiga.io/api/v1/history/task/" + str(ut[i])
+		testUserTask1 = requests.get(test1 , headers=headers)
+		testData1 = json.loads(testUserTask1.content)
+		for testEntry in testData1:
+			for key in testEntry['values_diff']:
+				if key == 'status':
+					tmpList.append(testEntry['values_diff'][key])
+					tmpList.append(testEntry['created_at'])
+		dic['status_change'] = tmpList
+		tl = []
+		tl.append(dict([("created_date", utCreate_date[ut[i]])]))
+		tl.append(dict([('status_change',tmpList)]))
+		utHistory[ut[i]] = tl
+		tmpList = []
+		tl = []
+		#print json.dumps(utHistory, indent=4)
 
-	return dic
+	return utHistory
 
 #print user_story_info(slug1,2)
-# user_task_info("sarthak-tiwari-ser-574_redteam_team-taiga",2)
+user_task_info("sarthak-tiwari-ser-574_redteam_team-taiga",2)
