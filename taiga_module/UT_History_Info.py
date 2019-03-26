@@ -16,6 +16,7 @@ def user_task_info(slug1,sprint_no):
 	project_id = project_data['epic_statuses'][0]['project_id']
 	response_sprintTask = requests.get("http://api.taiga.io/api/v1/tasks?project=" + str(project_id) , headers=headers)
 	sprintTask_data = json.loads(response_sprintTask.content)
+	print sprintTask_data
 	dic = {}
 	ut = []
 	utHistory = {}
@@ -43,7 +44,7 @@ def user_task_info(slug1,sprint_no):
 		utHistory[ut[i]] = tl
 		tmpList = []
 		tl = []
-		#print json.dumps(utHistory, indent=4)
+		print json.dumps(utHistory, indent=4)
 
 	return utHistory
 
