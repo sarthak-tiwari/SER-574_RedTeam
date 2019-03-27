@@ -9,6 +9,7 @@ headers = {
 #slug1 = "sarthak-tiwari-ser-574_redteam_team-taiga"
 
 def user_task_info(slug1,sprint_no):
+	sprint_no = int(sprint_no)
 	projectinfo = "https://api.taiga.io/api/v1/projects/by_slug?slug="
 	response_project_data = requests.get(projectinfo+slug1, headers=headers)
 	project_data = json.loads(response_project_data.content)
@@ -48,4 +49,4 @@ def user_task_info(slug1,sprint_no):
 	return utHistory
 
 #print user_story_info(slug1,2)
-#user_task_info("sarthak-tiwari-ser-574_redteam_team-taiga",2)
+#print json.dumps(user_task_info("sarthak-tiwari-ser-574_redteam_team-taiga",2), indent = 4)
