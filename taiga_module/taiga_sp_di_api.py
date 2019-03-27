@@ -1,16 +1,20 @@
 #!/usr/bin/env python3
 
-import requests
-
 from flask import Flask, jsonify, request
 
-
-import wikiTextParser
-import listWikiContent
+import US_Group1
 import findSprintGaps
-
-import user_story, user_task_information, userstory_create_date, taskassignedto, task_of_userstory, US_Group1, list_sprints, list_userstories, task_finishdate
-
+import listWikiContent
+import list_sprints
+import list_userstories
+import task_finishdate
+import task_of_userstory
+import taskassignedto
+import user_story
+import user_task_information
+import userstory_create_date
+import wikiTextParser
+import sprintplanningAnalysis
 
 app = Flask(__name__)
 
@@ -109,6 +113,13 @@ def taskFinishdate():
 def listSprintDetails():
     projectSlug = request.args.get('projectslug')
     return jsonify({'sprintDetails': findSprintGaps.findSprintGaps(projectSlug)})
+
+
+@app.route('/taiga/planning-retrospective-analysis', methods=['GET'])
+def plan_retro_details():
+    projectSlug = request.args.get('projectslug')
+    wiki_slug = request.args.get('wikislug')
+    return jsonify({'project_details': sprintplanningAnalysis.sprint_planning(projectSlug,wiki_slug)})
 
 
 if __name__ == '__main__':

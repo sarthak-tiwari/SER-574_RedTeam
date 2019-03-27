@@ -1,14 +1,10 @@
 from datetime import date
-import listWikiContent
-import findSprintGaps
 import wikiTextParser
 import re
 
 
-def sprint_planning(project_slug):
-    project_slug = "cram1206-test"
-
-    wiki_content = wikiTextParser.wikiTextParser(project_slug, "samplewiki")
+def sprint_planning(project_slug, wiki_slug):
+    wiki_content = wikiTextParser.wikiTextParser(project_slug, wiki_slug)
     planning_analysis = []
     retrospective_analysis = []
     analysis = {}
@@ -44,6 +40,3 @@ def diff_between_two_dates(from_date,to_date):
     delta = start_date - end_date
 
     return delta.days
-
-
-print(sprint_planning("cram1206-personalized-travel-planning-platform"))
