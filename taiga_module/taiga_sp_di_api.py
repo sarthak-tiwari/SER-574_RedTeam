@@ -15,7 +15,7 @@ import user_task_information
 import userstory_create_date
 import wikiTextParser
 import sprintplanningAnalysis
-import UT_History_Info, taskAssignedTo_modified
+import ut_History_Info, taskAssignedTo_modified
 
 app = Flask(__name__)
 
