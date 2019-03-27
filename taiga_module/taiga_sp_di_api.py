@@ -16,6 +16,7 @@ import userstory_create_date
 import wikiTextParser
 import sprintplanningAnalysis
 import ut_History_Info, taskAssignedTo_modified
+import teammemberinfo
 
 app = Flask(__name__)
 
@@ -133,6 +134,16 @@ def plan_retro_details():
     projectSlug = request.args.get('projectslug')
     wiki_slug = request.args.get('wikislug')
     return jsonify({'project_details': sprintplanningAnalysis.sprint_planning(projectSlug,wiki_slug)})
+
+@app.route('/taiga/teammemberinfo', methods=['GET'])
+def teammemberinfo():
+    projectSlug = request.args.get('projectslug')
+    return jsonify({'TeamMemberInfo': teammemberinfo.members_info(projectSlug)})
+
+@app.route('/taiga/memberuserstorypointsinfo', methods=['GET'])
+def memberuserstorypointsinfo():
+    projectSlug = request.args.get('projectslug')
+    return jsonify({'TeamMemberInfo': teammemberinfo.user_story_points_info(projectSlug)})
 
 
 if __name__ == '__main__':
