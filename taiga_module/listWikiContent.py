@@ -1,13 +1,12 @@
 import requests
 
-#@author Chiranjeevi Ramamurthy
-#@description A module that downloads the contents from taiga wikipage
 
 projectSlug = "cram1206-test"
 header = {'Content-Type': 'application/json'}
 projectHTTP = "https://api.taiga.io/api/v1/projects/by_slug?slug="
-wikiHTTP = "https://api.taiga.io/api/v1/wiki/by_slug?slug="
+wikiHTTP = "https://api.taiga.io/api/v1/wiki"
 wikiSlug = "samplewiki"
+
 
 def getProjectID(projectSlug):
     project_response = requests.get(projectHTTP + projectSlug, headers=header)
@@ -16,10 +15,13 @@ def getProjectID(projectSlug):
     return projectID
 
 
-def getWiki(projectSlug,wikiSlug):
+def getWiki(projectSlug):
     projectID = getProjectID(projectSlug)
-    wikiResponse = requests.get(wikiHTTP+wikiSlug+"&project="+str(projectID), headers=header)
+    wikiResponse = requests.get(wikiHTTP+"?project="+str(projectID), headers=header)
     wiki = wikiResponse.json()
-    wikiContent = wiki["html"]
-    return wikiContent
-    
+    counter = 1
+    wikilist = {}
+    for json in wiki:
+        wikilist["wikiPage"+str(counter)]=json["slug"]
+        counter = counter+1
+    return wikilist
