@@ -5,9 +5,8 @@ from collections import namedtuple
 
 
 def user_login():
-    endpoint = 'https://github.com/login/oauth/authorize'
-
-    # login_html is the html page that GitHub generates
+    client_id = "5d45a5aa02a482c56abd"
+    endpoint = 'https://github.com/login/oauth/authorize?client_id=' + client_id
     login_html = requests.get(endpoint)
     return login_html
 
@@ -23,29 +22,22 @@ def get_access_token(client_id, client_secret, code):
 
 def get_user_info(access_token):
     endpoint = 'https://api.github.com/user?access_token=' + access_token
-    raw_content = requests.get(endpoint)
-    return raw_content
+    return process_get_request(endpoint)
 
 
 def get_user_repos(access_token):
     endpoint = 'https://api.github.com/user/repos?access_token=' + access_token
-    raw_content = requests.get(endpoint)
-    raw_content = json.loads(raw_content.content)
-    return raw_content
+    return process_get_request(endpoint)
 
 
 def get_repo(repo_id):
     endpoint = 'https://api.github.com/repositories/' + str(repo_id)
-    raw_content = requests.get(endpoint)
-    raw_content = json.loads(raw_content.content)
-    return raw_content
+    return process_get_request(endpoint)
 
 
 def get_all_commits(repo_id):
     endpoint = 'https://api.github.com/repositories/' + str(repo_id) + '/commits'
-    raw_content = requests.get(endpoint)
-    raw_content = json.loads(raw_content.content)
-    return raw_content
+    return process_get_request(endpoint)
 
 
 def get_commit(repo_id, commit_sha, username=None, token=None):
@@ -89,3 +81,4 @@ def process_get_request(endpoint, username=None, token=None):
 # print(get_pull_request("168214867", '4'))
 # print(get_all_pull_requests("168214867"))
 # print(get_file(168214867, 'github_module/README'))
+# print(user_login())

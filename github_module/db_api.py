@@ -1,6 +1,6 @@
 import sqlite3
-import db_populate
 
+from . import db_populate
 from .Constants import Constants
 
 """
@@ -201,6 +201,36 @@ def fetch_commit(github_id, commit_hash):
 
     return commit_metadata
 
+def fetch_pull(github_id, pull_id):
+    """
+    Returns a dictionary containing information (pull_id, repositoryID, author,
+    noOfComments, targetBranch, and noOfReviews) for a
+    specific pull request.
+
+    Assumes that pull_id is the id of pull request existing in local database.
+
+    :param github_id: id of a git repository (integer).
+    :param pull_id: pull request number of a git pull (integer).
+    :return: a pull_metadata dictionary containing information about a pull request (dictionary).
+    """
+    conn = sqlite3.connect(Constants.DATABASE)
+    db = conn.cursor()
+
+    display_query = "SELECT requestTitle, author, noOfComments, targetBranch, noOfReviews FROM pullData WHERE pullData.requestID=\"" + pull_id +"\""
+
+    db.execute(display_query)
+    found = db.fetchall()
+
+    #prepare metadata dictionary
+    pull_metadata = dict()
+    pull_metadata["requestID"] = pull_id
+    pull_metadata["repositoryID"] = github_id
+    pull_metadata["author"] = found[0][0]
+    pull_metadata["noOfComments"] = found[0][1]
+    pull_metadata["targetBranch"] = found[0][2]
+    pull_metadata["noOfReviews"] = found[0][3]
+
+    return pull_metadata
 
 # -----------------------------------------------------------------------------
 
@@ -354,4 +384,4 @@ def get_complexity_of_authors_in_repo(repoName):
 # print(fetch_repo_hashes(168214867))
 # print(fetch_commit(168214867, "70f13b111e1147611b70f9c9f1f76ddb00fcbe27"))
 # print(list_details("SER-574_RedTeam"))
-print(fetch_commits(168214867))
+# print(fetch_commits(168214867))

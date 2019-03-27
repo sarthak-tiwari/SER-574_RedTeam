@@ -14,10 +14,15 @@ from collections import deque
 import pickle
 from pprint import pprint
 import sqlite3
-import GithubAPI
 
-# from .static_code_analysis.CheckStyleManager import CheckStyleManager
-# from .Constants import Constants
+from collections import deque
+import pickle
+from pprint import pprint
+import sqlite3
+
+from . import GithubAPI
+from .static_code_analysis.CheckStyleManager import CheckStyleManager
+from .Constants import Constants
 
 
 def store_repository_info(db, repo_id, access_token):
