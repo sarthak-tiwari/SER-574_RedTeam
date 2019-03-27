@@ -1,19 +1,22 @@
 # Class to launch github api service on flask
 #
-# Author: Sarthak Tiwari, Ruben Acuna
-# E-Mail: sarthak.tiwari@asu.edu, racuna1@asu.edu
+# Author: Sarthak Tiwari, Ruben Acuna, Carnic
+# E-Mail: sarthak.tiwari@asu.edu, racuna1@asu.edu, clnu2@asu.edu
 
 from flask import Blueprint, Flask, request
 import datetime
 import json
 import sqlite3
-import GithubAPI
 
-from .static_code_analysis.CheckStyleManager import CheckStyleManager
+# import GithubAPI
+# from static_code_analysis.CheckStyleManager import CheckStyleManager
 #import metadata_analysis.commit_frequency as CF
-from . import db_api as DB
+# import db_api as DB
+
+app = Flask(__name__)
 
 github_api = Blueprint('github_api', __name__,)
+
 
 
 # TODO: these should be somewhere else
@@ -33,210 +36,229 @@ def dateobj_to_strdate(date):
 # General DB Access Calls
 
 
-# ex: 127.0.0.1:5000/github/core_initialize_repo?git_id=168214867
-@github_api.route('/core_initialize_repo', methods=('GET', 'POST'))
-def api_core_initialize_repo():
-    git_id = request.args.get('git_id', type=int)
-
-    if not git_id:
-        status = "error"
-        result = "Failed to parse git_id parameter."
-    else:
-        status = "wip"
-        result = DB.initialize_repo_data(git_id)
-
-    header = {'Content-Type': 'application/json'}
-    data = json.dumps({"status": status, "result": result})
-    return (data, header)
-
-
-# ex: 127.0.0.1:5000/github/listdetails/?format=json&query=SER-574_RedTeam
-@github_api.route('/listdetails/', methods=('GET', 'POST'))
-def api_core_listdetails():
-
-    fo = request.args.get('format')
-    query = request.args.get('query')
-
-    if fo != "json":
-        return ("", "501: only json is supported for format.")
-    else:
-        result = DB.list_details(query)
-
-        header = {'Content-Type': 'application/json'}
-        data = json.dumps(result)
-        return (data, header)
-
-
-# ex: 127.0.0.1:5000/github/commits/?format=json&query=168214867
-@github_api.route('/commits/', methods=('GET', 'POST'))
-def api_core_commits():
-
-    fo = request.args.get('format')
-    query = request.args.get('query', type=int)
-
-    if fo != "json":
-        return ("", "501: only json is supported for format.")
-    else:
-        result = DB.fetch_commits(query)
-
-        header = {'Content-Type': 'application/json'}
-        data = json.dumps(result)
-        return (data, header)
-
-
-# ex: 127.0.0.1:5000/github/core_fetch_repo_hashes?git_id=168214867
-@github_api.route('/core_fetch_repo_hashes', methods=('GET', 'POST'))
-def api_core_fetch_repo_hashes():
-    git_id = request.args.get('git_id', type=int)
-
-    if not git_id:
-        status = "error"
-        result = "Failed to parse git_id parameter."
-    else:
-        status = "unimplemented"
-        result = ['70f13b111e1147611b70f9c9f1f76ddb00fcbe27', '70f13b111e1147611b70f9c9f1f76ddb00fcbe28', '70f13b111e1147611b70f9c9f1f76ddb00fcbe29', '70f13b111e1147611b70f9c9f1f76ddb00fcbe2a', '70f13b111e1147611b70f9c9f1f76ddb00fcbe2b']
-        # result = DB.fetch_repo_hashes(git_id)
-
-    header = {'Content-Type': 'application/json'}
-    data = json.dumps({"status": status, "result": result})
-    return (data, header)
-
-
-# ex: 127.0.0.1:5000/github/core_fetch_commit?git_id=168214867&commit_hash="70f13b111e1147611b70f9c9f1f76ddb00fcbe27"
-@github_api.route('/core_fetch_commit', methods=('GET', 'POST'))
-def api_core_fetch_commit():
-    git_id = request.args.get('git_id', type=int)
-    commit_hash = request.args.get('commit_hash')
-
-    result = {'hash': '70f13b111e1147611b70f9c9f1f76ddb00fcbe27', 'repositoryID': 168214867, 'author': 'test', 'message': 'Added gitignore for python to the source directory', 'date': 20190206, 'timeCommitted': '2019-02-07T23:39:00Z', 'files': '[".gitignore"]', 'additions': 116, 'deletions': 0}
-    # result = DB.fetch_commit(git_id, commit_hash)
-
-    header = {'Content-Type': 'application/json'}
-    data = json.dumps({"status": "unimplemented", "result": result})
-    return (data, header)
-
-################################################################################
-# Comment Analysis::Frequency
-
-
-# ex: 127.0.0.1:5000/github/get_commit_count_interval?git_id=168214867&username="test"&interval_start=20190201&interval_end=20190228
-@github_api.route('/get_commit_count_interval', methods=('GET', 'POST'))
-def api_get_commit_count_interval():
-    git_id = request.args.get('git_id', type=int)
-    username = request.args.get('username')
-    interval_start = parse_str_date(request.args.get('interval_start'))
-    interval_end = parse_str_date(request.args.get('interval_end'))
-
-    result = 1
-    # result = CF.get_commit_count_interval(git_id, username, interval_start, interval_end)
-
-    header = {'Content-Type': 'application/json'}
-    data = json.dumps({"status": "unimplemented", "result": result})
-    return (data, header)
-
-
-# ex: 127.0.0.1:5000/github/get_commit_count_day?git_id=168214867&username="test"&date=20190208
-@github_api.route('/get_commit_count_day', methods=('GET', 'POST'))
-def api_get_commit_count_day():
-    git_id = request.args.get('git_id', type=int)
-    username = request.args.get('username')
-    date = parse_str_date(request.args.get('date'))
-
-    result = 0
-    # result = CF.commit_count_day(git_id, username, date)
-
-    header = {'Content-Type': 'application/json'}
-    data = json.dumps({"status": "unimplemented", "result": result})
-    return (data, header)
-
-
-# ex: 127.0.0.1:5000/github/count_list_interval?git_id=168214867&username="test"&interval_start=20190201&interval_end=20190228
-@github_api.route('/get_commit_counts_interval', methods=('GET', 'POST'))
-def api_get_commit_counts_interval():
-    git_id = request.args.get('git_id', type=int)
-    username = request.args.get('username')
-    interval_start = parse_str_date(request.args.get('interval_start'))
-    interval_end = parse_str_date(request.args.get('interval_end'))
-
-    result = [0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-    # result = CF.get_commit_counts_interval(git_id, username, interval_start, interval_end)
-
-    header = {'Content-Type': 'application/json'}
-    data = json.dumps({"status": "unimplemented", "result": result})
-    return (data, header)
-
-
-# ex: 127.0.0.1:5000/github/get_commit_freq_data?git_id=168214867&interval_start=20190201&interval_end=20190214
-@github_api.route('/get_commit_freq_data', methods=('GET', 'POST'))
-def api_get_commit_freq_data():
-    git_id = request.args.get('git_id', type=int)
-    interval_start = parse_str_date(request.args.get('interval_start'))
-    interval_end = parse_str_date(request.args.get('interval_end'))
-
-    result = [{'usernames': ['test', 'sarthak-tiwari'], 'date': datetime.datetime(2019, 2, 1, 0, 0), 'commit_count': {'test': 0, 'sarthak-tiwari': 0}}, {'usernames': ['test', 'sarthak-tiwari'], 'date': datetime.datetime(2019, 2, 2, 0, 0), 'commit_count': {'test': 0, 'sarthak-tiwari': 0}}, {'usernames': ['test', 'sarthak-tiwari'], 'date': datetime.datetime(2019, 2, 3, 0, 0), 'commit_count': {'test': 0, 'sarthak-tiwari': 0}}, {'usernames': ['test', 'sarthak-tiwari'], 'date': datetime.datetime(2019, 2, 4, 0, 0), 'commit_count': {'test': 0, 'sarthak-tiwari': 0}}, {'usernames': ['test', 'sarthak-tiwari'], 'date': datetime.datetime(2019, 2, 5, 0, 0), 'commit_count': {'test': 0, 'sarthak-tiwari': 0}}, {'usernames': ['test', 'sarthak-tiwari'], 'date': datetime.datetime(2019, 2, 6, 0, 0), 'commit_count': {'test': 1, 'sarthak-tiwari': 0}}, {'usernames': ['test', 'sarthak-tiwari'], 'date': datetime.datetime(2019, 2, 7, 0, 0), 'commit_count': {'test': 0, 'sarthak-tiwari': 4}}, {'usernames': ['test', 'sarthak-tiwari'], 'date': datetime.datetime(2019, 2, 8, 0, 0), 'commit_count': {'test': 0, 'sarthak-tiwari': 0}}, {'usernames': ['test', 'sarthak-tiwari'], 'date': datetime.datetime(2019, 2, 9, 0, 0), 'commit_count': {'test': 0, 'sarthak-tiwari': 0}}, {'usernames': ['test', 'sarthak-tiwari'], 'date': datetime.datetime(2019, 2, 10, 0, 0), 'commit_count': {'test': 0, 'sarthak-tiwari': 0}}, {'usernames': ['test', 'sarthak-tiwari'], 'date': datetime.datetime(2019, 2, 11, 0, 0), 'commit_count': {'test': 0, 'sarthak-tiwari': 0}}, {'usernames': ['test', 'sarthak-tiwari'], 'date': datetime.datetime(2019, 2, 12, 0, 0), 'commit_count': {'test': 0, 'sarthak-tiwari': 0}}, {'usernames': ['test', 'sarthak-tiwari'], 'date': datetime.datetime(2019, 2, 13, 0, 0), 'commit_count': {'test': 0, 'sarthak-tiwari': 0}}, {'usernames': ['test', 'sarthak-tiwari'], 'date': datetime.datetime(2019, 2, 14, 0, 0), 'commit_count': {'test': 0, 'sarthak-tiwari': 0}}]
-    # result = CF.get_commit_freq_data(git_id, interval_start, interval_end)
-
-    #repack python datetime objects
-    for entry in result:
-        entry["date"] = dateobj_to_strdate(entry["date"])
-
-    header = {'Content-Type': 'application/json'}
-    data = json.dumps({"status": "unimplemented", "result": result})
-    return (data, header)
-
-
-################################################################################
-# Comment Analysis::Commit Messages
-
-# ex: 127.0.0.1:5000/github/compute_commit_message_quality?git_id=168214867&commit_hash="70f13b111e1147611b70f9c9f1f76ddb00fcbe27"
-@github_api.route('/compute_commit_message_quality', methods=('GET', 'POST'))
-def api_compute_commit_message_quality():
-    git_id = request.args.get('git_id', type=int)
-    commit_hash = request.args.get('commit_hash')
-
-    result = 50
-    # result = CF.compute_commit_message_quality(git_id, commit_hash)
-
-    header = {'Content-Type': 'application/json'}
-    data = json.dumps({"status": "unimplemented", "result": result})
-    return (data, header)
+# # ex: 127.0.0.1:5000/github/core_initialize_repo?git_id=168214867
+# @github_api.route('/core_initialize_repo', methods=('GET', 'POST'))
+# def api_core_initialize_repo():
+#     git_id = request.args.get('git_id', type=int)
+#
+#     if not git_id:
+#         status = "error"
+#         result = "Failed to parse git_id parameter."
+#     else:
+#         status = "wip"
+#         result = DB.initialize_repo_data(git_id)
+#
+#     header = {'Content-Type': 'application/json'}
+#     data = json.dumps({"status": status, "result": result})
+#     return (data, header)
+#
+#
+# # ex: 127.0.0.1:5000/github/listdetails/?format=json&query=SER-574_RedTeam
+# @github_api.route('/listdetails/', methods=('GET', 'POST'))
+# def api_core_listdetails():
+#
+#     fo = request.args.get('format')
+#     query = request.args.get('query')
+#
+#     if fo != "json":
+#         return ("", "501: only json is supported for format.")
+#     else:
+#         result = DB.list_details(query)
+#
+#         header = {'Content-Type': 'application/json'}
+#         data = json.dumps(result)
+#         return (data, header)
+#
+#
+# # ex: 127.0.0.1:5000/github/commits/?format=json&query=168214867
+# @github_api.route('/commits/', methods=('GET', 'POST'))
+# def api_core_commits():
+#
+#     fo = request.args.get('format')
+#     query = request.args.get('query', type=int)
+#
+#     if fo != "json":
+#         return ("", "501: only json is supported for format.")
+#     else:
+#         result = DB.fetch_commits(query)
+#
+#         header = {'Content-Type': 'application/json'}
+#         data = json.dumps(result)
+#         return (data, header)
+#
+#
+# # ex: 127.0.0.1:5000/github/core_fetch_repo_hashes?git_id=168214867
+# @github_api.route('/core_fetch_repo_hashes', methods=('GET', 'POST'))
+# def api_core_fetch_repo_hashes():
+#     git_id = request.args.get('git_id', type=int)
+#
+#     if not git_id:
+#         status = "error"
+#         result = "Failed to parse git_id parameter."
+#     else:
+#         status = "unimplemented"
+#         result = ['70f13b111e1147611b70f9c9f1f76ddb00fcbe27', '70f13b111e1147611b70f9c9f1f76ddb00fcbe28',
+#                   '70f13b111e1147611b70f9c9f1f76ddb00fcbe29', '70f13b111e1147611b70f9c9f1f76ddb00fcbe2a', '70f13b111e1147611b70f9c9f1f76ddb00fcbe2b']
+#         # result = DB.fetch_repo_hashes(git_id)
+#
+#     header = {'Content-Type': 'application/json'}
+#     data = json.dumps({"status": status, "result": result})
+#     return (data, header)
+#
+#
+# # ex: 127.0.0.1:5000/github/core_fetch_commit?git_id=168214867&commit_hash="70f13b111e1147611b70f9c9f1f76ddb00fcbe27"
+# @github_api.route('/core_fetch_commit', methods=('GET', 'POST'))
+# def api_core_fetch_commit():
+#     git_id = request.args.get('git_id', type=int)
+#     commit_hash = request.args.get('commit_hash')
+#
+#     result = {'hash': '70f13b111e1147611b70f9c9f1f76ddb00fcbe27', 'repositoryID': 168214867, 'author': 'test', 'message': 'Added gitignore for python to the source directory',
+#               'date': 20190206, 'timeCommitted': '2019-02-07T23:39:00Z', 'files': '[".gitignore"]', 'additions': 116, 'deletions': 0}
+#     # result = DB.fetch_commit(git_id, commit_hash)
+#
+#     header = {'Content-Type': 'application/json'}
+#     data = json.dumps({"status": "unimplemented", "result": result})
+#     return (data, header)
+#
+# ################################################################################
+# # Comment Analysis::Frequency
+#
+#
+# # ex: 127.0.0.1:5000/github/get_commit_count_interval?git_id=168214867&username="test"&interval_start=20190201&interval_end=20190228
+# @github_api.route('/get_commit_count_interval', methods=('GET', 'POST'))
+# def api_get_commit_count_interval():
+#     git_id = request.args.get('git_id', type=int)
+#     username = request.args.get('username')
+#     interval_start = parse_str_date(request.args.get('interval_start'))
+#     interval_end = parse_str_date(request.args.get('interval_end'))
+#
+#     result = 1
+#     # result = CF.get_commit_count_interval(git_id, username, interval_start, interval_end)
+#
+#     header = {'Content-Type': 'application/json'}
+#     data = json.dumps({"status": "unimplemented", "result": result})
+#     return (data, header)
+#
+#
+# # ex: 127.0.0.1:5000/github/get_commit_count_day?git_id=168214867&username="test"&date=20190208
+# @github_api.route('/get_commit_count_day', methods=('GET', 'POST'))
+# def api_get_commit_count_day():
+#     git_id = request.args.get('git_id', type=int)
+#     username = request.args.get('username')
+#     date = parse_str_date(request.args.get('date'))
+#
+#     result = 0
+#     # result = CF.commit_count_day(git_id, username, date)
+#
+#     header = {'Content-Type': 'application/json'}
+#     data = json.dumps({"status": "unimplemented", "result": result})
+#     return (data, header)
+#
+#
+# # ex: 127.0.0.1:5000/github/count_list_interval?git_id=168214867&username="test"&interval_start=20190201&interval_end=20190228
+# @github_api.route('/get_commit_counts_interval', methods=('GET', 'POST'))
+# def api_get_commit_counts_interval():
+#     git_id = request.args.get('git_id', type=int)
+#     username = request.args.get('username')
+#     interval_start = parse_str_date(request.args.get('interval_start'))
+#     interval_end = parse_str_date(request.args.get('interval_end'))
+#
+#     result = [0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0,
+#               0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+#     # result = CF.get_commit_counts_interval(git_id, username, interval_start, interval_end)
+#
+#     header = {'Content-Type': 'application/json'}
+#     data = json.dumps({"status": "unimplemented", "result": result})
+#     return (data, header)
+#
+#
+# # ex: 127.0.0.1:5000/github/get_commit_freq_data?git_id=168214867&interval_start=20190201&interval_end=20190214
+# @github_api.route('/get_commit_freq_data', methods=('GET', 'POST'))
+# def api_get_commit_freq_data():
+#     git_id = request.args.get('git_id', type=int)
+#     interval_start = parse_str_date(request.args.get('interval_start'))
+#     interval_end = parse_str_date(request.args.get('interval_end'))
+#
+#     result = [{'usernames': ['test', 'sarthak-tiwari'], 'date': datetime.datetime(2019, 2, 1, 0, 0), 'commit_count': {'test': 0, 'sarthak-tiwari': 0}}, {'usernames': ['test', 'sarthak-tiwari'], 'date': datetime.datetime(2019, 2, 2, 0, 0), 'commit_count': {'test': 0, 'sarthak-tiwari': 0}}, {'usernames': ['test', 'sarthak-tiwari'], 'date': datetime.datetime(2019, 2, 3, 0, 0), 'commit_count': {'test': 0, 'sarthak-tiwari': 0}}, {'usernames': ['test', 'sarthak-tiwari'], 'date': datetime.datetime(2019, 2, 4, 0, 0), 'commit_count': {'test': 0, 'sarthak-tiwari': 0}}, {'usernames': ['test', 'sarthak-tiwari'], 'date': datetime.datetime(2019, 2, 5, 0, 0), 'commit_count': {'test': 0, 'sarthak-tiwari': 0}}, {'usernames': ['test', 'sarthak-tiwari'], 'date': datetime.datetime(2019, 2, 6, 0, 0), 'commit_count': {'test': 1, 'sarthak-tiwari': 0}}, {'usernames': ['test', 'sarthak-tiwari'], 'date': datetime.datetime(2019, 2, 7, 0, 0), 'commit_count': {'test': 0, 'sarthak-tiwari': 4}}, {
+#         'usernames': ['test', 'sarthak-tiwari'], 'date': datetime.datetime(2019, 2, 8, 0, 0), 'commit_count': {'test': 0, 'sarthak-tiwari': 0}}, {'usernames': ['test', 'sarthak-tiwari'], 'date': datetime.datetime(2019, 2, 9, 0, 0), 'commit_count': {'test': 0, 'sarthak-tiwari': 0}}, {'usernames': ['test', 'sarthak-tiwari'], 'date': datetime.datetime(2019, 2, 10, 0, 0), 'commit_count': {'test': 0, 'sarthak-tiwari': 0}}, {'usernames': ['test', 'sarthak-tiwari'], 'date': datetime.datetime(2019, 2, 11, 0, 0), 'commit_count': {'test': 0, 'sarthak-tiwari': 0}}, {'usernames': ['test', 'sarthak-tiwari'], 'date': datetime.datetime(2019, 2, 12, 0, 0), 'commit_count': {'test': 0, 'sarthak-tiwari': 0}}, {'usernames': ['test', 'sarthak-tiwari'], 'date': datetime.datetime(2019, 2, 13, 0, 0), 'commit_count': {'test': 0, 'sarthak-tiwari': 0}}, {'usernames': ['test', 'sarthak-tiwari'], 'date': datetime.datetime(2019, 2, 14, 0, 0), 'commit_count': {'test': 0, 'sarthak-tiwari': 0}}]
+#     # result = CF.get_commit_freq_data(git_id, interval_start, interval_end)
+#
+#     #repack python datetime objects
+#     for entry in result:
+#         entry["date"] = dateobj_to_strdate(entry["date"])
+#
+#     header = {'Content-Type': 'application/json'}
+#     data = json.dumps({"status": "unimplemented", "result": result})
+#     return (data, header)
+#
+#
+# ################################################################################
+# # Comment Analysis::Commit Messages
+#
+# # ex: 127.0.0.1:5000/github/compute_commit_message_quality?git_id=168214867&commit_hash="70f13b111e1147611b70f9c9f1f76ddb00fcbe27"
+# @github_api.route('/compute_commit_message_quality', methods=('GET', 'POST'))
+# def api_compute_commit_message_quality():
+#     git_id = request.args.get('git_id', type=int)
+#     commit_hash = request.args.get('commit_hash')
+#
+#     result = 50
+#     # result = CF.compute_commit_message_quality(git_id, commit_hash)
+#
+#     header = {'Content-Type': 'application/json'}
+#     data = json.dumps({"status": "unimplemented", "result": result})
+#     return (data, header)
 
 ################################################################################
 # Comment Analysis::Comments
 
 
-@app.route('/github/pull_request', methods=('GET', 'POST'))
+
+#################################################################################
+# pull request info
+
+@github_api.route('/pull_request/')
 def api_count_pull():
     conn = sqlite3.connect('database.db')
     db = conn.cursor()
     db.execute("SELECT * FROM pullData")
     result = db.fetchall()
+    print(result)
+    # print(str(result[0][0]))
     pulls_data = []
     for data in result:
         pull_data = {}
-        pull_data['request_title']: data.requestTile
-        pull_data['author']: data.author
-        pull_data['no_of_comments']: data.noOfComments
-        pull_data['target_branch']: data.targetBranch
-        pull_data['no_of_reviews']: data.noOfReviews
+        pull_data['request_title'] = data[1]
+        pull_data['author'] = data[2]
+        pull_data['no_of_comments'] = data[3]
+        pull_data['target_branch'] = data[4]
+        pull_data['no_of_reviews'] = data[5]
         pulls_data.append(pull_data)
-    return jsonify({'result': pulls_data})
+
+    print(pull_data)
+    return str(pulls_data), {'Content-Type': 'application/json'}
+    # return jsonify({'result': pulls_data})
 
 
-@app.route('/github/user', methods=('GET', 'POST'))
-def api_count_pull():
+#################################################################################
+# user info
+
+@github_api.route('/user', methods=('GET', 'POST'))
+def api_count_user():
     conn = sqlite3.connect('database.db')
     db = conn.cursor()
     db.execute("SELECT * FROM userProfile")
     result = db.fetchall()
+    print(result)
     users_data = []
     for data in result:
         user_data = {}
-        user_data['github_login']: data.githubLogin
-        user_data['github_username']: data.githubUsername
-        user_data['github_profile']: data.githubProfile
+        # user_data['github_login'] = data[1]
+        user_data['github_username'] = data[1]
+        user_data['github_profile'] = data[2]
         users_data.append(user_data)
-    return jsonify({'result': users_data})
+
+    return str(users_data),{'Content-Type':'application/json'}
+    # return jsonify({'result': users_data})
 
 
 ################################################################################
@@ -285,10 +307,27 @@ def api_get_complexity_of_authors_in_repo():
 
     complexityData = DB.get_complexity_of_authors_in_repo(repoName)
     data = json.dumps(complexityData)
-    
+
     return (data, {'Content-Type': 'application/json'})
 
+# ex: 127.0.0.1:5000/github/pulls/?format=json&query=168214867
+@github_api.route('/pulls/', methods=('GET', 'POST'))
+def api_core_pulls():
+
+    fo = request.args.get('format')
+    query = request.args.get('query', type=int)
+
+    if fo != "json":
+        return ("", "501: only json is supported for format.")
+    else:
+        result = DB.fetch_pull(query)
+
+        header = {'Content-Type': 'application/json'}
+        data = json.dumps(result)
+        return (data, header)
+
 ################################################################################
+
 
 @github_api.route('/', methods=('GET', 'POST'))
 def test():
@@ -302,4 +341,5 @@ def test():
 
 if __name__ == '__main__':
     app.debug = True
+    app.register_blueprint(github_api)
     app.run()

@@ -16,8 +16,8 @@ from pprint import pprint
 import sqlite3
 import GithubAPI
 
-from .static_code_analysis.CheckStyleManager import CheckStyleManager
-from .Constants import Constants
+# from .static_code_analysis.CheckStyleManager import CheckStyleManager
+# from .Constants import Constants
 
 
 def store_repository_info(db, repo_id, access_token):
@@ -134,13 +134,14 @@ def store_pull_data(repo_id, pull_no):
     target_branch = head_branch["label"]
     no_of_reviews = 4
 
-    insert_query = "INSERT INTO pullData(requestID, requestTile, author, noOfComments, targetBranch, noOfReviews )" \
-                   "VALUES(?, ?, ?, ?, ?, ?)", (repo_id, request_title, author, str(no_of_comments), target_branch, str(no_of_reviews))
-                   # "VALUES("+repo_id+", "+request_title+", "+author+", "+str(no_of_comments)+", "+target_branch+", "+str(no_of_reviews)+")"
+    insert_query = "INSERT INTO pullData(requestID, requestTile, author, noOfComments, targetBranch, noOfReviews ) " \
+                   "VALUES('"+repo_id+"', '"+request_title+"', '"+author+"', '"+str(no_of_comments)+"', '"+str(target_branch)+"', '"+str(no_of_reviews)+"')"
+                   # "VALUES(?, ?, ?, ?, ?, ?)", (repo_id, request_title, author, str(no_of_comments), target_branch, str(no_of_reviews))
+
     # insert_tuple = (repo_id, request_title, author, str(no_of_comments), target_branch, str(no_of_reviews))
 
     # db.execute(insert_query, insert_tuple)
-    db.execute(insert_query)
+    db.execute(str(insert_query))
 
     if db.fetchall():
         print("store_pull_data: unknown failure.")
@@ -199,7 +200,7 @@ def store_repo(db, repo_id, branch="master"):
     print(seen)
 
 if __name__ == "__main__":
-    conn = sqlite3.connect(Constants.DATABASE)
+    conn = sqlite3.connect('database.db')
     db = conn.cursor()
 
     #store_repo(db, 168214867)
@@ -218,7 +219,7 @@ if __name__ == "__main__":
     store_repository_info(db, repo_id, None)
     # store_repository_info(db, repo_id, None)
     #store_commit(db, repo_id, sample_hash)
-    #store_pull_data(repo_id, newPull)
+    store_pull_data(repo_id, newPull)
     #store_user_info(db, 43050725) #sarthak-tiwari's ID
     #display_query = "SELECT * FROM pullData"
     store_complexity(db, 'sarthak-tiwari/SER-574_RedTeam')
