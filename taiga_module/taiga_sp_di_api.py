@@ -1,15 +1,21 @@
 #!/usr/bin/env python3
 
-import requests
-
 from flask import Flask, jsonify, request
 
-
-import wikiTextParser
+import US_Group1
+import findSprintGaps
 import listWikiContent
-
-import user_story, user_task_information, userstory_create_date, taskassignedto, task_of_userstory, US_Group1, list_sprints, list_userstories, task_finishdate, UT_History_Info, taskAssignedTo_modified
-
+import list_sprints
+import list_userstories
+import task_finishdate
+import task_of_userstory
+import taskassignedto
+import user_story
+import user_task_information
+import userstory_create_date
+import wikiTextParser
+import sprintplanningAnalysis
+import UT_History_Info, taskAssignedTo_modified
 
 app = Flask(__name__)
 
@@ -89,12 +95,14 @@ def listOfSprints():
     projectSlug = request.args.get('projectslug')
     return jsonify({'SPRINTS': list_sprints.get_list_sprints(projectSlug)})
 
+
 @app.route('/taiga/list_of_userstories', methods=['GET'])
 def listOfUserstories():
     projectSlug = request.args.get('projectslug')
     sprintno = request.args.get('sprint')
     return jsonify({'USERSTORY': list_userstories.get_list_userstories(projectSlug, sprintno)})
-	
+
+
 @app.route('/taiga/taskFinishdate', methods=['GET'])
 def taskFinishdate():
     projectSlug = request.args.get('projectslug')
@@ -112,6 +120,19 @@ def historyOfTasks():
     projectSlug = request.args.get('projectslug')
     sprintno = request.args.get('sprint')
     return jsonify({'historyOfTasks':UT_History_Info.user_task_info(projectSlug, sprintno)})
+
+
+@app.route('/taiga/listSprintDetails', methods=['GET'])
+def listSprintDetails():
+    projectSlug = request.args.get('projectslug')
+    return jsonify({'sprintDetails': findSprintGaps.findSprintGaps(projectSlug)})
+
+
+@app.route('/taiga/planning-retrospective-analysis', methods=['GET'])
+def plan_retro_details():
+    projectSlug = request.args.get('projectslug')
+    wiki_slug = request.args.get('wikislug')
+    return jsonify({'project_details': sprintplanningAnalysis.sprint_planning(projectSlug,wiki_slug)})
 
 
 if __name__ == '__main__':
