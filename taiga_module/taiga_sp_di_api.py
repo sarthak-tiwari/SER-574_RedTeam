@@ -119,7 +119,7 @@ def assignedToModified():
 def historyOfTasks():
     projectSlug = request.args.get('projectslug')
     sprintno = request.args.get('sprint')
-    return jsonify({'historyOfTasks':UT_History_Info.user_task_info(projectSlug, sprintno)})
+    return jsonify({'historyOfTasks':ut_History_Info.user_task_info(projectSlug, sprintno)})
 
 
 @app.route('/taiga/listSprintDetails', methods=['GET'])
