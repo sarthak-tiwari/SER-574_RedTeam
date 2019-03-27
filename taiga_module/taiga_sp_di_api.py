@@ -1,12 +1,16 @@
 #!/usr/bin/env python3
 
 from flask import Flask, jsonify, request
+from flask_cors import CORS
 
 import US_Group1
+import UT_History_Info
 import findSprintGaps
 import listWikiContent
 import list_sprints
 import list_userstories
+import sprintplanningAnalysis
+import taskAssignedTo_modified
 import task_finishdate
 import task_of_userstory
 import taskassignedto
@@ -14,12 +18,15 @@ import user_story
 import user_task_information
 import userstory_create_date
 import wikiTextParser
+
 import sprintplanningAnalysis
 import ut_History_Info, taskAssignedTo_modified
 import teammemberinfo
 import UserTask_change_status
 
+
 app = Flask(__name__)
+CORS(app)
 
 
 @app.route('/taiga/sprint_story_points', methods=['GET'])
