@@ -1,7 +1,8 @@
 import taigaWiki
 
+
 def wikiTextParser(projectSlug,wikiSlug):
-    wikiContent = taigaWiki.getWiki(projectSlug,wikiSlug)
+    wikiContent = taigaWiki.getWiki(projectSlug, wikiSlug)
     input_dict = wikiContent.split("\n")
     input_dict.append(':')
 
@@ -23,9 +24,9 @@ def wikiTextParser(projectSlug,wikiSlug):
                 currentMOM = {}
         else:
             if ':' in data:
-                currentKey = data.split(':')[0]
+                currentKey = data.split(':')[0].strip()
                 if ':' in input_dict[i+1]:
-                    currentValue = data.split(':')[1]
+                    currentValue = data.split(':')[1].strip()
                     currentMOM.update({currentKey: currentValue})
                 else:
                     currentList = []

@@ -90,12 +90,14 @@ def listOfSprints():
     projectSlug = request.args.get('projectslug')
     return jsonify({'SPRINTS': list_sprints.get_list_sprints(projectSlug)})
 
+
 @app.route('/taiga/list_of_userstories', methods=['GET'])
 def listOfUserstories():
     projectSlug = request.args.get('projectslug')
     sprintno = request.args.get('sprint')
     return jsonify({'USERSTORY': list_userstories.get_list_userstories(projectSlug, sprintno)})
-	
+
+
 @app.route('/taiga/taskFinishdate', methods=['GET'])
 def taskFinishdate():
     projectSlug = request.args.get('projectslug')

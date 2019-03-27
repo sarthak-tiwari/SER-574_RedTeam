@@ -19,7 +19,6 @@ def getWiki(projectSlug):
     projectID = getProjectID(projectSlug)
     wikiResponse = requests.get(wikiHTTP+"?project="+str(projectID), headers=header)
     wiki = wikiResponse.json()
-    print(len(wiki))
     counter = 1
     wikilist = {}
     for json in wiki:
