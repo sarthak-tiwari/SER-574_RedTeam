@@ -16,6 +16,7 @@ import user_task_information
 import userstory_create_date
 import wikiTextParser
 import sprintplanningAnalysis
+import UT_History_Info, taskAssignedTo_modified
 
 app = Flask(__name__)
 CORS(app)
@@ -109,6 +110,18 @@ def taskFinishdate():
     projectSlug = request.args.get('projectslug')
     userStoryId = request.args.get('userstory_id')
     return jsonify({'TASK': task_finishdate.get_task_finishdate(projectSlug, userStoryId)})
+	
+@app.route('/taiga/taskAssignedTo_modified', methods=['GET'])
+def assignedToModified():
+    projectSlug = request.args.get('projectslug')
+    sprintno = request.args.get('sprint')
+    return jsonify({'assignedToModified': taskAssignedTo_modified.get_modifiedTaskAssignedTo(projectSlug, sprintno)})
+
+@app.route('/taiga/historyOfTasks', methods=['GET'])
+def historyOfTasks():
+    projectSlug = request.args.get('projectslug')
+    sprintno = request.args.get('sprint')
+    return jsonify({'historyOfTasks':UT_History_Info.user_task_info(projectSlug, sprintno)})
 
 
 @app.route('/taiga/listSprintDetails', methods=['GET'])
