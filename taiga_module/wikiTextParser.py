@@ -1,4 +1,4 @@
-import taigaWiki
+from taiga_module import taigaWiki
 
 
 def wikiTextParser(projectSlug,wikiSlug):
