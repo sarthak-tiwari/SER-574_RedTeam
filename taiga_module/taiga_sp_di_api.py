@@ -17,6 +17,7 @@ import wikiTextParser
 import sprintplanningAnalysis
 import ut_History_Info, taskAssignedTo_modified
 import teammemberinfo
+import UserTask_change_status
 
 app = Flask(__name__)
 
@@ -144,6 +145,12 @@ def teammemberinfo():
 def memberuserstorypointsinfo():
     projectSlug = request.args.get('projectslug')
     return jsonify({'TeamMemberInfo': teammemberinfo.user_story_points_info(projectSlug)})
+
+@app.route('/taiga/UserTaskchangestatus', methods=['GET'])
+def UserTaskchangestatus():
+    projectSlug = request.args.get('projectslug')
+    sprintno = request.args.get('sprint')
+    return jsonify({'historyOfTasks':UserTask_change_status.UserTaskchangestatus(projectSlug, sprintno)})
 
 
 if __name__ == '__main__':
