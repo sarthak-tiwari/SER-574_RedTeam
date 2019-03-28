@@ -17,7 +17,7 @@ class CheckStyleManager:
 
         fileName = fileLink[fileLink.rfind('/')+1:]
         fileContent = requests.get(fileLink).text
-        with open(str(Path(__file__).parent.resolve()) + '/TestFile/' + fileName, 'w+') as newFile:
+        with open(str(Path(__file__).parent.resolve()) + '\\TestFile\\' + fileName, 'w+') as newFile:
             newFile.write(fileContent)
 
     @staticmethod

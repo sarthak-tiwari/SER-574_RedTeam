@@ -151,35 +151,38 @@ def store_pull_data(repo_id, pull_no):
     if db.fetchall():
         print("store_pull_data: unknown failure.")
 
-def store_complexity(db, repoName):
+def store_complexity(repoName):
 
-    getFileLinkQuery = 'SELECT codeLink FROM codeComplexity WHERE repository="' + repoName + '";'
-    db.execute(getFileLinkQuery)
-    fileLinks = db.fetchall()
+    with sqlite3.connect(Constants.DATABASE) as conn:
+        db = conn.cursor()
 
-    for row in fileLinks:
-        metrics = CheckStyleManager.getComplexity(row[0])
+        getFileLinkQuery = 'SELECT codeLink FROM codeComplexity WHERE repository="' + repoName + '";'
+        db.execute(getFileLinkQuery)
+        fileLinks = db.fetchall()
 
-        updateQuery = 'UPDATE codeComplexity SET ' \
-            + 'booleanExpressionComplexity = ?' \
-            + ',classFanOutComplexity = ?' \
-            + ',cyclomaticComplexity = ?' \
-            + ',javaNCSS = ?' \
-            + ',nPathComplexity = ?' \
-            + ',classDataAbstractionCoupling = ?' \
-            + ',javaWarnings = ?' \
-            + ' WHERE codeLink = ?;'
+        for row in fileLinks:
+            metrics = CheckStyleManager.getComplexity(row[0])
 
-        updateTuple = (metrics['BooleanExpressionComplexity'],
-                        metrics['ClassFanOutComplexity'],
-                        metrics['CyclomaticComplexity'],
-                        metrics['JavaNCSS'],
-                        metrics['NPathComplexity'],
-                        metrics['ClassDataAbstractionCoupling'],
-                        metrics['JavaWarnings'],
-                        row[0])
+            updateQuery = 'UPDATE codeComplexity SET ' \
+                + 'booleanExpressionComplexity = ?' \
+                + ',classFanOutComplexity = ?' \
+                + ',cyclomaticComplexity = ?' \
+                + ',javaNCSS = ?' \
+                + ',nPathComplexity = ?' \
+                + ',classDataAbstractionCoupling = ?' \
+                + ',javaWarnings = ?' \
+                + ' WHERE codeLink = ?;'
 
-        db.execute(updateQuery, updateTuple)
+            updateTuple = (metrics['BooleanExpressionComplexity'],
+                            metrics['ClassFanOutComplexity'],
+                            metrics['CyclomaticComplexity'],
+                            metrics['JavaNCSS'],
+                            metrics['NPathComplexity'],
+                            metrics['ClassDataAbstractionCoupling'],
+                            metrics['JavaWarnings'],
+                            row[0])
+
+            db.execute(updateQuery, updateTuple)
 
 def store_repo(db, repo_id, branch="master"):
 
@@ -205,7 +208,7 @@ def store_repo(db, repo_id, branch="master"):
     print(seen)
 
 if __name__ == "__main__":
-    conn = sqlite3.connect('database.db')
+    conn = sqlite3.connect(Constants.DATABASE)
     db = conn.cursor()
 
     #store_repo(db, 168214867)
@@ -224,7 +227,7 @@ if __name__ == "__main__":
     store_repository_info(db, repo_id, None)
     # store_repository_info(db, repo_id, None)
     #store_commit(db, repo_id, sample_hash)
-    store_pull_data(repo_id, newPull)
+    # store_pull_data(repo_id, newPull)
     #store_user_info(db, 43050725) #sarthak-tiwari's ID
     #display_query = "SELECT * FROM pullData"
     store_complexity(db, 'sarthak-tiwari/SER-574_RedTeam')

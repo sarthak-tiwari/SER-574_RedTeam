@@ -12,6 +12,7 @@ from . import GithubAPI
 from .static_code_analysis.CheckStyleManager import CheckStyleManager
 #import metadata_analysis.commit_frequency as CF
 from . import db_api as DB
+from . import db_populate as DP
 
 github_api = Blueprint('github_api', __name__,)
 
