@@ -34,7 +34,7 @@ def dateobj_to_strdate(date):
 # General DB Access Calls
 
 
-# ex: 127.0.0.1:5000/github/core_initialize_repo?git_id=168214867&username=racuna1&access_token=REPLACEME
+# ex: 127.0.0.1:5000/github/core_initialize_repo?git_repo=sarthak-tiwari/SER-574_RedTeam&username=racuna1&access_token=REPLACEME
 @github_api.route('/core_initialize_repo', methods=('GET', 'POST'))
 def api_core_initialize_repo():
     git_repo_name = request.args.get('git_repo')
