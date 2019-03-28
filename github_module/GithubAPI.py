@@ -45,6 +45,24 @@ def get_commit(repo_id, commit_sha, username=None, token=None):
     return process_get_request(endpoint, username, token)
 
 
+def get_commits_branch(repo_id, branch, username, token, per_page=100):
+    commits = []
+    page = 0
+
+    while page < 10: #HACK: hard coded limit to prevent infinite loop
+        endpoint = "https://api.github.com/repositories/" + str(repo_id) + "/commits?per_page="+str(per_page)+"&page="+str(page)+"&sha=" + branch
+        page_result = process_get_request(endpoint, username, token)
+
+        if page_result and "documentation_url" not in page_result:
+            commits.extend(page_result)
+        else:
+            break
+
+        page += 1
+
+    return commits
+
+
 def get_all_pull_requests(repo_id):
     endpoint = 'https://api.github.com/repositories/' + str(repo_id) + '/pulls'
     return process_get_request(endpoint)
