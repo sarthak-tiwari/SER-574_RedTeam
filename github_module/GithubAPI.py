@@ -35,6 +35,11 @@ def get_repo(repo_id):
     return process_get_request(endpoint)
 
 
+def get_repo_friendly(git_repo_name):
+    endpoint = 'https://api.github.com/repos/' + git_repo_name
+    return process_get_request(endpoint)
+
+
 def get_all_commits(repo_id):
     endpoint = 'https://api.github.com/repositories/' + str(repo_id) + '/commits'
     return process_get_request(endpoint)
