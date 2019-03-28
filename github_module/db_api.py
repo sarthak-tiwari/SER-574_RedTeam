@@ -12,7 +12,7 @@ __author__    = "Sarthak Tiwari"
 __copyright__ = "Copyright 2019, SER574 Red Team"
 
 
-def initialize_repo(github_id, access_token=None):
+def initialize_repo(github_id, username=None, access_token=None):
     """
     Stores the contents of a specific github repository in the interval
     database. Calling this function is required for all other API functions to
@@ -27,7 +27,7 @@ def initialize_repo(github_id, access_token=None):
     db_populate.store_repository_info(db, github_id, access_token)
 
     #1) TODO: download and store commit information.
-    #db_populate.store_repo_commits(db, repo_id, "master", username, access_token)
+    db_populate.store_repo_commits(db, github_id, "master", username, access_token)
 
     #2) TODO: download and store URL information.
     #3) TODO: download and store pull request information.
