@@ -306,6 +306,21 @@ def api_get_complexity_of_authors_in_repo():
 
     return (data, {'Content-Type': 'application/json'})
 
+
+# Function to test live calculation of complexity metric
+@github_api.route('/calculate_complexity', methods=('GET', 'POST'))
+def api_get_complexity_of_authors_in_repo():
+    repoName = request.args.get('reponame')
+
+    DP.store_complexity(repoName)
+
+    complexityData = DB.get_complexity_of_authors_in_repo(repoName)
+    data = json.dumps(complexityData)
+
+    return (data, {'Content-Type': 'application/json'})
+
+################################################################################
+
 # ex: 127.0.0.1:5000/github/pulls/?format=json&query=168214867
 @github_api.route('/pulls/', methods=('GET', 'POST'))
 def api_core_pulls():
