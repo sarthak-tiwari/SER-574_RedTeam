@@ -212,6 +212,7 @@ def api_compute_commit_message_quality():
 #################################################################################
 # pull request info
 
+
 @github_api.route('/pull_request/')
 def api_count_pull():
     conn = sqlite3.connect('database.db')
@@ -253,12 +254,22 @@ def api_count_user():
         user_data['github_profile'] = data[2]
         users_data.append(user_data)
 
-    return str(users_data),{'Content-Type':'application/json'}
+    return str(users_data), {'Content-Type': 'application/json'}
     # return jsonify({'result': users_data})
 
 
 ################################################################################
 # Code Analysis
+
+# ex: 127.0.0.1:5000/github/baseline_for_complexity"
+# Returns baseline values for code complexity metrices.
+@github_api.route('/baseline_for_complexity', methods=('GET', 'POST'))
+def api_get_baseline_for_complexity():
+
+    baselineData = CheckStyleManager.getBaselineForComplexities()
+    data = json.dumps(baselineData)
+
+    return (data, {'Content-Type': 'application/json'})
 
 # ex: 127.0.0.1:5000/github/complexity_of_file?repoName="someRepo"&fileName="package/another/abc.java"
 # Returns code complexity of fileName present in repoName.
@@ -300,19 +311,6 @@ def api_get_complexity_by_author():
 @github_api.route('/complexity_of_authors_in_repo', methods=('GET', 'POST'))
 def api_get_complexity_of_authors_in_repo():
     repoName = request.args.get('reponame')
-
-    complexityData = DB.get_complexity_of_authors_in_repo(repoName)
-    data = json.dumps(complexityData)
-
-    return (data, {'Content-Type': 'application/json'})
-
-
-# Function to test live calculation of complexity metric
-@github_api.route('/calculate_complexity', methods=('GET', 'POST'))
-def api_get_complexity_of_authors_in_repo():
-    repoName = request.args.get('reponame')
-
-    DP.store_complexity(repoName)
 
     complexityData = DB.get_complexity_of_authors_in_repo(repoName)
     data = json.dumps(complexityData)
