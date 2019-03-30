@@ -7,8 +7,8 @@ from .Constants import Constants
 This file implements several basic functions for querying and updating the state
 of the database.
 """
-__author__    = "Ruben Acuna"
-__author__    = "Sarthak Tiwari"
+__author__ = "Ruben Acuna"
+__author__ = "Sarthak Tiwari"
 __copyright__ = "Copyright 2019, SER574 Red Team"
 
 
@@ -58,7 +58,7 @@ def list_details(query):
     db = conn.cursor()
 
     #fetch main repo information
-    info_query = "SELECT name, owner, id FROM repositories WHERE name=\"" + query +"\""
+    info_query = "SELECT name, owner, id FROM repositories WHERE name=\"" + query + "\""
     db.execute(info_query)
     repository_info = db.fetchall()[0]
 
@@ -67,18 +67,23 @@ def list_details(query):
     details["repoInternalId"] = repository_info[2]
 
     #fetch owner information
-    info_query = "SELECT githubUsername FROM userProfile WHERE id=\"" + str(repository_info[1]) +"\""
+    info_query = "SELECT githubUsername FROM userProfile WHERE id=\"" + \
+        str(repository_info[1]) + "\""
     db.execute(info_query)
     owner_info = db.fetchall()[0]
-    details["repoURL"] = "https://github.com/" + owner_info[0] + "/" + details["repoName"]
+    details["repoURL"] = "https://github.com/" + \
+        owner_info[0] + "/" + details["repoName"]
 
     # fetch collaborators information
-    collab_query = "SELECT DISTINCT userProfile.githubUsername, userProfile.id FROM userProfile, commitData WHERE commitData.repositoryID=" + str(details["repoInternalId"]) + " AND userProfile.githubUsername=commitData.author"
+    collab_query = "SELECT DISTINCT userProfile.githubUsername, userProfile.id FROM userProfile, commitData WHERE commitData.repositoryID=" + \
+        str(details["repoInternalId"]) + \
+        " AND userProfile.githubUsername=commitData.author"
     db.execute(collab_query)
     collaborators = db.fetchall()
     details["collaborators"] = [None] * len(collaborators)
     for i in range(len(collaborators)):
-        details["collaborators"][i] = {"name": collaborators[i][0], "githubId": collaborators[i][1]}
+        details["collaborators"][i] = {
+            "name": collaborators[i][0], "githubId": collaborators[i][1]}
 
     return details
 
@@ -115,18 +120,20 @@ def fetch_commits(github_id):
     result = list_details(repo_name)
 
     #fetch commit information
-    commit_query = "SELECT authorID, commitMessage, date, timeCommitted, filesModified, noOfAdditions, noOfDeletions FROM commitData WHERE repositoryID=" + str(result["repoInternalId"])
+    commit_query = "SELECT authorID, commitMessage, date, timeCommitted, filesModified, noOfAdditions, noOfDeletions FROM commitData WHERE repositoryID=" + \
+        str(result["repoInternalId"])
     db.execute(commit_query)
     commits = db.fetchall()
     result["commits"] = [None] * len(result["collaborators"])
 
     for i in range(len(result["collaborators"])):
-        result["commits"][i] = {"githubId": result["collaborators"][i]["githubId"], "numberOfCommits": 0, "distribution": []}
+        result["commits"][i] = {"githubId": result["collaborators"]
+                                [i]["githubId"], "numberOfCommits": 0, "distribution": []}
 
     #update commit dictionary information from actual commits
     for i in range(len(commits)):
         commit_authorID = commits[i][0]
-        commit_date = commits[i][2] #YYYYMMDD
+        commit_date = commits[i][2]  # YYYYMMDD
 
         #pick out which distribution/user to update
         active_entry = None
@@ -143,7 +150,8 @@ def fetch_commits(github_id):
                 active_entry["numberOfCommits"] += 1
 
         if not exists:
-            active_entry["distribution"].append({"date": commit_date, "numberOfCommits": 1})
+            active_entry["distribution"].append(
+                {"date": commit_date, "numberOfCommits": 1})
             active_entry["numberOfCommits"] += 1
 
     return result
@@ -159,7 +167,8 @@ def fetch_repo_hashes(github_id):
     conn = sqlite3.connect(Constants.DATABASE)
     db = conn.cursor()
 
-    display_query = "SELECT DISTINCT hash FROM commitData WHERE commitData.repositoryID=\"" + str(github_id) +"\""
+    display_query = "SELECT DISTINCT hash FROM commitData WHERE commitData.repositoryID=\"" + \
+        str(github_id) + "\""
 
     db.execute(display_query)
     found = db.fetchall()
@@ -182,7 +191,7 @@ def fetch_commit(github_id, commit_hash):
     conn = sqlite3.connect(Constants.DATABASE)
     db = conn.cursor()
 
-    display_query = "SELECT author, commitMessage, date, timeCommitted, filesModified, noOfAdditions, noOfDeletions FROM commitData WHERE commitData.hash=\"" + commit_hash +"\""
+    display_query = "SELECT author, commitMessage, date, timeCommitted, filesModified, noOfAdditions, noOfDeletions FROM commitData WHERE commitData.hash=\"" + commit_hash + "\""
 
     db.execute(display_query)
     found = db.fetchall()
@@ -201,6 +210,7 @@ def fetch_commit(github_id, commit_hash):
 
     return commit_metadata
 
+
 def fetch_pull(github_id, pull_id):
     """
     Returns a dictionary containing information (pull_id, repositoryID, author,
@@ -216,7 +226,7 @@ def fetch_pull(github_id, pull_id):
     conn = sqlite3.connect(Constants.DATABASE)
     db = conn.cursor()
 
-    display_query = "SELECT requestTitle, author, noOfComments, targetBranch, noOfReviews FROM pullData WHERE pullData.requestID=\"" + pull_id +"\""
+    display_query = "SELECT requestTitle, author, noOfComments, targetBranch, noOfReviews FROM pullData WHERE pullData.requestID=\"" + pull_id + "\""
 
     db.execute(display_query)
     found = db.fetchall()
@@ -281,44 +291,44 @@ def get_complexity_of_file(repoName, fileName):
     """
     Returns code complexity of fileName present in repoName.
     """
-    conn = sqlite3.connect(Constants.DATABASE)
-    db = conn.cursor()
+    with sqlite3.connect(Constants.DATABASE) as conn:
+        db = conn.cursor()
 
-    query = 'SELECT * FROM codeComplexity WHERE repository="' \
-                    + repoName +'" AND filename = "' + fileName + '";'
+        query = 'SELECT * FROM codeComplexity WHERE repository="' \
+            + repoName + '" AND filename = "' + fileName + '";'
 
-    db.execute(query)
-    rows = db.fetchall()
-    
-    result = []
+        db.execute(query)
+        rows = db.fetchall()
 
-    for row in rows:
-        fileComplexity = convert_complexity_row_to_json(row)
-        result.append(fileComplexity)
+        result = []
 
-    return result
+        for row in rows:
+            fileComplexity = convert_complexity_row_to_json(row)
+            result.append(fileComplexity)
+
+        return result
 
 
 def get_complexity_of_files_in_repo(repoName):
     """
     Return complexity of all files in this repository.
     """
-    conn = sqlite3.connect(Constants.DATABASE)
-    db = conn.cursor()
+    with sqlite3.connect(Constants.DATABASE) as conn:
+        db = conn.cursor()
 
-    query = 'SELECT * FROM codeComplexity WHERE repository="' \
-                    + repoName +'";'
+        query = 'SELECT * FROM codeComplexity WHERE repository="' \
+            + repoName + '";'
 
-    db.execute(query)
-    rows = db.fetchall()
-    
-    result = []
+        db.execute(query)
+        rows = db.fetchall()
 
-    for row in rows:
-        fileComplexity = convert_complexity_row_to_json(row)
-        result.append(fileComplexity)
+        result = []
 
-    return result
+        for row in rows:
+            fileComplexity = convert_complexity_row_to_json(row)
+            result.append(fileComplexity)
+
+        return result
 
 
 def get_complexity_by_author(repoName, authorName):
@@ -326,62 +336,57 @@ def get_complexity_by_author(repoName, authorName):
     Return average complexity of all files authored by specified author in
     this repository
     """
-    conn = sqlite3.connect(Constants.DATABASE)
-    db = conn.cursor()
+    with sqlite3.connect(Constants.DATABASE) as conn:
+        db = conn.cursor()
 
-    query = 'SELECT repository, author,'\
-            +'avg(booleanExpressionComplexity) AS booleanExpressionComplexity,'\
-            +'avg(classFanOutComplexity) AS classFanOutComplexity,'\
-            +'avg(cyclomaticComplexity) AS cyclomaticComplexity,'\
-            +'avg(javaNCSS) AS javaNCSS,'\
-            +'avg(nPathComplexity) AS nPathComplexity,'\
-            +'avg(classDataAbstractionCoupling) AS classDataAbstractionCoupling,'\
-            +'avg(javaWarnings) AS javaWarnings '\
-            +'FROM codeComplexity '\
-            +'WHERE repository="' + repoName + '" AND author = "' + authorName + '";'
+        query = 'SELECT repository, author,'\
+                + 'avg(booleanExpressionComplexity) AS booleanExpressionComplexity,'\
+                + 'avg(classFanOutComplexity) AS classFanOutComplexity,'\
+                + 'avg(cyclomaticComplexity) AS cyclomaticComplexity,'\
+                + 'avg(javaNCSS) AS javaNCSS,'\
+                + 'avg(nPathComplexity) AS nPathComplexity,'\
+                + 'avg(classDataAbstractionCoupling) AS classDataAbstractionCoupling,'\
+                + 'avg(javaWarnings) AS javaWarnings '\
+                + 'FROM codeComplexity '\
+                + 'WHERE repository="' + repoName + '" AND author = "' + authorName + '";'
 
-    db.execute(query)
-    rows = db.fetchall()
-    
-    result = []
+        db.execute(query)
+        rows = db.fetchall()
 
-    for row in rows:
-        authorComplexity = convert_author_complexity_row_to_json(row)
-        result.append(authorComplexity)
+        result = []
 
-    return result
+        for row in rows:
+            authorComplexity = convert_author_complexity_row_to_json(row)
+            result.append(authorComplexity)
+
+        return result
 
 
 def get_complexity_of_authors_in_repo(repoName):
     """
     Return complexity generated by all authors in this repository
     """
-    conn = sqlite3.connect(Constants.DATABASE)
-    db = conn.cursor()
+    with sqlite3.connect(Constants.DATABASE) as conn:
+        db = conn.cursor()
 
-    query = 'SELECT repository, author,'\
-            +'avg(booleanExpressionComplexity) AS booleanExpressionComplexity,'\
-            +'avg(classFanOutComplexity) AS classFanOutComplexity,'\
-            +'avg(cyclomaticComplexity) AS cyclomaticComplexity,'\
-            +'avg(javaNCSS) AS javaNCSS,'\
-            +'avg(nPathComplexity) AS nPathComplexity,'\
-            +'avg(classDataAbstractionCoupling) AS classDataAbstractionCoupling,'\
-            +'avg(javaWarnings) AS javaWarnings '\
-            +'FROM codeComplexity '\
-            +'WHERE repository="' + repoName + '" GROUP BY author ORDER BY author;'
+        query = 'SELECT repository, author,'\
+                + 'avg(booleanExpressionComplexity) AS booleanExpressionComplexity,'\
+                + 'avg(classFanOutComplexity) AS classFanOutComplexity,'\
+                + 'avg(cyclomaticComplexity) AS cyclomaticComplexity,'\
+                + 'avg(javaNCSS) AS javaNCSS,'\
+                + 'avg(nPathComplexity) AS nPathComplexity,'\
+                + 'avg(classDataAbstractionCoupling) AS classDataAbstractionCoupling,'\
+                + 'avg(javaWarnings) AS javaWarnings '\
+                + 'FROM codeComplexity '\
+                + 'WHERE repository="' + repoName + '" GROUP BY author ORDER BY author;'
 
-    db.execute(query)
-    rows = db.fetchall()
-    
-    result = []
+        db.execute(query)
+        rows = db.fetchall()
 
-    for row in rows:
-        authorComplexity = convert_author_complexity_row_to_json(row)
-        result.append(authorComplexity)
+        result = []
 
-    return result
+        for row in rows:
+            authorComplexity = convert_author_complexity_row_to_json(row)
+            result.append(authorComplexity)
 
-# print(fetch_repo_hashes(168214867))
-# print(fetch_commit(168214867, "70f13b111e1147611b70f9c9f1f76ddb00fcbe27"))
-# print(list_details("SER-574_RedTeam"))
-# print(fetch_commits(168214867))
+        return result
