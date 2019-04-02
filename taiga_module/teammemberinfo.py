@@ -15,7 +15,7 @@ def members_info(slug1):
 	lst = []
 	for pdata in project_data['members']:
 		dic['full_name_display'] = pdata['full_name_display']
-	 	dic['id'] = pdata['id']
+		dic['id'] = pdata['id']
 		dic['role_name'] = pdata['role_name']
 		dic['username'] = pdata['username']
 		lst.append(dic)

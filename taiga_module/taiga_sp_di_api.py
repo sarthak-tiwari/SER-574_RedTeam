@@ -4,7 +4,7 @@ from flask import Flask, jsonify, request
 from flask_cors import CORS
 
 import US_Group1
-import UT_History_Info
+import ut_History_Info
 import findSprintGaps
 import listWikiContent
 import list_sprints
