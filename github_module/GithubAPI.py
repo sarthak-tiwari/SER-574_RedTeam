@@ -68,11 +68,28 @@ def get_file(repo_id, file_path):
     raw_data["content"] = base64.b64decode(raw_data["content"]).decode('utf-8')
     return raw_data
 
+def get_all_files(repo_id):
+    return get_all_files_recursive(repo_id, '')
+
+def get_all_files_recursive(repo_id, path):
+    endpoint = 'https://api.github.com/repositories/' + str(repo_id) + '/contents' + str(path)
+    raw_data = process_get_request(endpoint)
+    data = []
+    data_for_other_folders = []
+    for files in raw_data:
+        if files["type"] == "file":
+            data.append(files["path"])
+        elif files["type"] == "dir":
+            data_for_other_folders.extend(get_all_files_recursive(repo_id, path + "/" + files["name"]))
+    
+    data.extend(data_for_other_folders)
+    return data
+
 def process_get_request(endpoint, username=None, token=None):
     if username and token:
         return json.loads(requests.get(endpoint, auth=(username, token)).content)
     else:
-        return json.loads(requests.get(endpoint).content)
+        return json.loads(requests.get(endpoint + "?client_id=5d45a5aa02a482c56abd&client_secret=ac05cfd61eeecd795374868b9a9965ca9999c999").content)
 
 # print(get_repo("168214867"))
 # print(get_all_commits("168214867"))
@@ -81,4 +98,5 @@ def process_get_request(endpoint, username=None, token=None):
 # print(get_pull_request("168214867", '4'))
 # print(get_all_pull_requests("168214867"))
 # print(get_file(168214867, 'github_module/README'))
+# print(get_all_files(168214867))
 # print(user_login())
