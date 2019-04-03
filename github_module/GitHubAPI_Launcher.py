@@ -342,11 +342,12 @@ def api_core_pulls():
 ################################################################################
 # GitHub - Taiga Overlap
 
-# ex: 127.0.0.1:5000/github/commits_on_stories?projectSlug="someSlug"
-# Returns commit information of each user story in the project with someSlug
+# ex: 127.0.0.1:5000/github/commits_on_stories?projectSlug="someSlug"&repoName="someRepo"
+# Returns commit information in someRepo for each user story in the project with someSlug
 @github_api.route('/commits_on_stories', methods=('GET', 'POST'))
 def api_get_commits_on_stories():
     projectSlug = request.args.get('projectSlug')
+    repoName = request.args.get('repoName')
 
     commitOnStoryData = DB.get_commits_on_stories()
     
