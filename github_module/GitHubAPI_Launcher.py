@@ -279,7 +279,8 @@ def api_get_complexity_of_file():
     fileName = request.args.get('filename')
 
     complexityData = DB.get_complexity_of_file(repoName, fileName)
-    data = json.dumps(complexityData)
+    baselineData = CheckStyleManager.getBaselineForComplexities()
+    data = json.dumps({'complexities' : complexityData, 'baselines' : baselineData})
 
     return (data, {'Content-Type': 'application/json'})
 
@@ -290,7 +291,8 @@ def api_get_complexity_of_files_in_repo():
     repoName = request.args.get('reponame')
 
     complexityData = DB.get_complexity_of_files_in_repo(repoName)
-    data = json.dumps(complexityData)
+    baselineData = CheckStyleManager.getBaselineForComplexities()
+    data = json.dumps({'complexities' : complexityData, 'baselines' : baselineData})
 
     return (data, {'Content-Type': 'application/json'})
 
@@ -302,7 +304,8 @@ def api_get_complexity_by_author():
     authorName = request.args.get('authorname')
 
     complexityData = DB.get_complexity_by_author(repoName, authorName)
-    data = json.dumps(complexityData)
+    baselineData = CheckStyleManager.getBaselineForComplexities()
+    data = json.dumps({'complexities' : complexityData, 'baselines' : baselineData})
 
     return (data, {'Content-Type': 'application/json'})
 
@@ -313,7 +316,8 @@ def api_get_complexity_of_authors_in_repo():
     repoName = request.args.get('reponame')
 
     complexityData = DB.get_complexity_of_authors_in_repo(repoName)
-    data = json.dumps(complexityData)
+    baselineData = CheckStyleManager.getBaselineForComplexities()
+    data = json.dumps({'complexities' : complexityData, 'baselines' : baselineData})
 
     return (data, {'Content-Type': 'application/json'})
 

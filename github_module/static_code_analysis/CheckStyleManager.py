@@ -87,8 +87,8 @@ class CheckStyleManager:
     @staticmethod
     def getBaselineForComplexities():
 
-        metrics = {'BooleanExpressionComplexity': 3, 'ClassFanOutComplexity': 20,
-                   'CyclomaticComplexity': 10, 'JavaNCSS': 50, 'NPathComplexity': 200,
-                   'ClassDataAbstractionCoupling': 7}
+        metrics = {'booleanExpressionComplexity': 3, 'classFanOutComplexity': 20,
+                   'cyclomaticComplexity': 10, 'javaNCSS': 50, 'nPathComplexity': 200,
+                   'classDataAbstractionCoupling': 7}
 
         return metrics
