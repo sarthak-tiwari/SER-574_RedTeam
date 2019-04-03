@@ -390,3 +390,40 @@ def get_complexity_of_authors_in_repo(repoName):
             result.append(authorComplexity)
 
         return result
+
+def get_commits_on_stories():
+
+    #TODO: Update the code to use live data, currently returning dummy data
+    
+    data = []
+
+    storyOne = {
+        "number" : 78,
+        "subject" : "As a front-end developer, I want live data to be served so that we could develop and test the front-end accordingly.",
+        "start_date" : 20190327,
+        "end_date" : 20190405,
+        "commit_count" : 8,
+        "first_commit_date" : 20190329,
+        "last_commit_date" : 20190401,
+        "late_start_days" : 2,
+        "early_start_days" : 0,
+        "early_finish_days" : 4,
+        "late_finish_days" : 0 }
+
+    storyTwo = {
+        "number" : 80,
+        "subject" : "As a backend developer, I want to store the overall GitHub repository data in the database.",
+        "start_date" : 20190327,
+        "end_date" : 20190405,
+        "commit_count" : 10,
+        "first_commit_date" : 20190325,
+        "last_commit_date" : 20190408,
+        "late_start_days" : 0,
+        "early_start_days" : 2,
+        "early_finish_days" : 0,
+        "late_finish_days" : 3 }
+
+    data.append(storyOne)
+    data.append(storyTwo)
+
+    return data
