@@ -3,26 +3,26 @@
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 
-import US_Group1
-import ut_History_Info
-import findSprintGaps
-import listWikiContent
-import list_sprints
-import list_userstories
-import sprintplanningAnalysis
-import taskAssignedTo_modified
-import task_finishdate
-import task_of_userstory
-import taskassignedto
-import user_story
-import user_task_information
-import userstory_create_date
-import wikiTextParser
+from taiga_module import US_Group1
+from taiga_module import ut_History_Info
+from taiga_module import findSprintGaps
+from taiga_module import listWikiContent
+from taiga_module import list_sprints
+from taiga_module import list_userstories
+from taiga_module import sprintplanningAnalysis
+from taiga_module import taskAssignedTo_modified
+from taiga_module import task_finishdate
+from taiga_module import task_of_userstory
+from taiga_module import taskassignedto
+from taiga_module import user_story
+from taiga_module import user_task_information
+from taiga_module import userstory_create_date
+from taiga_module import wikiTextParser
 
-import sprintplanningAnalysis
-import ut_History_Info, taskAssignedTo_modified
-import teammemberinfo
-import UserTask_change_status
+from taiga_module import sprintplanningAnalysis
+from taiga_module import ut_History_Info, taskAssignedTo_modified
+from taiga_module import teammemberinfo
+from taiga_module import UserTask_change_status
 
 
 app = Flask(__name__)
