@@ -2,6 +2,7 @@ import sqlite3
 
 from . import db_populate
 from .Constants import Constants
+from . import Utility
 
 """
 This file implements several basic functions for querying and updating the state
@@ -391,10 +392,40 @@ def get_complexity_of_authors_in_repo(repoName):
 
         return result
 
-def get_commits_on_stories():
-
+def get_commits_on_stories(taigaSlug):
+    """
+    Returns commit count and details regarding each user story
+    """
     #TODO: Update the code to use live data, currently returning dummy data
+    # SELECT COUNT(*) FROM
+    # (SELECT commitMessage
+    # FROM commitData
+    # WHERE instr(substr(commitMessage, 0, 25), '44') > 0
+    # GROUP BY hash, commitMessage);
     
+    userStories = Utility.fetchDataFromTaigaAPI(taigaSlug)
+
+    with sqlite3.connect(Constants.DATABASE) as conn:
+        db = conn.cursor()
+
+        for userStory in userStories:
+            totalCountOfCommit = 0
+            for taskNumber in userStory['taskNumbers']:
+
+                query = 'SELECT COUNT(*) FROM '\
+                    + '(SELECT commitMessage FROM commitData '\
+                    + 'WHERE instr(substr(commitMessage, 0, 25), "' + str(taskNumber) + '") > 0 '\
+                    + 'GROUP BY hash, commitMessage);'
+
+                db.execute(query)
+                rows = db.fetchall()
+
+                totalCountOfCommit += rows[0][0]
+            
+            userStory['commit_count'] = totalCountOfCommit
+            #print(userStory)
+            #print()
+
     data = []
 
     storyOne = {
@@ -426,4 +457,4 @@ def get_commits_on_stories():
     data.append(storyOne)
     data.append(storyTwo)
 
-    return data
+    return userStories

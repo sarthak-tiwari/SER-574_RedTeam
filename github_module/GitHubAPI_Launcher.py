@@ -349,7 +349,7 @@ def api_get_commits_on_stories():
     projectSlug = request.args.get('projectSlug')
     repoName = request.args.get('repoName')
 
-    commitOnStoryData = DB.get_commits_on_stories()
+    commitOnStoryData = DB.get_commits_on_stories(projectSlug)
     
     data = json.dumps(commitOnStoryData)
 
