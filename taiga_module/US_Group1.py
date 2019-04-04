@@ -68,8 +68,8 @@ def processTaskCreation(slug):
     for sprint in milestone:
         rsp_dict = {'name': sprint['name']}
         sprint_start = sprint["created_date"].split("T")[0]
-        user = {}
-        cnt = 1
+        user = []
+
         for us in sprint['user_stories']:
             usId = str(us['id'])
             task_rsp = requests.get(http + "/tasks?user_story="+usId, headers=header)
@@ -79,10 +79,12 @@ def processTaskCreation(slug):
                 if ts['created_date'].split("T")[0] <= sprint_start:
                     task_count += 1
 
-            user["user_story"+str(cnt)] = {"Description": us["subject"],
+            '''user["user_story"+str(cnt)] = {"Description": us["subject"],
                                            "Initial_task":  task_count}
-            cnt += 1
+            cnt += 1'''
 
+            user += [{"Description": us["subject"],
+                    "Initial_task": task_count}]
         rsp_dict['user_stories'] = user
         taskCreate += [rsp_dict]
 
@@ -121,3 +123,51 @@ def processSprintUserStory(slug):
         sprintUserStory += [rsp_dict]
 
     return sprintUserStory
+
+
+def processUserAndTaskDetails(slug):
+    project_response = requests.get(http + "/projects/by_slug?slug=" + str(slug), headers=header)
+    project = project_response.json()
+    prjId = str(project['id'])
+    taskCreate = list()
+
+    milestone_rsp = requests.get(http + "/milestones?project=" + prjId, headers=header)
+    milestone = milestone_rsp.json()
+
+    for sprint in milestone:
+        rsp_dict = {'name': sprint['name']}
+        user = []
+
+        for us in sprint['user_stories']:
+            usId = str(us['id'])
+            task_rsp = requests.get(http + "/tasks?user_story=" + usId, headers=header)
+            task = task_rsp.json()
+
+            tempUser = {"Description": us["subject"],
+                      "Ref_Num": us["ref"],
+                      "Create_Date": us["created_date"].split("T")[0],
+                      "Complete_Date": None,
+                      "Tasks": None}
+
+            if us["finish_date"]:
+                tempUser["Complete_Date"] = us["finish_date"].split("T")[0]
+
+            tasks = []
+            for ts in task:
+                tempTask = {"Description": ts["subject"],
+                          "Ref_Num": ts["ref"],
+                          "Create_Date": ts["created_date"].split("T")[0],
+                          "Complete_Date": None,
+                }
+
+                if ts["finished_date"]:
+                    tempTask["Complete_Date"] = ts["finished_date"].split("T")[0]
+
+                tasks += [tempTask]
+
+            tempUser["Tasks"] = tasks
+            user += [tempUser]
+        rsp_dict['user_stories'] = user
+        taskCreate += [rsp_dict]
+
+    return taskCreate

@@ -2,6 +2,7 @@
 
 from flask import Flask, jsonify, request, Blueprint
 from taiga_module import US_Group1
+
 from taiga_module import findSprintGaps
 from taiga_module import listWikiContent
 from taiga_module import list_sprints
@@ -47,6 +48,13 @@ def initialTaskInformation():
 def sprintUserStoryInformation():
     slug = request.args.get('slug')
     return jsonify({'sprint_user_story_info': US_Group1.processSprintUserStory(slug)})
+
+
+@app.route('/user_task_details', methods=['GET'])
+def sprintUserTaskDetails():
+    slug = request.args.get('slug')
+    return jsonify({'sprint_user_task_details': US_Group1.processUserAndTaskDetails(slug)})
+
 
 
 @taiga_api.route('/wikiPage', methods=['GET'])
