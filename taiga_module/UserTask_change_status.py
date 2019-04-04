@@ -27,6 +27,7 @@ def UserTaskchangestatus(slug1,sprint_no):
 		if (sprint_no == int(i['milestone_slug'][7])):
 			ut.append(i['id'])
 			utChangeDate[i['id']] = i['created_date']
+
 	for i in range(len(ut)):
 		cd=[]
 		cd.append(utChangeDate[ut[i]])

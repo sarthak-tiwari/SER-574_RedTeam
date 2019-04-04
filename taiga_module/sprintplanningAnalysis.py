@@ -1,5 +1,5 @@
 from datetime import date
-import wikiTextParser
+from taiga_module import wikiTextParser
 import re
 
 
