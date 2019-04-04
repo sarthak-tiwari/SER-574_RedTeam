@@ -410,21 +410,27 @@ def get_commits_on_stories(taigaSlug):
 
         for userStory in userStories:
             totalCountOfCommit = 0
+            minDate = 21991212
+            maxDate = 19900101
             for taskNumber in userStory['taskNumbers']:
 
-                query = 'SELECT COUNT(*) FROM '\
-                    + '(SELECT commitMessage FROM commitData '\
+                query = 'SELECT ifnull(min(date), 21991212) as first_commit_date, '\
+                    + 'ifnull(max(date), 19900101) as last_commit_date, '\
+                    + 'COUNT(*) as commit_count FROM '\
+                    + '(SELECT date, commitMessage FROM commitData '\
                     + 'WHERE instr(substr(commitMessage, 0, 25), "' + str(taskNumber) + '") > 0 '\
-                    + 'GROUP BY hash, commitMessage);'
+                    + 'GROUP BY hash, commitMessage, date);'
 
                 db.execute(query)
                 rows = db.fetchall()
 
-                totalCountOfCommit += rows[0][0]
+                minDate = min(minDate, rows[0][0])
+                maxDate = max(maxDate, rows[0][1])
+                totalCountOfCommit += rows[0][2]
             
             userStory['commit_count'] = totalCountOfCommit
-            #print(userStory)
-            #print()
+            userStory['first_commit_date'] = None if (totalCountOfCommit==0) else minDate
+            userStory['last_commit_date'] = None if (totalCountOfCommit==0) else maxDate
 
     data = []
 

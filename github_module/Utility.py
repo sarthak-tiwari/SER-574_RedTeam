@@ -1,3 +1,5 @@
+from datetime import datetime
+import datetime
 import http
 import json
 import requests
@@ -19,8 +21,11 @@ def fetchDataFromTaigaAPI(taigaSlug):
             userStoryDetail = {}
             userStoryDetail['number'] = userStory.get('Ref_Num')
             userStoryDetail['subject'] = userStory.get('Description')
-            userStoryDetail['start_date'] = userStory.get('Create_Date')
-            userStoryDetail['end_date'] = userStory.get('Complete_Date')
+            userStoryDetail['start_date'] = datetime.datetime.strptime(userStory.get('Create_Date'), '%Y-%m-%d').strftime('%Y%m%d')
+            if (userStory.get('Complete_Date') is None):
+                userStoryDetail['end_date'] = None
+            else:
+                userStoryDetail['end_date'] = datetime.datetime.strptime(userStory.get('Complete_Date'), '%Y-%m-%d').strftime('%Y%m%d')
             userStoryDetail['commit_count'] = 0
             userStoryDetail['first_commit_date'] = 0
             userStoryDetail['last_commit_date'] = 0
