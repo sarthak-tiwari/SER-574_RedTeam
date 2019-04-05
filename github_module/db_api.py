@@ -1,3 +1,4 @@
+from datetime import datetime
 import sqlite3
 
 from . import db_populate
@@ -431,36 +432,37 @@ def get_commits_on_stories(taigaSlug):
             userStory['commit_count'] = totalCountOfCommit
             userStory['first_commit_date'] = None if (totalCountOfCommit==0) else minDate
             userStory['last_commit_date'] = None if (totalCountOfCommit==0) else maxDate
+            userStory.pop('taskNumbers', None)
 
-    data = []
 
-    storyOne = {
-        "number" : 78,
-        "subject" : "As a front-end developer, I want live data to be served so that we could develop and test the front-end accordingly.",
-        "start_date" : 20190327,
-        "end_date" : 20190405,
-        "commit_count" : 8,
-        "first_commit_date" : 20190329,
-        "last_commit_date" : 20190401,
-        "late_start_days" : 2,
-        "early_start_days" : 0,
-        "early_finish_days" : 4,
-        "late_finish_days" : 0 }
+            if(totalCountOfCommit == 0):
+                userStory['first_commit_date'] = None
+                userStory['last_commit_date'] = None
+                userStory['late_start_days'] = None
+                userStory['early_start_days'] = None
+                userStory['early_finish_days'] = None
+                userStory['late_finish_days'] = None
+            else:
+                start_date = datetime.strptime(userStory['start_date'], '%Y%m%d')
+                end_date = None if userStory['end_date'] is None else datetime.strptime(userStory['end_date'], '%Y%m%d')
+                minDate = datetime.strptime(str(minDate), '%Y%m%d')
+                maxDate = datetime.strptime(str(maxDate), '%Y%m%d')
+                if((start_date - minDate).days > 0):
+                    userStory['early_start_days'] = abs((start_date - minDate).days)
+                    userStory['late_start_days'] = 0
+                else:
+                    userStory['early_start_days'] = 0
+                    userStory['late_start_days'] = abs((start_date - minDate).days)
 
-    storyTwo = {
-        "number" : 80,
-        "subject" : "As a backend developer, I want to store the overall GitHub repository data in the database.",
-        "start_date" : 20190327,
-        "end_date" : 20190405,
-        "commit_count" : 10,
-        "first_commit_date" : 20190325,
-        "last_commit_date" : 20190408,
-        "late_start_days" : 0,
-        "early_start_days" : 2,
-        "early_finish_days" : 0,
-        "late_finish_days" : 3 }
-
-    data.append(storyOne)
-    data.append(storyTwo)
+                if(userStory['end_date'] is None):
+                    userStory['early_finish_days'] = None
+                    userStory['late_finish_days'] = None
+                else:
+                    if((end_date - maxDate).days > 0):
+                        userStory['early_finish_days'] = abs((end_date - maxDate).days)
+                        userStory['late_finish_days'] = 0
+                    else:
+                        userStory['early_finish_days'] = 0
+                        userStory['late_finish_days'] = abs((end_date - maxDate).days)
 
     return userStories
