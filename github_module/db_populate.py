@@ -1,10 +1,12 @@
 #!/usr/bin/env python
 ################################################################################
 
-from .Constants import Constants
-from .static_code_analysis.CheckStyleManager import CheckStyleManager
-from . import GithubAPI
+# from .Constants import Constants
+# from .static_code_analysis.CheckStyleManager import CheckStyleManager
+import GithubAPI
 import sqlite3
+import urllib, json
+import requests
 from pprint import pprint
 import pickle
 from collections import deque
@@ -87,8 +89,42 @@ def store_user_info(db, repo_id):
 def store_commit(db, repo_id, hash):
     data = GithubAPI.get_commit(repo_id, hash)
     # print(data)
+    comments_url = data["comments_url"]
 
-    store_commit_json(db, repo_id, data)
+    with urllib.request.urlopen(comments_url) as url:
+        comment_data = json.loads(url.read().decode())
+
+    comments = []
+    for comment in comment_data:
+        comments.append(comment['body'])
+    print(comments)
+
+    # extract data
+    hash = data["sha"]  # TEXT
+    author = data["author"]["login"]  # TEXT
+    commit_message = data["commit"]["message"]  # TEXT
+    date = str(data["commit"]["author"]["date"][0:4]) + str(data["commit"]
+                                                            ["author"]["date"][5:7]) + str(
+        data["commit"]["author"]["date"][8:10])
+    time_committed = data["commit"]["author"]["date"]  # BLOB
+    files_modified = (repr([f["filename"]
+                            for f in data["files"]])).replace("'", "\"")  # TEXT
+    num_additions = data["stats"]["additions"]  # INTEGER
+    num_deletions = data["stats"]["deletions"]  # INTEGER"
+    commitComment = comments
+    commit_comment = ''.join(commitComment)
+
+    query = "INSERT INTO commitData(hash, repositoryID, author, commitMessage, " \
+            "timeCommitted, filesModified, noOfAdditions, noOfDeletions, commentMessage) " \
+            "VALUES('" + hash + "', " + str(repo_id) + ", '" + author + "', '" + commit_message + "', " \
+            "'" + time_committed + "', '" + files_modified + "', " + \
+            str(num_additions) + ", " + str(num_deletions) + ", '" + commit_comment + "')"
+
+    db.execute(query)
+    conn.commit()
+
+
+    # store_commit_json(db, repo_id, data)
 
 
 def store_commit_json(db, repo_id, data):
@@ -105,6 +141,7 @@ def store_commit_json(db, repo_id, data):
                             for f in data["files"]])).replace("'", "\"")  # TEXT
     num_additions = data["stats"]["additions"]                      # INTEGER
     num_deletions = data["stats"]["deletions"]                      # INTEGER"
+
 
     query = "INSERT INTO commitData(hash, repositoryID, author, commitMessage, " \
         "timeCommitted, filesModified, noOfAdditions, noOfDeletions) " \
@@ -142,7 +179,7 @@ def store_pull_data(repo_id, pull_no):
     no_of_reviews = 4
 
     insert_query = "INSERT INTO pullData(requestID, requestTile, author, noOfComments, targetBranch, noOfReviews ) " \
-                   "VALUES('"+repo_id+"', '"+request_title+"', '"+author+"', '"+str(
+                   "VALUES('"+str(repo_id)+"', '"+request_title+"', '"+author+"', '"+str(
                        no_of_comments)+"', '"+str(target_branch)+"', '"+str(no_of_reviews)+"')"
     # "VALUES(?, ?, ?, ?, ?, ?)", (repo_id, request_title, author, str(no_of_comments), target_branch, str(no_of_reviews))
 
@@ -214,7 +251,7 @@ def store_repo(db, repo_id, branch="master"):
 
 
 if __name__ == "__main__":
-    conn = sqlite3.connect(Constants.DATABASE)
+    conn = sqlite3.connect("database.db")
     db = conn.cursor()
 
     #store_repo(db, 168214867)
@@ -229,8 +266,8 @@ if __name__ == "__main__":
     # store_commit(db, repo_id, sample_hash)
     store_pull_data(repo_id, newPull)
     # store_user_info(db, repo_id)
-    display_query = "SELECT * FROM pullData"
-    store_repository_info(db, repo_id, None)
+    # display_query = "SELECT * FROM pullData"
+    # store_repository_info(db, repo_id, None)
     # store_repository_info(db, repo_id, None)
     #store_commit(db, repo_id, sample_hash)
     # store_pull_data(repo_id, newPull)
