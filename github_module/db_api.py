@@ -1,7 +1,9 @@
+from datetime import datetime
 import sqlite3
 
 from . import db_populate
 from .Constants import Constants
+from . import Utility
 
 """
 This file implements several basic functions for querying and updating the state
@@ -390,3 +392,77 @@ def get_complexity_of_authors_in_repo(repoName):
             result.append(authorComplexity)
 
         return result
+
+def get_commits_on_stories(taigaSlug):
+    """
+    Returns commit count and details regarding each user story
+    """
+    #TODO: Update the code to use live data, currently returning dummy data
+    # SELECT COUNT(*) FROM
+    # (SELECT commitMessage
+    # FROM commitData
+    # WHERE instr(substr(commitMessage, 0, 25), '44') > 0
+    # GROUP BY hash, commitMessage);
+    
+    userStories = Utility.fetchDataFromTaigaAPI(taigaSlug)
+
+    with sqlite3.connect(Constants.DATABASE) as conn:
+        db = conn.cursor()
+
+        for userStory in userStories:
+            totalCountOfCommit = 0
+            minDate = 21991212
+            maxDate = 19900101
+            for taskNumber in userStory['taskNumbers']:
+
+                query = 'SELECT ifnull(min(date), 21991212) as first_commit_date, '\
+                    + 'ifnull(max(date), 19900101) as last_commit_date, '\
+                    + 'COUNT(*) as commit_count FROM '\
+                    + '(SELECT date, commitMessage FROM commitData '\
+                    + 'WHERE instr(substr(commitMessage, 0, 25), "' + str(taskNumber) + '") > 0 '\
+                    + 'GROUP BY hash, commitMessage, date);'
+
+                db.execute(query)
+                rows = db.fetchall()
+
+                minDate = min(minDate, rows[0][0])
+                maxDate = max(maxDate, rows[0][1])
+                totalCountOfCommit += rows[0][2]
+            
+            userStory['commit_count'] = totalCountOfCommit
+            userStory['first_commit_date'] = None if (totalCountOfCommit==0) else minDate
+            userStory['last_commit_date'] = None if (totalCountOfCommit==0) else maxDate
+            userStory.pop('taskNumbers', None)
+
+
+            if(totalCountOfCommit == 0):
+                userStory['first_commit_date'] = None
+                userStory['last_commit_date'] = None
+                userStory['late_start_days'] = None
+                userStory['early_start_days'] = None
+                userStory['early_finish_days'] = None
+                userStory['late_finish_days'] = None
+            else:
+                start_date = datetime.strptime(userStory['start_date'], '%Y%m%d')
+                end_date = None if userStory['end_date'] is None else datetime.strptime(userStory['end_date'], '%Y%m%d')
+                minDate = datetime.strptime(str(minDate), '%Y%m%d')
+                maxDate = datetime.strptime(str(maxDate), '%Y%m%d')
+                if((start_date - minDate).days > 0):
+                    userStory['early_start_days'] = abs((start_date - minDate).days)
+                    userStory['late_start_days'] = 0
+                else:
+                    userStory['early_start_days'] = 0
+                    userStory['late_start_days'] = abs((start_date - minDate).days)
+
+                if(userStory['end_date'] is None):
+                    userStory['early_finish_days'] = None
+                    userStory['late_finish_days'] = None
+                else:
+                    if((end_date - maxDate).days > 0):
+                        userStory['early_finish_days'] = abs((end_date - maxDate).days)
+                        userStory['late_finish_days'] = 0
+                    else:
+                        userStory['early_finish_days'] = 0
+                        userStory['late_finish_days'] = abs((end_date - maxDate).days)
+
+    return userStories
