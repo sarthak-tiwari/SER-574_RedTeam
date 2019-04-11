@@ -44,6 +44,18 @@ def get_commit(repo_id, commit_sha, username=None, token=None):
     endpoint = 'https://api.github.com/repositories/' + str(repo_id) + '/commits/' + commit_sha
     return process_get_request(endpoint, username, token)
 
+def get_commit_comments(repo_id, commit_sha):
+    endpoint = 'https://api.github.com/repositories/' + str(repo_id) + '/commits/' + commit_sha + '/comments'
+    return process_get_request(endpoint)
+
+def get_all_commits_with_comments(repo_id):
+    commits = get_all_commits(repo_id)
+    for commit in commits:
+        commit_sha = commit["sha"]
+        comments = get_commit_comments(repo_id, commit_sha)
+        commit["comments"] = comments
+    return commits
+
 
 def get_all_pull_requests(repo_id):
     endpoint = 'https://api.github.com/repositories/' + str(repo_id) + '/pulls'
@@ -100,3 +112,4 @@ def process_get_request(endpoint, username=None, token=None):
 # print(get_file(168214867, 'github_module/README'))
 # print(get_all_files(168214867))
 # print(user_login())
+# print(get_all_commits_with_comments(168214867))
