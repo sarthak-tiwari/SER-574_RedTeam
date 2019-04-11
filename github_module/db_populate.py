@@ -127,6 +127,39 @@ def store_commit(db, repo_id, hash):
 
     # store_commit_json(db, repo_id, data)
 
+def store_all_commits(db, repo_id):
+    commits = GithubAPI.get_all_commits_with_comments(repo_id)
+    for data in commits:
+        # extract data
+        comments = []
+        for comment in data["comments"]:
+            comments.append(comment['body'])
+
+        hash = data["sha"]  # TEXT
+        author = data["author"]["login"]  # TEXT
+        commit_message = data["commit"]["message"]  # TEXT
+        date = str(data["commit"]["author"]["date"][0:4]) + str(data["commit"]
+                                                                ["author"]["date"][5:7]) + str(
+            data["commit"]["author"]["date"][8:10])
+        time_committed = data["commit"]["author"]["date"]  # BLOB
+        files_modified = (repr([f["filename"]
+                                for f in data["files"]])).replace("'", "\"")  # TEXT
+        num_additions = data["stats"]["additions"]  # INTEGER
+        num_deletions = data["stats"]["deletions"]  # INTEGER"
+        commitComment = comments
+        commit_comment = ''.join(commitComment)
+
+        query = "INSERT INTO commitData(hash, repositoryID, author, commitMessage, " \
+                "timeCommitted, filesModified, noOfAdditions, noOfDeletions, commentMessage) " \
+                "VALUES('" + hash + "', " + str(repo_id) + ", '" + author + "', '" + commit_message + "', " \
+                "'" + time_committed + "', '" + files_modified + "', " + \
+                str(num_additions) + ", " + str(num_deletions) + ", '" + commit_comment + "')"
+
+        db.execute(query)
+        conn.commit()
+
+
+
 
 def store_commit_json(db, repo_id, data):
     # TODO: consider case where commit already has been stored.
