@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 ################################################################################
 
-# from .Constants import Constants
-# from .static_code_analysis.CheckStyleManager import CheckStyleManager
+from Constants import Constants
+from static_code_analysis.CheckStyleManager import CheckStyleManager
 import GithubAPI
 import sqlite3
 import urllib, json
@@ -18,6 +18,7 @@ from collections import deque
 __author__ = "Ruben Acuna"
 __author__ = "Carnic"
 __author__ = "Sarthak Tiwari"
+__author__ = "Joshua Drumm"
 __copyright__ = "Copyright 2019, SER574 Red Team"
 
 
@@ -224,6 +225,23 @@ def store_complexity(repoName):
                            row[0])
 
             db.execute(updateQuery, updateTuple)
+
+def store_files(db, repo_id):
+    files = GithubAPI.get_all_files(repo_id)
+    with sqlite3.connect(Constants.DATABASE) as conn:
+        db = conn.cursor()
+
+        for gitFile in files:
+
+            insert_query = 'INSERT INTO codeComplexity(repository, fileName, author, codeLink) VALUES(?, ?, ?, ?);'
+
+            insert_tuple = (str(repo_id),
+                           gitFile["path"],
+                           "Not yet Supported",
+                           gitFile["download_url"])
+
+            db.execute(insert_query, insert_tuple)
+    
 
 
 def store_repo(db, repo_id, branch="master"):

@@ -8,11 +8,11 @@ import datetime
 import json
 import sqlite3
 
-from . import GithubAPI
-from .static_code_analysis.CheckStyleManager import CheckStyleManager
+import GithubAPI
+from static_code_analysis.CheckStyleManager import CheckStyleManager
 #import metadata_analysis.commit_frequency as CF
-from . import db_api as DB
-from . import db_populate as DP
+import db_api as DB
+import db_populate as DP
 
 github_api = Blueprint('github_api', __name__,)
 
@@ -44,7 +44,7 @@ def api_core_initialize_repo():
         result = "Failed to parse git_id parameter."
     else:
         status = "wip"
-        result = DB.initialize_repo_data(git_id)
+        result = DB.initialize_repo(git_id)
 
     header = {'Content-Type': 'application/json'}
     data = json.dumps({"status": status, "result": result})
