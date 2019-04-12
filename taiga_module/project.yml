@@ -1,0 +1,275 @@
+configuration:
+  title: Agile Process API
+  description: An API dedicated to validate the Agile process followed by team with the help of Taiga.
+  uri: https://peaceful-bastion-96327.herokuapp.com/taiga/
+
+categories:
+  Sprint:
+    description: Information based on sprint in a project.
+  User Story:
+    description: Information based on user stories within a sprint.
+  Task:
+    description: Information based on tasks within user stories.
+
+versions:
+  v1.0:
+    methods:
+      Sprint Total Points:
+        category: Sprint
+        uri: sprint_story_points?slug={project}
+        description: The story points that has been closed within a sprint
+
+        request_parameters:
+          project:
+            type: string
+            description: project slug name.
+
+        response_body:
+          type: object
+          properties:
+            story:
+              type: array
+              description: List of sprints and their story points
+              items:
+                type: Story
+
+
+      Date Information:
+        category: Sprint
+        uri: sprint_date?slug={project}
+        description: The date information of the user stories and sprint to validate which user stories are closed with in the sprint end date.
+
+        request_parameters:
+          project:
+            type: string
+            description: project slug name.
+
+        response_body:
+          type: object
+          properties:
+            date_info:
+              type: array
+              description: List of sprints and their user story date information.
+              items:
+                type: Date
+
+
+      Sprint Information:
+        category: Sprint
+        uri: user_task_details?slug={project}
+        description: The sprint information, user stories tasks and its references.
+
+        request_parameters:
+          project:
+            type: string
+            description: project slug name.
+
+        response_body:
+          type: object
+          properties:
+            sprint_user_task_details:
+              type: array
+              description: List of sprints and their user story date information.
+              items:
+                type: Sprint User Information
+          
+
+      Initial Task:
+        category: Task
+        uri: initial_task?slug={project}
+        description: The initial tasks created in a user stories within a sprint.
+
+        request_parameters:
+          project:
+            type: string
+            description: project slug name.
+
+        response_body:
+          type: object
+          properties:
+            task_info:
+              type: array
+              description: List of sprints and their user story date information.
+              items:
+                type: Task
+
+
+      User Story Information:
+        category: User Story
+        uri: sprint_user_story?slug={project}
+        description: The number of open user story information in a sprint.
+
+        request_parameters:
+          project:
+            type: string
+            description: project slug name.
+
+        response_body:
+          type: object
+          properties:
+            sprint_user_story_info:
+              type: array
+              description: List of sprints and their user story date information.
+              items:
+                type: Sprint User Story
+
+    types:
+
+      Story:
+        description: A story points information.
+        item:
+          type: object
+          properties:
+            closed_points:
+              type: integer
+              description: Total points closed in the sprint.
+
+            name:
+              type: string
+              description: Name of the sprint.
+
+            total_points:
+              type: integer
+              description: Total points in the sprint.
+
+      Date:
+        description: Date information of the sprint and user story.
+        item:
+          type: object
+          properties:
+            name:
+              type: string
+              description: Name of the sprint.
+            sprint_end:
+              type: string
+              description: Sprint ending date.
+            sprint_start:
+              type: string
+              description: Sprint starting date.
+            user_story:
+              type: array
+              description: List of users story date details.
+              items:
+                type: User
+      
+      Task:
+        description: Date information of the sprint and user story.
+        item:
+          type: object
+          properties:
+            name:
+              type: string
+              description: Name of the sprint.
+            user_stories:
+              type: array
+              description: List of users story date details.
+              items:
+                type: Task Stories
+
+      Sprint User Story:
+        description: The sprint description and details.
+        item:
+          type: object
+          properties:
+            name:
+              type: string
+              description: Name of the sprint
+
+            user_stories:
+              type: array
+              description: List of users story date details.
+              items:
+                type: Task Stories
+
+      
+      Sprint User Information:
+        description: Date information of the sprint and user story.
+        item:
+          type: object
+          properties:
+            name:
+              type: string
+              description: Name of the sprint.
+            user_stories:
+              type: array
+              description: List of users story date details.
+              items:
+                type: User Task Information
+
+
+      User Task Information:
+        description: The sprint description and details.
+        item:
+          type: object
+          properties:
+            Complete_Date:
+              type: string
+              description: User story completion date.
+
+            Create_Date:
+              type: string
+              description: User story creation date.
+
+            Description:
+              type: string
+              description: Detailed description of the user story.
+
+            Ref_Num:
+              type: integer
+              description: Reference number of the user story.
+
+            Tasks:
+              type: array
+              description: List of tasks and reference number details.
+              items:
+                type: Task Information
+
+                
+      User:
+        description: A user
+        item:
+          type: object
+          properties:
+            created_date:
+              type: string
+              description: Creation date of user story
+            description:
+              type: string
+              description: Details of the user story
+            finish_date:
+              type: string
+              description: Finishing date of user story
+
+      Task Stories:
+        description: A initial tasks in a user story
+        item:
+          type: object
+          properties:
+            Description:
+              type: string
+              description: user story detailed description.
+            Initial_task:
+              type: integer
+              description: Total number of initial task.
+          
+
+      Task Information:
+        description: A initial tasks in a user story
+        item:
+          type: object
+          properties:
+            Complete_Date:
+              type: string
+              description: Task completion date.
+
+            Create_Date:
+              type: string
+              description: Task creation date.
+
+            Description:
+              type: string
+              description: Detailed description of the Task.
+
+            Ref_Num:
+              type: integer
+              description: Reference number of the Task.

@@ -1,0 +1,1370 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Agile Process API</title>
+    
+<link href="./css/combined.css" rel="stylesheet">
+<script type="text/javascript" src="./js/combined.js"></script>
+     
+</head>
+<body>
+    <div class="jumbotron">
+    <div class="container">
+        <h1>Agile Process API</h1><p>
+        An API dedicated to validate the Agile process followed by team with the help of Taiga.
+        </p></div>
+</div><div id="help-modal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                <h3>Keyboard Shortcuts</h3>
+            </div>
+            <div class="modal-body">
+                <div class="help_row">
+                    <h4>Site wide shortcuts</h4>
+                    <dl class="keyboard-mappings">
+                        <dt>?</dt>
+                        <dd>Bring up this help dialog</dd>
+                    </dl>
+                    <dl class="keyboard-mappings">
+                        <dt>esc</dt>
+                        <dd>Hide this help dialog</dd>
+                    </dl>
+                    <dl class="keyboard-mappings">
+                        <dt>/</dt>
+                        <dd>Focus search bar</dd>
+                    </dl>
+                </div>
+                <div class="help_row">
+                    <h4>Navigation</h4>
+                    <dl class="keyboard-mappings">
+                        <dt>j <em>or</em> n</dt>
+                        <dd>Move to next method or type</dd>
+                    </dl>
+                    <dl class="keyboard-mappings">
+                        <dt>k <em>or</em> p</dt>
+                        <dd>Move to previous method or type</dd>
+                    </dl>
+            
+                </div>
+            
+            </div>
+        </div>
+    </div>
+</div><div class="container">
+    <div class="row">
+        <div class="col-md-3">
+            <div class="doc-sidebar"><input type="search" placeholder="search" class="col-md-12 form-control">
+<div class="scroll-spyable">
+    <ul class="nav nav-list doc-sidenav">
+        <li class="nav-header"><h5>Methods</h5></li><li class="nav-header" data-group="Sprint"><a href="javascript:navigateTo({category: 'Sprint'}, ['category', 'method', 'type'])" data-target="#c-Sprint"><h6>Sprint</h6></a></li>
+        <li data-group="Sprint"  data-item="Date Information"><a href="javascript:navigateTo({category: 'Sprint', method: 'Date Information'}, ['category', 'method'])" data-target="#m-Date Information"><span>Date Information</span></a></li>
+        <li data-group="Sprint"  data-item="Sprint Information"><a href="javascript:navigateTo({category: 'Sprint', method: 'Sprint Information'}, ['category', 'method'])" data-target="#m-Sprint Information"><span>Sprint Information</span></a></li>
+        <li data-group="Sprint"  data-item="Sprint Total Points"><a href="javascript:navigateTo({category: 'Sprint', method: 'Sprint Total Points'}, ['category', 'method'])" data-target="#m-Sprint Total Points"><span>Sprint Total Points</span></a></li>
+        <li class="separator"></li><li class="nav-header" data-group="Task"><a href="javascript:navigateTo({category: 'Task'}, ['category', 'method', 'type'])" data-target="#c-Task"><h6>Task</h6></a></li>
+        <li data-group="Task"  data-item="Initial Task"><a href="javascript:navigateTo({category: 'Task', method: 'Initial Task'}, ['category', 'method'])" data-target="#m-Initial Task"><span>Initial Task</span></a></li>
+        <li class="separator"></li><li class="nav-header" data-group="User Story"><a href="javascript:navigateTo({category: 'User Story'}, ['category', 'method', 'type'])" data-target="#c-User Story"><h6>User Story</h6></a></li>
+        <li data-group="User Story"  data-item="User Story Information"><a href="javascript:navigateTo({category: 'User Story', method: 'User Story Information'}, ['category', 'method'])" data-target="#m-User Story Information"><span>User Story Information</span></a></li>
+    </ul>
+    <ul class="nav nav-list doc-sidenav">
+        <li class="nav-header"><h5>Types</h5></li>
+        <li data-group="None" data-item="Date"><a href="javascript:navigateTo({category: 'None', type: 'Date'}, ['category', 'method'])" data-target="#t-Date"><span>Date</span></a></li>
+        <li data-group="None" data-item="Sprint User Information"><a href="javascript:navigateTo({category: 'None', type: 'Sprint User Information'}, ['category', 'method'])" data-target="#t-Sprint User Information"><span>Sprint User Information</span></a></li>
+        <li data-group="None" data-item="Sprint User Story"><a href="javascript:navigateTo({category: 'None', type: 'Sprint User Story'}, ['category', 'method'])" data-target="#t-Sprint User Story"><span>Sprint User Story</span></a></li>
+        <li data-group="None" data-item="Story"><a href="javascript:navigateTo({category: 'None', type: 'Story'}, ['category', 'method'])" data-target="#t-Story"><span>Story</span></a></li>
+        <li data-group="None" data-item="Task"><a href="javascript:navigateTo({category: 'None', type: 'Task'}, ['category', 'method'])" data-target="#t-Task"><span>Task</span></a></li>
+        <li data-group="None" data-item="Task Information"><a href="javascript:navigateTo({category: 'None', type: 'Task Information'}, ['category', 'method'])" data-target="#t-Task Information"><span>Task Information</span></a></li>
+        <li data-group="None" data-item="Task Stories"><a href="javascript:navigateTo({category: 'None', type: 'Task Stories'}, ['category', 'method'])" data-target="#t-Task Stories"><span>Task Stories</span></a></li>
+        <li data-group="None" data-item="User"><a href="javascript:navigateTo({category: 'None', type: 'User'}, ['category', 'method'])" data-target="#t-User"><span>User</span></a></li>
+        <li data-group="None" data-item="User Task Information"><a href="javascript:navigateTo({category: 'None', type: 'User Task Information'}, ['category', 'method'])" data-target="#t-User Task Information"><span>User Task Information</span></a></li>
+    </ul>
+</div>
+            </div>
+        </div>
+        <div class="col-md-9">
+            <div id="item-head" class="item">
+                <h4></h4>
+                <div class="diff-header"></div>
+                <div class="stack">
+                    <h5>hello</h5>
+                </div>
+            </div>
+            <div class="page-header">
+                <h2>Methods</h2>
+            </div>
+            <ul class="list-unstyled">
+    <li class="category" id="c-Sprint"><h3>Sprint</h3>
+        <div class="description">Information based on sprint in a project.</div>
+        <ul class="list-unstyled">
+            <li class="method item" id="m-Date Information" data-method="GET">
+                <h4>Date Information</h4><div class="nocontents">no implementation for this version</div>
+                <div class="contents">
+
+<h5 class="title"></h5>
+
+<div class="description stack">
+    
+    <div class="diff_version" data-version="v1.0">The date information of the user stories and sprint to validate which user stories are closed with in the sprint end date.</div></div><div class="request stack">
+    <h5><i class="i-request"></i> Request: </h5>
+    <h6>Resource: </h6>
+
+    <code  class="diff_version" data-version="v1.0"><span class="hur">https://peaceful-bastion-96327.herokuapp.com/taiga/sprint_date?slug={project}</span></code>
+    <h6>URI Parameters: </h6><table class="table table-bordered table-hover table-condensed">
+        <colgroup>
+            <col></col>
+            <col width="160px"></col>
+            <col width="70px"></col>
+            <col width="50%"></col>
+        </colgroup>
+        <thead>
+            <tr>
+            <th><span
+            >Parameter</span></th>
+            <th><span
+            >Type</span></th>
+            <th><span
+            >Optional</span></th>
+            <th><span
+            >Description</span></th>
+            </tr>
+        </thead>
+        <tbody>
+            
+        <tr class="diff_version " data-version="v1.0">
+            <td><span class="str">project</span></td>
+            <td><span class="typ">string<td><span class="lit"></span></td>
+            <td><span class="com">project slug name.</span></td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+<div class="response stack">
+    <h5><i class="i-response"></i> Response: </h5>
+    <h6>Body: </h6>
+    <div class="code"><table class="table-hover">
+        <colgroup>
+            <col width="50%%"></col>
+            <col width="50%%"></col>
+        </colgroup>
+        <tbody>
+
+    <tr class="diff_version" data-version="v1.0">
+        <td><span class="pun">{</span></td>
+        <td class="com"></td>
+    </tr>
+    <tr class="diff_version" data-version="v1.0">
+        <td>  <span class="str">"date_info"</span><span class="pun">: </span><span class="pun">[</span></td>
+        <td class="com">List of sprints and their user story date information.</td>
+    </tr>
+    <tr class="diff_version" data-version="v1.0">
+        <td>    <span class="typ"><a href="javascript:navigateTo({type: 'Date'}, ['category', 'method'])">Date</a></span></td>
+        <td class="com"></td>
+    </tr>
+    <tr class="diff_version" data-version="v1.0">
+        <td>  <span class="pun">]</span></td>
+        <td></td>
+    </tr>
+    <tr class="diff_version" data-version="v1.0">
+        <td><span class="pun">}</span></td>
+        <td></td>
+    </tr>
+        </tbody>
+    </table></div>
+</div><div class="stack sample"><div data-version="v1.0">
+
+<h5><i class="i-sample"></i> Sample: </h5>
+<h6>Request: </h6>
+<div class="code"><span class="hme">GET</span> <span class="hur">sprint_date?slug=my_project</span> <span class="hpr">HTTP/1.1</span>
+<span class="hat">Content-Type</span><span class="pun">: </span><span class="hva">application/json; charset=utf-8</span>
+
+</div>
+        <h6>Response: </h6>
+        <div class="code"><span class="hpr">HTTP/1.1</span> <span class="lit">200</span> <span class="str">OK</span>
+<span class="hat">Content-Type</span><span class="pun">: </span><span class="hva">application/json; charset=utf-8</span>
+
+<span class="pun">{
+</span>  <span class="str">"date_info"</span><span class="pun">: </span><span class="pun">[
+</span>    <span class="pun">{
+</span>      <span class="str">"name"</span><span class="pun">: </span><span class="str">"my_name"</span><span class="pun">,
+</span>      <span class="str">"sprint_end"</span><span class="pun">: </span><span class="str">"my_sprint_end"</span><span class="pun">,
+</span>      <span class="str">"sprint_start"</span><span class="pun">: </span><span class="str">"my_sprint_start"</span><span class="pun">,
+</span>      <span class="str">"user_story"</span><span class="pun">: </span><span class="pun">[
+</span>        <span class="pun">{
+</span>          <span class="str">"created_date"</span><span class="pun">: </span><span class="str">"my_created_date"</span><span class="pun">,
+</span>          <span class="str">"description"</span><span class="pun">: </span><span class="str">"my_description"</span><span class="pun">,
+</span>          <span class="str">"finish_date"</span><span class="pun">: </span><span class="str">"my_finish_date"</span>
+        <span class="pun">}</span><span class="pun">,
+</span>        <span class="pun">{
+</span>          <span class="str">"created_date"</span><span class="pun">: </span><span class="str">"my_created_date"</span><span class="pun">,
+</span>          <span class="str">"description"</span><span class="pun">: </span><span class="str">"my_description"</span><span class="pun">,
+</span>          <span class="str">"finish_date"</span><span class="pun">: </span><span class="str">"my_finish_date"</span>
+        <span class="pun">}</span>
+      <span class="pun">]</span>
+    <span class="pun">}</span><span class="pun">,
+</span>    <span class="pun">{
+</span>      <span class="str">"name"</span><span class="pun">: </span><span class="str">"my_name"</span><span class="pun">,
+</span>      <span class="str">"sprint_end"</span><span class="pun">: </span><span class="str">"my_sprint_end"</span><span class="pun">,
+</span>      <span class="str">"sprint_start"</span><span class="pun">: </span><span class="str">"my_sprint_start"</span><span class="pun">,
+</span>      <span class="str">"user_story"</span><span class="pun">: </span><span class="pun">[
+</span>        <span class="pun">{
+</span>          <span class="str">"created_date"</span><span class="pun">: </span><span class="str">"my_created_date"</span><span class="pun">,
+</span>          <span class="str">"description"</span><span class="pun">: </span><span class="str">"my_description"</span><span class="pun">,
+</span>          <span class="str">"finish_date"</span><span class="pun">: </span><span class="str">"my_finish_date"</span>
+        <span class="pun">}</span><span class="pun">,
+</span>        <span class="pun">{
+</span>          <span class="str">"created_date"</span><span class="pun">: </span><span class="str">"my_created_date"</span><span class="pun">,
+</span>          <span class="str">"description"</span><span class="pun">: </span><span class="str">"my_description"</span><span class="pun">,
+</span>          <span class="str">"finish_date"</span><span class="pun">: </span><span class="str">"my_finish_date"</span>
+        <span class="pun">}</span>
+      <span class="pun">]</span>
+    <span class="pun">}</span>
+  <span class="pun">]</span>
+<span class="pun">}</span></div></div></div>
+                </div>
+            </li>
+            <li class="method item" id="m-Sprint Information" data-method="GET">
+                <h4>Sprint Information</h4><div class="nocontents">no implementation for this version</div>
+                <div class="contents">
+
+<h5 class="title"></h5>
+
+<div class="description stack">
+    
+    <div class="diff_version" data-version="v1.0">The sprint information, user stories tasks and its references.</div></div><div class="request stack">
+    <h5><i class="i-request"></i> Request: </h5>
+    <h6>Resource: </h6>
+
+    <code  class="diff_version" data-version="v1.0"><span class="hur">https://peaceful-bastion-96327.herokuapp.com/taiga/user_task_details?slug={project}</span></code>
+    <h6>URI Parameters: </h6><table class="table table-bordered table-hover table-condensed">
+        <colgroup>
+            <col></col>
+            <col width="160px"></col>
+            <col width="70px"></col>
+            <col width="50%"></col>
+        </colgroup>
+        <thead>
+            <tr>
+            <th><span
+            >Parameter</span></th>
+            <th><span
+            >Type</span></th>
+            <th><span
+            >Optional</span></th>
+            <th><span
+            >Description</span></th>
+            </tr>
+        </thead>
+        <tbody>
+            
+        <tr class="diff_version " data-version="v1.0">
+            <td><span class="str">project</span></td>
+            <td><span class="typ">string<td><span class="lit"></span></td>
+            <td><span class="com">project slug name.</span></td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+<div class="response stack">
+    <h5><i class="i-response"></i> Response: </h5>
+    <h6>Body: </h6>
+    <div class="code"><table class="table-hover">
+        <colgroup>
+            <col width="50%%"></col>
+            <col width="50%%"></col>
+        </colgroup>
+        <tbody>
+
+    <tr class="diff_version" data-version="v1.0">
+        <td><span class="pun">{</span></td>
+        <td class="com"></td>
+    </tr>
+    <tr class="diff_version" data-version="v1.0">
+        <td>  <span class="str">"sprint_user_task_details"</span><span class="pun">: </span><span class="pun">[</span></td>
+        <td class="com">List of sprints and their user story date information.</td>
+    </tr>
+    <tr class="diff_version" data-version="v1.0">
+        <td>    <span class="typ"><a href="javascript:navigateTo({type: 'Sprint User Information'}, ['category', 'method'])">Sprint User Information</a></span></td>
+        <td class="com"></td>
+    </tr>
+    <tr class="diff_version" data-version="v1.0">
+        <td>  <span class="pun">]</span></td>
+        <td></td>
+    </tr>
+    <tr class="diff_version" data-version="v1.0">
+        <td><span class="pun">}</span></td>
+        <td></td>
+    </tr>
+        </tbody>
+    </table></div>
+</div><div class="stack sample"><div data-version="v1.0">
+
+<h5><i class="i-sample"></i> Sample: </h5>
+<h6>Request: </h6>
+<div class="code"><span class="hme">GET</span> <span class="hur">user_task_details?slug=my_project</span> <span class="hpr">HTTP/1.1</span>
+<span class="hat">Content-Type</span><span class="pun">: </span><span class="hva">application/json; charset=utf-8</span>
+
+</div>
+        <h6>Response: </h6>
+        <div class="code"><span class="hpr">HTTP/1.1</span> <span class="lit">200</span> <span class="str">OK</span>
+<span class="hat">Content-Type</span><span class="pun">: </span><span class="hva">application/json; charset=utf-8</span>
+
+<span class="pun">{
+</span>  <span class="str">"sprint_user_task_details"</span><span class="pun">: </span><span class="pun">[
+</span>    <span class="pun">{
+</span>      <span class="str">"name"</span><span class="pun">: </span><span class="str">"my_name"</span><span class="pun">,
+</span>      <span class="str">"user_stories"</span><span class="pun">: </span><span class="pun">[
+</span>        <span class="pun">{
+</span>          <span class="str">"Complete_Date"</span><span class="pun">: </span><span class="str">"my_Complete_Date"</span><span class="pun">,
+</span>          <span class="str">"Create_Date"</span><span class="pun">: </span><span class="str">"my_Create_Date"</span><span class="pun">,
+</span>          <span class="str">"Description"</span><span class="pun">: </span><span class="str">"my_Description"</span><span class="pun">,
+</span>          <span class="str">"Ref_Num"</span><span class="pun">: </span><span class="lit">42</span><span class="pun">,
+</span>          <span class="str">"Tasks"</span><span class="pun">: </span><span class="pun">[
+</span>            <span class="pun">{
+</span>              <span class="str">"Complete_Date"</span><span class="pun">: </span><span class="str">"my_Complete_Date"</span><span class="pun">,
+</span>              <span class="str">"Create_Date"</span><span class="pun">: </span><span class="str">"my_Create_Date"</span><span class="pun">,
+</span>              <span class="str">"Description"</span><span class="pun">: </span><span class="str">"my_Description"</span><span class="pun">,
+</span>              <span class="str">"Ref_Num"</span><span class="pun">: </span><span class="lit">42</span>
+            <span class="pun">}</span><span class="pun">,
+</span>            <span class="pun">{
+</span>              <span class="str">"Complete_Date"</span><span class="pun">: </span><span class="str">"my_Complete_Date"</span><span class="pun">,
+</span>              <span class="str">"Create_Date"</span><span class="pun">: </span><span class="str">"my_Create_Date"</span><span class="pun">,
+</span>              <span class="str">"Description"</span><span class="pun">: </span><span class="str">"my_Description"</span><span class="pun">,
+</span>              <span class="str">"Ref_Num"</span><span class="pun">: </span><span class="lit">42</span>
+            <span class="pun">}</span>
+          <span class="pun">]</span>
+        <span class="pun">}</span><span class="pun">,
+</span>        <span class="pun">{
+</span>          <span class="str">"Complete_Date"</span><span class="pun">: </span><span class="str">"my_Complete_Date"</span><span class="pun">,
+</span>          <span class="str">"Create_Date"</span><span class="pun">: </span><span class="str">"my_Create_Date"</span><span class="pun">,
+</span>          <span class="str">"Description"</span><span class="pun">: </span><span class="str">"my_Description"</span><span class="pun">,
+</span>          <span class="str">"Ref_Num"</span><span class="pun">: </span><span class="lit">42</span><span class="pun">,
+</span>          <span class="str">"Tasks"</span><span class="pun">: </span><span class="pun">[
+</span>            <span class="pun">{
+</span>              <span class="str">"Complete_Date"</span><span class="pun">: </span><span class="str">"my_Complete_Date"</span><span class="pun">,
+</span>              <span class="str">"Create_Date"</span><span class="pun">: </span><span class="str">"my_Create_Date"</span><span class="pun">,
+</span>              <span class="str">"Description"</span><span class="pun">: </span><span class="str">"my_Description"</span><span class="pun">,
+</span>              <span class="str">"Ref_Num"</span><span class="pun">: </span><span class="lit">42</span>
+            <span class="pun">}</span><span class="pun">,
+</span>            <span class="pun">{
+</span>              <span class="str">"Complete_Date"</span><span class="pun">: </span><span class="str">"my_Complete_Date"</span><span class="pun">,
+</span>              <span class="str">"Create_Date"</span><span class="pun">: </span><span class="str">"my_Create_Date"</span><span class="pun">,
+</span>              <span class="str">"Description"</span><span class="pun">: </span><span class="str">"my_Description"</span><span class="pun">,
+</span>              <span class="str">"Ref_Num"</span><span class="pun">: </span><span class="lit">42</span>
+            <span class="pun">}</span>
+          <span class="pun">]</span>
+        <span class="pun">}</span>
+      <span class="pun">]</span>
+    <span class="pun">}</span><span class="pun">,
+</span>    <span class="pun">{
+</span>      <span class="str">"name"</span><span class="pun">: </span><span class="str">"my_name"</span><span class="pun">,
+</span>      <span class="str">"user_stories"</span><span class="pun">: </span><span class="pun">[
+</span>        <span class="pun">{
+</span>          <span class="str">"Complete_Date"</span><span class="pun">: </span><span class="str">"my_Complete_Date"</span><span class="pun">,
+</span>          <span class="str">"Create_Date"</span><span class="pun">: </span><span class="str">"my_Create_Date"</span><span class="pun">,
+</span>          <span class="str">"Description"</span><span class="pun">: </span><span class="str">"my_Description"</span><span class="pun">,
+</span>          <span class="str">"Ref_Num"</span><span class="pun">: </span><span class="lit">42</span><span class="pun">,
+</span>          <span class="str">"Tasks"</span><span class="pun">: </span><span class="pun">[
+</span>            <span class="pun">{
+</span>              <span class="str">"Complete_Date"</span><span class="pun">: </span><span class="str">"my_Complete_Date"</span><span class="pun">,
+</span>              <span class="str">"Create_Date"</span><span class="pun">: </span><span class="str">"my_Create_Date"</span><span class="pun">,
+</span>              <span class="str">"Description"</span><span class="pun">: </span><span class="str">"my_Description"</span><span class="pun">,
+</span>              <span class="str">"Ref_Num"</span><span class="pun">: </span><span class="lit">42</span>
+            <span class="pun">}</span><span class="pun">,
+</span>            <span class="pun">{
+</span>              <span class="str">"Complete_Date"</span><span class="pun">: </span><span class="str">"my_Complete_Date"</span><span class="pun">,
+</span>              <span class="str">"Create_Date"</span><span class="pun">: </span><span class="str">"my_Create_Date"</span><span class="pun">,
+</span>              <span class="str">"Description"</span><span class="pun">: </span><span class="str">"my_Description"</span><span class="pun">,
+</span>              <span class="str">"Ref_Num"</span><span class="pun">: </span><span class="lit">42</span>
+            <span class="pun">}</span>
+          <span class="pun">]</span>
+        <span class="pun">}</span><span class="pun">,
+</span>        <span class="pun">{
+</span>          <span class="str">"Complete_Date"</span><span class="pun">: </span><span class="str">"my_Complete_Date"</span><span class="pun">,
+</span>          <span class="str">"Create_Date"</span><span class="pun">: </span><span class="str">"my_Create_Date"</span><span class="pun">,
+</span>          <span class="str">"Description"</span><span class="pun">: </span><span class="str">"my_Description"</span><span class="pun">,
+</span>          <span class="str">"Ref_Num"</span><span class="pun">: </span><span class="lit">42</span><span class="pun">,
+</span>          <span class="str">"Tasks"</span><span class="pun">: </span><span class="pun">[
+</span>            <span class="pun">{
+</span>              <span class="str">"Complete_Date"</span><span class="pun">: </span><span class="str">"my_Complete_Date"</span><span class="pun">,
+</span>              <span class="str">"Create_Date"</span><span class="pun">: </span><span class="str">"my_Create_Date"</span><span class="pun">,
+</span>              <span class="str">"Description"</span><span class="pun">: </span><span class="str">"my_Description"</span><span class="pun">,
+</span>              <span class="str">"Ref_Num"</span><span class="pun">: </span><span class="lit">42</span>
+            <span class="pun">}</span><span class="pun">,
+</span>            <span class="pun">{
+</span>              <span class="str">"Complete_Date"</span><span class="pun">: </span><span class="str">"my_Complete_Date"</span><span class="pun">,
+</span>              <span class="str">"Create_Date"</span><span class="pun">: </span><span class="str">"my_Create_Date"</span><span class="pun">,
+</span>              <span class="str">"Description"</span><span class="pun">: </span><span class="str">"my_Description"</span><span class="pun">,
+</span>              <span class="str">"Ref_Num"</span><span class="pun">: </span><span class="lit">42</span>
+            <span class="pun">}</span>
+          <span class="pun">]</span>
+        <span class="pun">}</span>
+      <span class="pun">]</span>
+    <span class="pun">}</span>
+  <span class="pun">]</span>
+<span class="pun">}</span></div></div></div>
+                </div>
+            </li>
+            <li class="method item" id="m-Sprint Total Points" data-method="GET">
+                <h4>Sprint Total Points</h4><div class="nocontents">no implementation for this version</div>
+                <div class="contents">
+
+<h5 class="title"></h5>
+
+<div class="description stack">
+    
+    <div class="diff_version" data-version="v1.0">The story points that has been closed within a sprint</div></div><div class="request stack">
+    <h5><i class="i-request"></i> Request: </h5>
+    <h6>Resource: </h6>
+
+    <code  class="diff_version" data-version="v1.0"><span class="hur">https://peaceful-bastion-96327.herokuapp.com/taiga/sprint_story_points?slug={project}</span></code>
+    <h6>URI Parameters: </h6><table class="table table-bordered table-hover table-condensed">
+        <colgroup>
+            <col></col>
+            <col width="160px"></col>
+            <col width="70px"></col>
+            <col width="50%"></col>
+        </colgroup>
+        <thead>
+            <tr>
+            <th><span
+            >Parameter</span></th>
+            <th><span
+            >Type</span></th>
+            <th><span
+            >Optional</span></th>
+            <th><span
+            >Description</span></th>
+            </tr>
+        </thead>
+        <tbody>
+            
+        <tr class="diff_version " data-version="v1.0">
+            <td><span class="str">project</span></td>
+            <td><span class="typ">string<td><span class="lit"></span></td>
+            <td><span class="com">project slug name.</span></td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+<div class="response stack">
+    <h5><i class="i-response"></i> Response: </h5>
+    <h6>Body: </h6>
+    <div class="code"><table class="table-hover">
+        <colgroup>
+            <col width="50%%"></col>
+            <col width="50%%"></col>
+        </colgroup>
+        <tbody>
+
+    <tr class="diff_version" data-version="v1.0">
+        <td><span class="pun">{</span></td>
+        <td class="com"></td>
+    </tr>
+    <tr class="diff_version" data-version="v1.0">
+        <td>  <span class="str">"story"</span><span class="pun">: </span><span class="pun">[</span></td>
+        <td class="com">List of sprints and their story points</td>
+    </tr>
+    <tr class="diff_version" data-version="v1.0">
+        <td>    <span class="typ"><a href="javascript:navigateTo({type: 'Story'}, ['category', 'method'])">Story</a></span></td>
+        <td class="com"></td>
+    </tr>
+    <tr class="diff_version" data-version="v1.0">
+        <td>  <span class="pun">]</span></td>
+        <td></td>
+    </tr>
+    <tr class="diff_version" data-version="v1.0">
+        <td><span class="pun">}</span></td>
+        <td></td>
+    </tr>
+        </tbody>
+    </table></div>
+</div><div class="stack sample"><div data-version="v1.0">
+
+<h5><i class="i-sample"></i> Sample: </h5>
+<h6>Request: </h6>
+<div class="code"><span class="hme">GET</span> <span class="hur">sprint_story_points?slug=my_project</span> <span class="hpr">HTTP/1.1</span>
+<span class="hat">Content-Type</span><span class="pun">: </span><span class="hva">application/json; charset=utf-8</span>
+
+</div>
+        <h6>Response: </h6>
+        <div class="code"><span class="hpr">HTTP/1.1</span> <span class="lit">200</span> <span class="str">OK</span>
+<span class="hat">Content-Type</span><span class="pun">: </span><span class="hva">application/json; charset=utf-8</span>
+
+<span class="pun">{
+</span>  <span class="str">"story"</span><span class="pun">: </span><span class="pun">[
+</span>    <span class="pun">{
+</span>      <span class="str">"closed_points"</span><span class="pun">: </span><span class="lit">42</span><span class="pun">,
+</span>      <span class="str">"name"</span><span class="pun">: </span><span class="str">"my_name"</span><span class="pun">,
+</span>      <span class="str">"total_points"</span><span class="pun">: </span><span class="lit">42</span>
+    <span class="pun">}</span><span class="pun">,
+</span>    <span class="pun">{
+</span>      <span class="str">"closed_points"</span><span class="pun">: </span><span class="lit">42</span><span class="pun">,
+</span>      <span class="str">"name"</span><span class="pun">: </span><span class="str">"my_name"</span><span class="pun">,
+</span>      <span class="str">"total_points"</span><span class="pun">: </span><span class="lit">42</span>
+    <span class="pun">}</span>
+  <span class="pun">]</span>
+<span class="pun">}</span></div></div></div>
+                </div>
+            </li>
+        </ul>
+    </li>
+    <li class="category" id="c-Task"><h3>Task</h3>
+        <div class="description">Information based on tasks within user stories.</div>
+        <ul class="list-unstyled">
+            <li class="method item" id="m-Initial Task" data-method="GET">
+                <h4>Initial Task</h4><div class="nocontents">no implementation for this version</div>
+                <div class="contents">
+
+<h5 class="title"></h5>
+
+<div class="description stack">
+    
+    <div class="diff_version" data-version="v1.0">The initial tasks created in a user stories within a sprint.</div></div><div class="request stack">
+    <h5><i class="i-request"></i> Request: </h5>
+    <h6>Resource: </h6>
+
+    <code  class="diff_version" data-version="v1.0"><span class="hur">https://peaceful-bastion-96327.herokuapp.com/taiga/initial_task?slug={project}</span></code>
+    <h6>URI Parameters: </h6><table class="table table-bordered table-hover table-condensed">
+        <colgroup>
+            <col></col>
+            <col width="160px"></col>
+            <col width="70px"></col>
+            <col width="50%"></col>
+        </colgroup>
+        <thead>
+            <tr>
+            <th><span
+            >Parameter</span></th>
+            <th><span
+            >Type</span></th>
+            <th><span
+            >Optional</span></th>
+            <th><span
+            >Description</span></th>
+            </tr>
+        </thead>
+        <tbody>
+            
+        <tr class="diff_version " data-version="v1.0">
+            <td><span class="str">project</span></td>
+            <td><span class="typ">string<td><span class="lit"></span></td>
+            <td><span class="com">project slug name.</span></td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+<div class="response stack">
+    <h5><i class="i-response"></i> Response: </h5>
+    <h6>Body: </h6>
+    <div class="code"><table class="table-hover">
+        <colgroup>
+            <col width="50%%"></col>
+            <col width="50%%"></col>
+        </colgroup>
+        <tbody>
+
+    <tr class="diff_version" data-version="v1.0">
+        <td><span class="pun">{</span></td>
+        <td class="com"></td>
+    </tr>
+    <tr class="diff_version" data-version="v1.0">
+        <td>  <span class="str">"task_info"</span><span class="pun">: </span><span class="pun">[</span></td>
+        <td class="com">List of sprints and their user story date information.</td>
+    </tr>
+    <tr class="diff_version" data-version="v1.0">
+        <td>    <span class="typ"><a href="javascript:navigateTo({type: 'Task'}, ['category', 'method'])">Task</a></span></td>
+        <td class="com"></td>
+    </tr>
+    <tr class="diff_version" data-version="v1.0">
+        <td>  <span class="pun">]</span></td>
+        <td></td>
+    </tr>
+    <tr class="diff_version" data-version="v1.0">
+        <td><span class="pun">}</span></td>
+        <td></td>
+    </tr>
+        </tbody>
+    </table></div>
+</div><div class="stack sample"><div data-version="v1.0">
+
+<h5><i class="i-sample"></i> Sample: </h5>
+<h6>Request: </h6>
+<div class="code"><span class="hme">GET</span> <span class="hur">initial_task?slug=my_project</span> <span class="hpr">HTTP/1.1</span>
+<span class="hat">Content-Type</span><span class="pun">: </span><span class="hva">application/json; charset=utf-8</span>
+
+</div>
+        <h6>Response: </h6>
+        <div class="code"><span class="hpr">HTTP/1.1</span> <span class="lit">200</span> <span class="str">OK</span>
+<span class="hat">Content-Type</span><span class="pun">: </span><span class="hva">application/json; charset=utf-8</span>
+
+<span class="pun">{
+</span>  <span class="str">"task_info"</span><span class="pun">: </span><span class="pun">[
+</span>    <span class="pun">{
+</span>      <span class="str">"name"</span><span class="pun">: </span><span class="str">"my_name"</span><span class="pun">,
+</span>      <span class="str">"user_stories"</span><span class="pun">: </span><span class="pun">[
+</span>        <span class="pun">{
+</span>          <span class="str">"Description"</span><span class="pun">: </span><span class="str">"my_Description"</span><span class="pun">,
+</span>          <span class="str">"Initial_task"</span><span class="pun">: </span><span class="lit">42</span>
+        <span class="pun">}</span><span class="pun">,
+</span>        <span class="pun">{
+</span>          <span class="str">"Description"</span><span class="pun">: </span><span class="str">"my_Description"</span><span class="pun">,
+</span>          <span class="str">"Initial_task"</span><span class="pun">: </span><span class="lit">42</span>
+        <span class="pun">}</span>
+      <span class="pun">]</span>
+    <span class="pun">}</span><span class="pun">,
+</span>    <span class="pun">{
+</span>      <span class="str">"name"</span><span class="pun">: </span><span class="str">"my_name"</span><span class="pun">,
+</span>      <span class="str">"user_stories"</span><span class="pun">: </span><span class="pun">[
+</span>        <span class="pun">{
+</span>          <span class="str">"Description"</span><span class="pun">: </span><span class="str">"my_Description"</span><span class="pun">,
+</span>          <span class="str">"Initial_task"</span><span class="pun">: </span><span class="lit">42</span>
+        <span class="pun">}</span><span class="pun">,
+</span>        <span class="pun">{
+</span>          <span class="str">"Description"</span><span class="pun">: </span><span class="str">"my_Description"</span><span class="pun">,
+</span>          <span class="str">"Initial_task"</span><span class="pun">: </span><span class="lit">42</span>
+        <span class="pun">}</span>
+      <span class="pun">]</span>
+    <span class="pun">}</span>
+  <span class="pun">]</span>
+<span class="pun">}</span></div></div></div>
+                </div>
+            </li>
+        </ul>
+    </li>
+    <li class="category" id="c-User Story"><h3>User Story</h3>
+        <div class="description">Information based on user stories within a sprint.</div>
+        <ul class="list-unstyled">
+            <li class="method item" id="m-User Story Information" data-method="GET">
+                <h4>User Story Information</h4><div class="nocontents">no implementation for this version</div>
+                <div class="contents">
+
+<h5 class="title"></h5>
+
+<div class="description stack">
+    
+    <div class="diff_version" data-version="v1.0">The number of open user story information in a sprint.</div></div><div class="request stack">
+    <h5><i class="i-request"></i> Request: </h5>
+    <h6>Resource: </h6>
+
+    <code  class="diff_version" data-version="v1.0"><span class="hur">https://peaceful-bastion-96327.herokuapp.com/taiga/sprint_user_story?slug={project}</span></code>
+    <h6>URI Parameters: </h6><table class="table table-bordered table-hover table-condensed">
+        <colgroup>
+            <col></col>
+            <col width="160px"></col>
+            <col width="70px"></col>
+            <col width="50%"></col>
+        </colgroup>
+        <thead>
+            <tr>
+            <th><span
+            >Parameter</span></th>
+            <th><span
+            >Type</span></th>
+            <th><span
+            >Optional</span></th>
+            <th><span
+            >Description</span></th>
+            </tr>
+        </thead>
+        <tbody>
+            
+        <tr class="diff_version " data-version="v1.0">
+            <td><span class="str">project</span></td>
+            <td><span class="typ">string<td><span class="lit"></span></td>
+            <td><span class="com">project slug name.</span></td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+<div class="response stack">
+    <h5><i class="i-response"></i> Response: </h5>
+    <h6>Body: </h6>
+    <div class="code"><table class="table-hover">
+        <colgroup>
+            <col width="50%%"></col>
+            <col width="50%%"></col>
+        </colgroup>
+        <tbody>
+
+    <tr class="diff_version" data-version="v1.0">
+        <td><span class="pun">{</span></td>
+        <td class="com"></td>
+    </tr>
+    <tr class="diff_version" data-version="v1.0">
+        <td>  <span class="str">"sprint_user_story_info"</span><span class="pun">: </span><span class="pun">[</span></td>
+        <td class="com">List of sprints and their user story date information.</td>
+    </tr>
+    <tr class="diff_version" data-version="v1.0">
+        <td>    <span class="typ"><a href="javascript:navigateTo({type: 'Sprint User Story'}, ['category', 'method'])">Sprint User Story</a></span></td>
+        <td class="com"></td>
+    </tr>
+    <tr class="diff_version" data-version="v1.0">
+        <td>  <span class="pun">]</span></td>
+        <td></td>
+    </tr>
+    <tr class="diff_version" data-version="v1.0">
+        <td><span class="pun">}</span></td>
+        <td></td>
+    </tr>
+        </tbody>
+    </table></div>
+</div><div class="stack sample"><div data-version="v1.0">
+
+<h5><i class="i-sample"></i> Sample: </h5>
+<h6>Request: </h6>
+<div class="code"><span class="hme">GET</span> <span class="hur">sprint_user_story?slug=my_project</span> <span class="hpr">HTTP/1.1</span>
+<span class="hat">Content-Type</span><span class="pun">: </span><span class="hva">application/json; charset=utf-8</span>
+
+</div>
+        <h6>Response: </h6>
+        <div class="code"><span class="hpr">HTTP/1.1</span> <span class="lit">200</span> <span class="str">OK</span>
+<span class="hat">Content-Type</span><span class="pun">: </span><span class="hva">application/json; charset=utf-8</span>
+
+<span class="pun">{
+</span>  <span class="str">"sprint_user_story_info"</span><span class="pun">: </span><span class="pun">[
+</span>    <span class="pun">{
+</span>      <span class="str">"name"</span><span class="pun">: </span><span class="str">"my_name"</span><span class="pun">,
+</span>      <span class="str">"user_stories"</span><span class="pun">: </span><span class="pun">[
+</span>        <span class="pun">{
+</span>          <span class="str">"Description"</span><span class="pun">: </span><span class="str">"my_Description"</span><span class="pun">,
+</span>          <span class="str">"Initial_task"</span><span class="pun">: </span><span class="lit">42</span>
+        <span class="pun">}</span><span class="pun">,
+</span>        <span class="pun">{
+</span>          <span class="str">"Description"</span><span class="pun">: </span><span class="str">"my_Description"</span><span class="pun">,
+</span>          <span class="str">"Initial_task"</span><span class="pun">: </span><span class="lit">42</span>
+        <span class="pun">}</span>
+      <span class="pun">]</span>
+    <span class="pun">}</span><span class="pun">,
+</span>    <span class="pun">{
+</span>      <span class="str">"name"</span><span class="pun">: </span><span class="str">"my_name"</span><span class="pun">,
+</span>      <span class="str">"user_stories"</span><span class="pun">: </span><span class="pun">[
+</span>        <span class="pun">{
+</span>          <span class="str">"Description"</span><span class="pun">: </span><span class="str">"my_Description"</span><span class="pun">,
+</span>          <span class="str">"Initial_task"</span><span class="pun">: </span><span class="lit">42</span>
+        <span class="pun">}</span><span class="pun">,
+</span>        <span class="pun">{
+</span>          <span class="str">"Description"</span><span class="pun">: </span><span class="str">"my_Description"</span><span class="pun">,
+</span>          <span class="str">"Initial_task"</span><span class="pun">: </span><span class="lit">42</span>
+        <span class="pun">}</span>
+      <span class="pun">]</span>
+    <span class="pun">}</span>
+  <span class="pun">]</span>
+<span class="pun">}</span></div></div></div>
+                </div>
+            </li>
+        </ul>
+    </li>
+            </ul>
+            <div class="page-header">
+                <h2>Types</h2>
+            </div>
+            <ul class="list-unstyled">
+    <li class="category" id="c-None">
+        <ul class="list-unstyled">
+            <li class="type item" id="t-Date">
+                <h4>Date</h4><div class="nocontents">no implementation for this version</div>
+                <div class="contents">
+
+
+<div class="description stack">
+    
+    <div class="diff_version" data-version="v1.0">Date information of the sprint and user story.</div></div><div class="configuration stack">
+    <h5><i class="i-presentation"></i> Presentation: </h5>
+    <div class="code"><table class="table-hover">
+        <colgroup>
+            <col width="50%%"></col>
+            <col width="50%%"></col>
+        </colgroup>
+        <tbody>
+
+    <tr class="diff_version" data-version="v1.0">
+        <td><span class="pun">{</span></td>
+        <td class="com"></td>
+    </tr>
+    <tr class="diff_version" data-version="v1.0">
+        <td>  <span class="str">"name"</span><span class="pun">: </span><span class="typ">string</span><span class="pun">,</span></td>
+        <td class="com">Name of the sprint.</td>
+    </tr>
+    <tr class="diff_version" data-version="v1.0">
+        <td>  <span class="str">"sprint_end"</span><span class="pun">: </span><span class="typ">string</span><span class="pun">,</span></td>
+        <td class="com">Sprint ending date.</td>
+    </tr>
+    <tr class="diff_version" data-version="v1.0">
+        <td>  <span class="str">"sprint_start"</span><span class="pun">: </span><span class="typ">string</span><span class="pun">,</span></td>
+        <td class="com">Sprint starting date.</td>
+    </tr>
+    <tr class="diff_version" data-version="v1.0">
+        <td>  <span class="str">"user_story"</span><span class="pun">: </span><span class="pun">[</span></td>
+        <td class="com">List of users story date details.</td>
+    </tr>
+    <tr class="diff_version" data-version="v1.0">
+        <td>    <span class="typ"><a href="javascript:navigateTo({type: 'User'}, ['category', 'method'])">User</a></span></td>
+        <td class="com"></td>
+    </tr>
+    <tr class="diff_version" data-version="v1.0">
+        <td>  <span class="pun">]</span></td>
+        <td></td>
+    </tr>
+    <tr class="diff_version" data-version="v1.0">
+        <td><span class="pun">}</span></td>
+        <td></td>
+    </tr>
+        </tbody>
+    </table></div>
+
+
+</div><div class="stack sample"><div data-version="v1.0">
+
+<h5><i class="i-sample"></i> Formats: </h5>
+<h6>Sample: </h6>
+<div class="code"><span class="pun">{
+</span>  <span class="str">"name"</span><span class="pun">: </span><span class="str">"my_name"</span><span class="pun">,
+</span>  <span class="str">"sprint_end"</span><span class="pun">: </span><span class="str">"my_sprint_end"</span><span class="pun">,
+</span>  <span class="str">"sprint_start"</span><span class="pun">: </span><span class="str">"my_sprint_start"</span><span class="pun">,
+</span>  <span class="str">"user_story"</span><span class="pun">: </span><span class="pun">[
+</span>    <span class="pun">{
+</span>      <span class="str">"created_date"</span><span class="pun">: </span><span class="str">"my_created_date"</span><span class="pun">,
+</span>      <span class="str">"description"</span><span class="pun">: </span><span class="str">"my_description"</span><span class="pun">,
+</span>      <span class="str">"finish_date"</span><span class="pun">: </span><span class="str">"my_finish_date"</span>
+    <span class="pun">}</span><span class="pun">,
+</span>    <span class="pun">{
+</span>      <span class="str">"created_date"</span><span class="pun">: </span><span class="str">"my_created_date"</span><span class="pun">,
+</span>      <span class="str">"description"</span><span class="pun">: </span><span class="str">"my_description"</span><span class="pun">,
+</span>      <span class="str">"finish_date"</span><span class="pun">: </span><span class="str">"my_finish_date"</span>
+    <span class="pun">}</span>
+  <span class="pun">]</span>
+<span class="pun">}</span></div></div></div>
+                </div>
+            </li>
+            <li class="type item" id="t-Sprint User Information">
+                <h4>Sprint User Information</h4><div class="nocontents">no implementation for this version</div>
+                <div class="contents">
+
+
+<div class="description stack">
+    
+    <div class="diff_version" data-version="v1.0">Date information of the sprint and user story.</div></div><div class="configuration stack">
+    <h5><i class="i-presentation"></i> Presentation: </h5>
+    <div class="code"><table class="table-hover">
+        <colgroup>
+            <col width="50%%"></col>
+            <col width="50%%"></col>
+        </colgroup>
+        <tbody>
+
+    <tr class="diff_version" data-version="v1.0">
+        <td><span class="pun">{</span></td>
+        <td class="com"></td>
+    </tr>
+    <tr class="diff_version" data-version="v1.0">
+        <td>  <span class="str">"name"</span><span class="pun">: </span><span class="typ">string</span><span class="pun">,</span></td>
+        <td class="com">Name of the sprint.</td>
+    </tr>
+    <tr class="diff_version" data-version="v1.0">
+        <td>  <span class="str">"user_stories"</span><span class="pun">: </span><span class="pun">[</span></td>
+        <td class="com">List of users story date details.</td>
+    </tr>
+    <tr class="diff_version" data-version="v1.0">
+        <td>    <span class="typ"><a href="javascript:navigateTo({type: 'User Task Information'}, ['category', 'method'])">User Task Information</a></span></td>
+        <td class="com"></td>
+    </tr>
+    <tr class="diff_version" data-version="v1.0">
+        <td>  <span class="pun">]</span></td>
+        <td></td>
+    </tr>
+    <tr class="diff_version" data-version="v1.0">
+        <td><span class="pun">}</span></td>
+        <td></td>
+    </tr>
+        </tbody>
+    </table></div>
+
+
+</div><div class="stack sample"><div data-version="v1.0">
+
+<h5><i class="i-sample"></i> Formats: </h5>
+<h6>Sample: </h6>
+<div class="code"><span class="pun">{
+</span>  <span class="str">"name"</span><span class="pun">: </span><span class="str">"my_name"</span><span class="pun">,
+</span>  <span class="str">"user_stories"</span><span class="pun">: </span><span class="pun">[
+</span>    <span class="pun">{
+</span>      <span class="str">"Complete_Date"</span><span class="pun">: </span><span class="str">"my_Complete_Date"</span><span class="pun">,
+</span>      <span class="str">"Create_Date"</span><span class="pun">: </span><span class="str">"my_Create_Date"</span><span class="pun">,
+</span>      <span class="str">"Description"</span><span class="pun">: </span><span class="str">"my_Description"</span><span class="pun">,
+</span>      <span class="str">"Ref_Num"</span><span class="pun">: </span><span class="lit">42</span><span class="pun">,
+</span>      <span class="str">"Tasks"</span><span class="pun">: </span><span class="pun">[
+</span>        <span class="pun">{
+</span>          <span class="str">"Complete_Date"</span><span class="pun">: </span><span class="str">"my_Complete_Date"</span><span class="pun">,
+</span>          <span class="str">"Create_Date"</span><span class="pun">: </span><span class="str">"my_Create_Date"</span><span class="pun">,
+</span>          <span class="str">"Description"</span><span class="pun">: </span><span class="str">"my_Description"</span><span class="pun">,
+</span>          <span class="str">"Ref_Num"</span><span class="pun">: </span><span class="lit">42</span>
+        <span class="pun">}</span><span class="pun">,
+</span>        <span class="pun">{
+</span>          <span class="str">"Complete_Date"</span><span class="pun">: </span><span class="str">"my_Complete_Date"</span><span class="pun">,
+</span>          <span class="str">"Create_Date"</span><span class="pun">: </span><span class="str">"my_Create_Date"</span><span class="pun">,
+</span>          <span class="str">"Description"</span><span class="pun">: </span><span class="str">"my_Description"</span><span class="pun">,
+</span>          <span class="str">"Ref_Num"</span><span class="pun">: </span><span class="lit">42</span>
+        <span class="pun">}</span>
+      <span class="pun">]</span>
+    <span class="pun">}</span><span class="pun">,
+</span>    <span class="pun">{
+</span>      <span class="str">"Complete_Date"</span><span class="pun">: </span><span class="str">"my_Complete_Date"</span><span class="pun">,
+</span>      <span class="str">"Create_Date"</span><span class="pun">: </span><span class="str">"my_Create_Date"</span><span class="pun">,
+</span>      <span class="str">"Description"</span><span class="pun">: </span><span class="str">"my_Description"</span><span class="pun">,
+</span>      <span class="str">"Ref_Num"</span><span class="pun">: </span><span class="lit">42</span><span class="pun">,
+</span>      <span class="str">"Tasks"</span><span class="pun">: </span><span class="pun">[
+</span>        <span class="pun">{
+</span>          <span class="str">"Complete_Date"</span><span class="pun">: </span><span class="str">"my_Complete_Date"</span><span class="pun">,
+</span>          <span class="str">"Create_Date"</span><span class="pun">: </span><span class="str">"my_Create_Date"</span><span class="pun">,
+</span>          <span class="str">"Description"</span><span class="pun">: </span><span class="str">"my_Description"</span><span class="pun">,
+</span>          <span class="str">"Ref_Num"</span><span class="pun">: </span><span class="lit">42</span>
+        <span class="pun">}</span><span class="pun">,
+</span>        <span class="pun">{
+</span>          <span class="str">"Complete_Date"</span><span class="pun">: </span><span class="str">"my_Complete_Date"</span><span class="pun">,
+</span>          <span class="str">"Create_Date"</span><span class="pun">: </span><span class="str">"my_Create_Date"</span><span class="pun">,
+</span>          <span class="str">"Description"</span><span class="pun">: </span><span class="str">"my_Description"</span><span class="pun">,
+</span>          <span class="str">"Ref_Num"</span><span class="pun">: </span><span class="lit">42</span>
+        <span class="pun">}</span>
+      <span class="pun">]</span>
+    <span class="pun">}</span>
+  <span class="pun">]</span>
+<span class="pun">}</span></div></div></div>
+                </div>
+            </li>
+            <li class="type item" id="t-Sprint User Story">
+                <h4>Sprint User Story</h4><div class="nocontents">no implementation for this version</div>
+                <div class="contents">
+
+
+<div class="description stack">
+    
+    <div class="diff_version" data-version="v1.0">The sprint description and details.</div></div><div class="configuration stack">
+    <h5><i class="i-presentation"></i> Presentation: </h5>
+    <div class="code"><table class="table-hover">
+        <colgroup>
+            <col width="50%%"></col>
+            <col width="50%%"></col>
+        </colgroup>
+        <tbody>
+
+    <tr class="diff_version" data-version="v1.0">
+        <td><span class="pun">{</span></td>
+        <td class="com"></td>
+    </tr>
+    <tr class="diff_version" data-version="v1.0">
+        <td>  <span class="str">"name"</span><span class="pun">: </span><span class="typ">string</span><span class="pun">,</span></td>
+        <td class="com">Name of the sprint</td>
+    </tr>
+    <tr class="diff_version" data-version="v1.0">
+        <td>  <span class="str">"user_stories"</span><span class="pun">: </span><span class="pun">[</span></td>
+        <td class="com">List of users story date details.</td>
+    </tr>
+    <tr class="diff_version" data-version="v1.0">
+        <td>    <span class="typ"><a href="javascript:navigateTo({type: 'Task Stories'}, ['category', 'method'])">Task Stories</a></span></td>
+        <td class="com"></td>
+    </tr>
+    <tr class="diff_version" data-version="v1.0">
+        <td>  <span class="pun">]</span></td>
+        <td></td>
+    </tr>
+    <tr class="diff_version" data-version="v1.0">
+        <td><span class="pun">}</span></td>
+        <td></td>
+    </tr>
+        </tbody>
+    </table></div>
+
+
+</div><div class="stack sample"><div data-version="v1.0">
+
+<h5><i class="i-sample"></i> Formats: </h5>
+<h6>Sample: </h6>
+<div class="code"><span class="pun">{
+</span>  <span class="str">"name"</span><span class="pun">: </span><span class="str">"my_name"</span><span class="pun">,
+</span>  <span class="str">"user_stories"</span><span class="pun">: </span><span class="pun">[
+</span>    <span class="pun">{
+</span>      <span class="str">"Description"</span><span class="pun">: </span><span class="str">"my_Description"</span><span class="pun">,
+</span>      <span class="str">"Initial_task"</span><span class="pun">: </span><span class="lit">42</span>
+    <span class="pun">}</span><span class="pun">,
+</span>    <span class="pun">{
+</span>      <span class="str">"Description"</span><span class="pun">: </span><span class="str">"my_Description"</span><span class="pun">,
+</span>      <span class="str">"Initial_task"</span><span class="pun">: </span><span class="lit">42</span>
+    <span class="pun">}</span>
+  <span class="pun">]</span>
+<span class="pun">}</span></div></div></div>
+                </div>
+            </li>
+            <li class="type item" id="t-Story">
+                <h4>Story</h4><div class="nocontents">no implementation for this version</div>
+                <div class="contents">
+
+
+<div class="description stack">
+    
+    <div class="diff_version" data-version="v1.0">A story points information.</div></div><div class="configuration stack">
+    <h5><i class="i-presentation"></i> Presentation: </h5>
+    <div class="code"><table class="table-hover">
+        <colgroup>
+            <col width="50%%"></col>
+            <col width="50%%"></col>
+        </colgroup>
+        <tbody>
+
+    <tr class="diff_version" data-version="v1.0">
+        <td><span class="pun">{</span></td>
+        <td class="com"></td>
+    </tr>
+    <tr class="diff_version" data-version="v1.0">
+        <td>  <span class="str">"closed_points"</span><span class="pun">: </span><span class="typ">integer</span><span class="pun">,</span></td>
+        <td class="com">Total points closed in the sprint.</td>
+    </tr>
+    <tr class="diff_version" data-version="v1.0">
+        <td>  <span class="str">"name"</span><span class="pun">: </span><span class="typ">string</span><span class="pun">,</span></td>
+        <td class="com">Name of the sprint.</td>
+    </tr>
+    <tr class="diff_version" data-version="v1.0">
+        <td>  <span class="str">"total_points"</span><span class="pun">: </span><span class="typ">integer</span></td>
+        <td class="com">Total points in the sprint.</td>
+    </tr>
+    <tr class="diff_version" data-version="v1.0">
+        <td><span class="pun">}</span></td>
+        <td></td>
+    </tr>
+        </tbody>
+    </table></div>
+
+
+</div><div class="stack sample"><div data-version="v1.0">
+
+<h5><i class="i-sample"></i> Formats: </h5>
+<h6>Sample: </h6>
+<div class="code"><span class="pun">{
+</span>  <span class="str">"closed_points"</span><span class="pun">: </span><span class="lit">42</span><span class="pun">,
+</span>  <span class="str">"name"</span><span class="pun">: </span><span class="str">"my_name"</span><span class="pun">,
+</span>  <span class="str">"total_points"</span><span class="pun">: </span><span class="lit">42</span>
+<span class="pun">}</span></div></div></div>
+                </div>
+            </li>
+            <li class="type item" id="t-Task">
+                <h4>Task</h4><div class="nocontents">no implementation for this version</div>
+                <div class="contents">
+
+
+<div class="description stack">
+    
+    <div class="diff_version" data-version="v1.0">Date information of the sprint and user story.</div></div><div class="configuration stack">
+    <h5><i class="i-presentation"></i> Presentation: </h5>
+    <div class="code"><table class="table-hover">
+        <colgroup>
+            <col width="50%%"></col>
+            <col width="50%%"></col>
+        </colgroup>
+        <tbody>
+
+    <tr class="diff_version" data-version="v1.0">
+        <td><span class="pun">{</span></td>
+        <td class="com"></td>
+    </tr>
+    <tr class="diff_version" data-version="v1.0">
+        <td>  <span class="str">"name"</span><span class="pun">: </span><span class="typ">string</span><span class="pun">,</span></td>
+        <td class="com">Name of the sprint.</td>
+    </tr>
+    <tr class="diff_version" data-version="v1.0">
+        <td>  <span class="str">"user_stories"</span><span class="pun">: </span><span class="pun">[</span></td>
+        <td class="com">List of users story date details.</td>
+    </tr>
+    <tr class="diff_version" data-version="v1.0">
+        <td>    <span class="typ"><a href="javascript:navigateTo({type: 'Task Stories'}, ['category', 'method'])">Task Stories</a></span></td>
+        <td class="com"></td>
+    </tr>
+    <tr class="diff_version" data-version="v1.0">
+        <td>  <span class="pun">]</span></td>
+        <td></td>
+    </tr>
+    <tr class="diff_version" data-version="v1.0">
+        <td><span class="pun">}</span></td>
+        <td></td>
+    </tr>
+        </tbody>
+    </table></div>
+
+
+</div><div class="stack sample"><div data-version="v1.0">
+
+<h5><i class="i-sample"></i> Formats: </h5>
+<h6>Sample: </h6>
+<div class="code"><span class="pun">{
+</span>  <span class="str">"name"</span><span class="pun">: </span><span class="str">"my_name"</span><span class="pun">,
+</span>  <span class="str">"user_stories"</span><span class="pun">: </span><span class="pun">[
+</span>    <span class="pun">{
+</span>      <span class="str">"Description"</span><span class="pun">: </span><span class="str">"my_Description"</span><span class="pun">,
+</span>      <span class="str">"Initial_task"</span><span class="pun">: </span><span class="lit">42</span>
+    <span class="pun">}</span><span class="pun">,
+</span>    <span class="pun">{
+</span>      <span class="str">"Description"</span><span class="pun">: </span><span class="str">"my_Description"</span><span class="pun">,
+</span>      <span class="str">"Initial_task"</span><span class="pun">: </span><span class="lit">42</span>
+    <span class="pun">}</span>
+  <span class="pun">]</span>
+<span class="pun">}</span></div></div></div>
+                </div>
+            </li>
+            <li class="type item" id="t-Task Information">
+                <h4>Task Information</h4><div class="nocontents">no implementation for this version</div>
+                <div class="contents">
+
+
+<div class="description stack">
+    
+    <div class="diff_version" data-version="v1.0">A initial tasks in a user story</div></div><div class="configuration stack">
+    <h5><i class="i-presentation"></i> Presentation: </h5>
+    <div class="code"><table class="table-hover">
+        <colgroup>
+            <col width="50%%"></col>
+            <col width="50%%"></col>
+        </colgroup>
+        <tbody>
+
+    <tr class="diff_version" data-version="v1.0">
+        <td><span class="pun">{</span></td>
+        <td class="com"></td>
+    </tr>
+    <tr class="diff_version" data-version="v1.0">
+        <td>  <span class="str">"Complete_Date"</span><span class="pun">: </span><span class="typ">string</span><span class="pun">,</span></td>
+        <td class="com">Task completion date.</td>
+    </tr>
+    <tr class="diff_version" data-version="v1.0">
+        <td>  <span class="str">"Create_Date"</span><span class="pun">: </span><span class="typ">string</span><span class="pun">,</span></td>
+        <td class="com">Task creation date.</td>
+    </tr>
+    <tr class="diff_version" data-version="v1.0">
+        <td>  <span class="str">"Description"</span><span class="pun">: </span><span class="typ">string</span><span class="pun">,</span></td>
+        <td class="com">Detailed description of the Task.</td>
+    </tr>
+    <tr class="diff_version" data-version="v1.0">
+        <td>  <span class="str">"Ref_Num"</span><span class="pun">: </span><span class="typ">integer</span></td>
+        <td class="com">Reference number of the Task.</td>
+    </tr>
+    <tr class="diff_version" data-version="v1.0">
+        <td><span class="pun">}</span></td>
+        <td></td>
+    </tr>
+        </tbody>
+    </table></div>
+
+
+</div><div class="stack sample"><div data-version="v1.0">
+
+<h5><i class="i-sample"></i> Formats: </h5>
+<h6>Sample: </h6>
+<div class="code"><span class="pun">{
+</span>  <span class="str">"Complete_Date"</span><span class="pun">: </span><span class="str">"my_Complete_Date"</span><span class="pun">,
+</span>  <span class="str">"Create_Date"</span><span class="pun">: </span><span class="str">"my_Create_Date"</span><span class="pun">,
+</span>  <span class="str">"Description"</span><span class="pun">: </span><span class="str">"my_Description"</span><span class="pun">,
+</span>  <span class="str">"Ref_Num"</span><span class="pun">: </span><span class="lit">42</span>
+<span class="pun">}</span></div></div></div>
+                </div>
+            </li>
+            <li class="type item" id="t-Task Stories">
+                <h4>Task Stories</h4><div class="nocontents">no implementation for this version</div>
+                <div class="contents">
+
+
+<div class="description stack">
+    
+    <div class="diff_version" data-version="v1.0">A initial tasks in a user story</div></div><div class="configuration stack">
+    <h5><i class="i-presentation"></i> Presentation: </h5>
+    <div class="code"><table class="table-hover">
+        <colgroup>
+            <col width="50%%"></col>
+            <col width="50%%"></col>
+        </colgroup>
+        <tbody>
+
+    <tr class="diff_version" data-version="v1.0">
+        <td><span class="pun">{</span></td>
+        <td class="com"></td>
+    </tr>
+    <tr class="diff_version" data-version="v1.0">
+        <td>  <span class="str">"Description"</span><span class="pun">: </span><span class="typ">string</span><span class="pun">,</span></td>
+        <td class="com">user story detailed description.</td>
+    </tr>
+    <tr class="diff_version" data-version="v1.0">
+        <td>  <span class="str">"Initial_task"</span><span class="pun">: </span><span class="typ">integer</span></td>
+        <td class="com">Total number of initial task.</td>
+    </tr>
+    <tr class="diff_version" data-version="v1.0">
+        <td><span class="pun">}</span></td>
+        <td></td>
+    </tr>
+        </tbody>
+    </table></div>
+
+
+</div><div class="stack sample"><div data-version="v1.0">
+
+<h5><i class="i-sample"></i> Formats: </h5>
+<h6>Sample: </h6>
+<div class="code"><span class="pun">{
+</span>  <span class="str">"Description"</span><span class="pun">: </span><span class="str">"my_Description"</span><span class="pun">,
+</span>  <span class="str">"Initial_task"</span><span class="pun">: </span><span class="lit">42</span>
+<span class="pun">}</span></div></div></div>
+                </div>
+            </li>
+            <li class="type item" id="t-User">
+                <h4>User</h4><div class="nocontents">no implementation for this version</div>
+                <div class="contents">
+
+
+<div class="description stack">
+    
+    <div class="diff_version" data-version="v1.0">A user</div></div><div class="configuration stack">
+    <h5><i class="i-presentation"></i> Presentation: </h5>
+    <div class="code"><table class="table-hover">
+        <colgroup>
+            <col width="50%%"></col>
+            <col width="50%%"></col>
+        </colgroup>
+        <tbody>
+
+    <tr class="diff_version" data-version="v1.0">
+        <td><span class="pun">{</span></td>
+        <td class="com"></td>
+    </tr>
+    <tr class="diff_version" data-version="v1.0">
+        <td>  <span class="str">"created_date"</span><span class="pun">: </span><span class="typ">string</span><span class="pun">,</span></td>
+        <td class="com">Creation date of user story</td>
+    </tr>
+    <tr class="diff_version" data-version="v1.0">
+        <td>  <span class="str">"description"</span><span class="pun">: </span><span class="typ">string</span><span class="pun">,</span></td>
+        <td class="com">Details of the user story</td>
+    </tr>
+    <tr class="diff_version" data-version="v1.0">
+        <td>  <span class="str">"finish_date"</span><span class="pun">: </span><span class="typ">string</span></td>
+        <td class="com">Finishing date of user story</td>
+    </tr>
+    <tr class="diff_version" data-version="v1.0">
+        <td><span class="pun">}</span></td>
+        <td></td>
+    </tr>
+        </tbody>
+    </table></div>
+
+
+</div><div class="stack sample"><div data-version="v1.0">
+
+<h5><i class="i-sample"></i> Formats: </h5>
+<h6>Sample: </h6>
+<div class="code"><span class="pun">{
+</span>  <span class="str">"created_date"</span><span class="pun">: </span><span class="str">"my_created_date"</span><span class="pun">,
+</span>  <span class="str">"description"</span><span class="pun">: </span><span class="str">"my_description"</span><span class="pun">,
+</span>  <span class="str">"finish_date"</span><span class="pun">: </span><span class="str">"my_finish_date"</span>
+<span class="pun">}</span></div></div></div>
+                </div>
+            </li>
+            <li class="type item" id="t-User Task Information">
+                <h4>User Task Information</h4><div class="nocontents">no implementation for this version</div>
+                <div class="contents">
+
+
+<div class="description stack">
+    
+    <div class="diff_version" data-version="v1.0">The sprint description and details.</div></div><div class="configuration stack">
+    <h5><i class="i-presentation"></i> Presentation: </h5>
+    <div class="code"><table class="table-hover">
+        <colgroup>
+            <col width="50%%"></col>
+            <col width="50%%"></col>
+        </colgroup>
+        <tbody>
+
+    <tr class="diff_version" data-version="v1.0">
+        <td><span class="pun">{</span></td>
+        <td class="com"></td>
+    </tr>
+    <tr class="diff_version" data-version="v1.0">
+        <td>  <span class="str">"Complete_Date"</span><span class="pun">: </span><span class="typ">string</span><span class="pun">,</span></td>
+        <td class="com">User story completion date.</td>
+    </tr>
+    <tr class="diff_version" data-version="v1.0">
+        <td>  <span class="str">"Create_Date"</span><span class="pun">: </span><span class="typ">string</span><span class="pun">,</span></td>
+        <td class="com">User story creation date.</td>
+    </tr>
+    <tr class="diff_version" data-version="v1.0">
+        <td>  <span class="str">"Description"</span><span class="pun">: </span><span class="typ">string</span><span class="pun">,</span></td>
+        <td class="com">Detailed description of the user story.</td>
+    </tr>
+    <tr class="diff_version" data-version="v1.0">
+        <td>  <span class="str">"Ref_Num"</span><span class="pun">: </span><span class="typ">integer</span><span class="pun">,</span></td>
+        <td class="com">Reference number of the user story.</td>
+    </tr>
+    <tr class="diff_version" data-version="v1.0">
+        <td>  <span class="str">"Tasks"</span><span class="pun">: </span><span class="pun">[</span></td>
+        <td class="com">List of tasks and reference number details.</td>
+    </tr>
+    <tr class="diff_version" data-version="v1.0">
+        <td>    <span class="typ"><a href="javascript:navigateTo({type: 'Task Information'}, ['category', 'method'])">Task Information</a></span></td>
+        <td class="com"></td>
+    </tr>
+    <tr class="diff_version" data-version="v1.0">
+        <td>  <span class="pun">]</span></td>
+        <td></td>
+    </tr>
+    <tr class="diff_version" data-version="v1.0">
+        <td><span class="pun">}</span></td>
+        <td></td>
+    </tr>
+        </tbody>
+    </table></div>
+
+
+</div><div class="stack sample"><div data-version="v1.0">
+
+<h5><i class="i-sample"></i> Formats: </h5>
+<h6>Sample: </h6>
+<div class="code"><span class="pun">{
+</span>  <span class="str">"Complete_Date"</span><span class="pun">: </span><span class="str">"my_Complete_Date"</span><span class="pun">,
+</span>  <span class="str">"Create_Date"</span><span class="pun">: </span><span class="str">"my_Create_Date"</span><span class="pun">,
+</span>  <span class="str">"Description"</span><span class="pun">: </span><span class="str">"my_Description"</span><span class="pun">,
+</span>  <span class="str">"Ref_Num"</span><span class="pun">: </span><span class="lit">42</span><span class="pun">,
+</span>  <span class="str">"Tasks"</span><span class="pun">: </span><span class="pun">[
+</span>    <span class="pun">{
+</span>      <span class="str">"Complete_Date"</span><span class="pun">: </span><span class="str">"my_Complete_Date"</span><span class="pun">,
+</span>      <span class="str">"Create_Date"</span><span class="pun">: </span><span class="str">"my_Create_Date"</span><span class="pun">,
+</span>      <span class="str">"Description"</span><span class="pun">: </span><span class="str">"my_Description"</span><span class="pun">,
+</span>      <span class="str">"Ref_Num"</span><span class="pun">: </span><span class="lit">42</span>
+    <span class="pun">}</span><span class="pun">,
+</span>    <span class="pun">{
+</span>      <span class="str">"Complete_Date"</span><span class="pun">: </span><span class="str">"my_Complete_Date"</span><span class="pun">,
+</span>      <span class="str">"Create_Date"</span><span class="pun">: </span><span class="str">"my_Create_Date"</span><span class="pun">,
+</span>      <span class="str">"Description"</span><span class="pun">: </span><span class="str">"my_Description"</span><span class="pun">,
+</span>      <span class="str">"Ref_Num"</span><span class="pun">: </span><span class="lit">42</span>
+    <span class="pun">}</span>
+  <span class="pun">]</span>
+<span class="pun">}</span></div></div></div>
+                </div>
+            </li>
+        </ul>
+    </li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<footer>
+    <div class="btn-group">
+        <button class="btn btn-default i-previous" type="button"></button>
+        <button class="btn btn-default i-top" type="button"></button>
+        <button class="btn btn-default i-next" type="button"></button>
+    </div>
+</footer>
+
+</body>
+</html>
