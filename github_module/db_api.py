@@ -159,14 +159,30 @@ def fetch_commits(github_id):
     return result
 
 
-def fetch_repo_hashes(github_id):
+def _get_internal_id(conn, repoName):
+
+    db = conn.cursor()
+
+    username, repo = repoName.split("/")
+
+    display_query = "SELECT repositories.id FROM repositories, userProfile WHERE userProfile.githubLogin = \""+username+"\" AND repositories.owner = userProfile.id AND repositories.name = \""+repo+"\""
+    db.execute(display_query)
+    found = db.fetchall()
+
+    return found[0][0]
+
+
+def fetch_repo_hashes(repoName):
     """
     Returns a list of the hashes of all commits within a specific repository.
 
-    :param github_id: id of a git repository (integer).
+    :param repoName: full slug of username/reponame (string).
     :return: hashes of all commits in a repository (list of string).
     """
     conn = sqlite3.connect(Constants.DATABASE)
+
+    github_id = _get_internal_id(conn, repoName)
+
     db = conn.cursor()
 
     display_query = "SELECT DISTINCT hash FROM commitData WHERE commitData.repositoryID=\"" + \
@@ -175,10 +191,10 @@ def fetch_repo_hashes(github_id):
     db.execute(display_query)
     found = db.fetchall()
 
-    return [x[0] for x in found]
+    return {"hashes" : [x[0] for x in found]}
 
 
-def fetch_commit(github_id, commit_hash):
+def fetch_commit(repoName, commit_hash):
     """
     Returns a dictionary containing information (hash, repositoryID, author,
     message, date, time committed, files, additions, and deletions) for a
@@ -186,11 +202,14 @@ def fetch_commit(github_id, commit_hash):
 
     Assumes that commit_hash is the hash of commit existing in local database.
 
-    :param github_id: id of a git repository (integer).
+    :param repoName: full slug of username/reponame (string).
     :param commit_hash: hash of a git commit (string).
     :return: a commit_metadata dictionary containing information about a commit (dictionary).
     """
     conn = sqlite3.connect(Constants.DATABASE)
+
+    github_id = _get_internal_id(conn, repoName)
+
     db = conn.cursor()
 
     display_query = "SELECT author, commitMessage, date, timeCommitted, filesModified, noOfAdditions, noOfDeletions FROM commitData WHERE commitData.hash=\"" + commit_hash + "\""
