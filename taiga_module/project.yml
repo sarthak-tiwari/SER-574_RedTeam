@@ -200,29 +200,80 @@ versions:
       User Task Information:
         description: The sprint description and details.
         item:
-          type: object
-          properties:
-            Complete_Date:
-              type: string
-              description: User story completion date.
+            type: object
+            properties:
+                Complete_Date:
+                    type: string
+                    description: User story completion date.
 
-            Create_Date:
-              type: string
-              description: User story creation date.
+                Create_Date:
+                    category: User Story
+                    uri: userStoryCreateDate?projectslug={project}&sprint={sprint}
+                    description: User story creation date.
 
-            Description:
-              type: string
-              description: Detailed description of the user story.
+                    request_parameters:
+                        project:
+                            type: string
+                            description: project slug name
+                        sprint:
+                            type: integer
+                            description: sprint number
+                    response_body:
+                        type: object
+                        properties:
+                            date_info:
+                                type: array
+                                description: User story creation date.
+                                items:
+                                    type: Date
 
-            Ref_Num:
-              type: integer
-              description: Reference number of the user story.
+                Description:
+                    type: string
+                    description: Detailed description of the user story.
 
-            Tasks:
-              type: array
-              description: List of tasks and reference number details.
-              items:
-                type: Task Information
+                Ref_Num:
+                    category: User Story
+                    uri: list_of_userstories?projectslug={project}&sprint={sprint}
+                    description: Reference number of the user story.
+
+                    request_parameters:
+                        project:
+                            type: string
+                            description: project slug name
+                        sprint:
+                            type: integer
+                            description: sprint number
+                            
+                    response_body:
+                        type: object
+                        properties:
+                            story:
+                                type: array
+                                description: Reference number of the user story.
+                                items:
+                                    type: integer
+
+                Tasks:
+                    category: Task
+                    uri: task_of_userstory?projectslug={project}&userstory_id={user_story}
+                    description: List of tasks.
+              
+                    request_parameters:
+                        project:
+                            type: string
+                            description: project slug name
+                        user_story:
+                            type: integer
+                            description: user story id
+                
+                    response_body:
+                        type: object
+                        properties:
+                            task:
+                                type: array
+                                description: List of tasks.
+                                items:
+                                    type: Task Information
 
                 
       User:
