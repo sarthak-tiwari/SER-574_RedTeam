@@ -111,7 +111,7 @@ versions:
               type: array
               description: List of sprints and their user story date information.
               items:
-                type: Sprint User Story
+                type: Closed User Story
 
     types:
 
@@ -290,6 +290,25 @@ versions:
             finish_date:
               type: string
               description: Finishing date of user story
+
+      Closed User Story:
+        description: Total number of closed user story information.
+        item:
+          type: object
+          properties:
+            closed_user_stories:
+              type: integer
+              description: Total number of closed user stories in a sprint.
+            name:
+              type: string
+              description: The name of the sprint.
+            no_of_user_stories:
+              type: integer
+              description: Total number of user stories in a sprint.
+            open_user_stories:
+              type: integer
+              description: Total number of open user stories in a sprint.
+
 
       Task Stories:
         description: A initial tasks in a user story
