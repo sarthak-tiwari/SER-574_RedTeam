@@ -4,6 +4,7 @@ import sqlite3
 from . import db_populate
 from .Constants import Constants
 from . import Utility
+from .metadata_analysis import commit_messages as CM
 
 """
 This file implements several basic functions for querying and updating the state
@@ -158,15 +159,95 @@ def fetch_commits(github_id):
 
     return result
 
+def message_quality(repoName):
+    """
+    Returns a repository details dictionary with pull request quality metrics. Assumes that query refers to a valid
+    git repository which has already been initialized.
 
-def fetch_repo_hashes(github_id):
+    For the contents of a repository details dictionary, see the list_details function. message_quality adds a key
+    called "message" to the standard repository details dictionary that is a list containing dictionaries with the
+    following format: (each list entry corresponds to one project pull request).
+        githubId: string
+        prId: integer
+        linktoPR: string
+        messages: list of messages quality dictionaries.
+
+    A messages quality dictionary looks like:
+        messageId: integer
+        messageText: integer
+        messageQuality: string
+
+    :param repoName: full slug of username/reponame (string).
+    :return:
+    """
+
+    conn = sqlite3.connect(Constants.DATABASE)
+    github_id =_get_internal_id(conn, repoName)
+    db = conn.cursor()
+
+    # fetch main repo information (uses list_details but needs extra look up for id->str)
+    info_query = "SELECT name FROM repositories WHERE id=" + str(github_id)
+    db.execute(info_query)
+    repo_name = db.fetchall()[0][0]
+    result = list_details(repo_name)
+
+    # fetch pull request information
+    pr_query = "SELECT repositoryID, requestID, requestTile, author, noOfComments, targetBranch, noOfReviews, commentMessage FROM pullData WHERE repositoryID=" + \
+        str(github_id)
+    db.execute(pr_query)
+    PRs = db.fetchall()
+    result["messages"] = [None] * len(PRs)
+
+    for i in range(len(PRs)):
+        PR = PRs[i]
+        requestID = int(PR[1])
+        author = PR[3]
+        commentMessage = PR[7]
+
+        commentMessageQ = CM.__compute_quality({"comment": commentMessage}) #HACK: SHOULD NOT DO THIS
+
+        inner_messages = [{"messsageID": 1,
+                           "messageText": commentMessage,
+                           "messageQuality": commentMessageQ}]
+
+        githubId = None
+        for i in range(len(result["collaborators"])):
+            if(result["collaborators"][i]["name"] == author):
+                githubId = result["collaborators"][i]["githubId"]
+                break
+
+        result["messages"][i] = {"githubId": githubId,
+                                 "prId": requestID,
+                                 "linktoPR": "https://github.com/"+repoName+"/pull/"+str(requestID),  # https://github.com/sarthak-tiwari/SER-574_RedTeam/pull/16
+                                 "numberOfCommits": 1, # TODO: information not stored in DB.
+                                 "messages": inner_messages}
+
+    return result
+
+def _get_internal_id(conn, repoName):
+
+    db = conn.cursor()
+
+    username, repo = repoName.split("/")
+
+    display_query = "SELECT repositories.id FROM repositories, userProfile WHERE userProfile.githubLogin = \""+username+"\" AND repositories.owner = userProfile.id AND repositories.name = \""+repo+"\""
+    db.execute(display_query)
+    found = db.fetchall()
+
+    return found[0][0]
+
+
+def fetch_repo_hashes(repoName):
     """
     Returns a list of the hashes of all commits within a specific repository.
 
-    :param github_id: id of a git repository (integer).
+    :param repoName: full slug of username/reponame (string).
     :return: hashes of all commits in a repository (list of string).
     """
     conn = sqlite3.connect(Constants.DATABASE)
+
+    github_id = _get_internal_id(conn, repoName)
+
     db = conn.cursor()
 
     display_query = "SELECT DISTINCT hash FROM commitData WHERE commitData.repositoryID=\"" + \
@@ -175,10 +256,10 @@ def fetch_repo_hashes(github_id):
     db.execute(display_query)
     found = db.fetchall()
 
-    return [x[0] for x in found]
+    return {"hashes" : [x[0] for x in found]}
 
 
-def fetch_commit(github_id, commit_hash):
+def fetch_commit(repoName, commit_hash):
     """
     Returns a dictionary containing information (hash, repositoryID, author,
     message, date, time committed, files, additions, and deletions) for a
@@ -186,11 +267,14 @@ def fetch_commit(github_id, commit_hash):
 
     Assumes that commit_hash is the hash of commit existing in local database.
 
-    :param github_id: id of a git repository (integer).
+    :param repoName: full slug of username/reponame (string).
     :param commit_hash: hash of a git commit (string).
     :return: a commit_metadata dictionary containing information about a commit (dictionary).
     """
     conn = sqlite3.connect(Constants.DATABASE)
+
+    github_id = _get_internal_id(conn, repoName)
+
     db = conn.cursor()
 
     display_query = "SELECT author, commitMessage, date, timeCommitted, filesModified, noOfAdditions, noOfDeletions FROM commitData WHERE commitData.hash=\"" + commit_hash + "\""
@@ -466,3 +550,4 @@ def get_commits_on_stories(taigaSlug):
                         userStory['late_finish_days'] = abs((end_date - maxDate).days)
 
     return userStories
+

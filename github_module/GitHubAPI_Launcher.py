@@ -86,37 +86,40 @@ def api_core_commits():
         return (data, header)
 
 
-# ex: 127.0.0.1:5000/github/core_fetch_repo_hashes?git_id=168214867
-@github_api.route('/core_fetch_repo_hashes', methods=('GET', 'POST'))
+# ex: 127.0.0.1:5000/github/fetch_repo_hashes/?format=json&repoName="sarthak-tiwari/SER-574_RedTeam"
+@github_api.route('/fetch_repo_hashes/', methods=('GET', 'POST'))
 def api_core_fetch_repo_hashes():
-    git_id = request.args.get('git_id', type=int)
+    fo = request.args.get('format')
+    repoName = request.args.get('repoName')
 
-    if not git_id:
-        status = "error"
-        result = "Failed to parse git_id parameter."
+    if fo != "json":
+        return ("", "501: only json is supported for format.")
     else:
-        status = "unimplemented"
-        result = ['70f13b111e1147611b70f9c9f1f76ddb00fcbe27', '70f13b111e1147611b70f9c9f1f76ddb00fcbe28',
-                  '70f13b111e1147611b70f9c9f1f76ddb00fcbe29', '70f13b111e1147611b70f9c9f1f76ddb00fcbe2a', '70f13b111e1147611b70f9c9f1f76ddb00fcbe2b']
-        # result = DB.fetch_repo_hashes(git_id)
+        #result = {"hashes" : ['70f13b111e1147611b70f9c9f1f76ddb00fcbe27', '70f13b111e1147611b70f9c9f1f76ddb00fcbe28',
+        #          '70f13b111e1147611b70f9c9f1f76ddb00fcbe29', '70f13b111e1147611b70f9c9f1f76ddb00fcbe2a', '70f13b111e1147611b70f9c9f1f76ddb00fcbe2b']}
+        result = DB.fetch_repo_hashes(repoName)
 
     header = {'Content-Type': 'application/json'}
-    data = json.dumps({"status": status, "result": result})
+    data = json.dumps(result)
     return (data, header)
 
 
-# ex: 127.0.0.1:5000/github/core_fetch_commit?git_id=168214867&commit_hash="70f13b111e1147611b70f9c9f1f76ddb00fcbe27"
-@github_api.route('/core_fetch_commit', methods=('GET', 'POST'))
+# ex: 127.0.0.1:5000/github/fetch_commit/?format=json&repoName="sarthak-tiwari/SER-574_RedTeam"&commit_hash="  "
+@github_api.route('/fetch_commit/', methods=('GET', 'POST'))
 def api_core_fetch_commit():
-    git_id = request.args.get('git_id', type=int)
+    fo = request.args.get('format')
+    repoName = request.args.get('repoName')
     commit_hash = request.args.get('commit_hash')
 
-    result = {'hash': '70f13b111e1147611b70f9c9f1f76ddb00fcbe27', 'repositoryID': 168214867, 'author': 'test', 'message': 'Added gitignore for python to the source directory',
-              'date': 20190206, 'timeCommitted': '2019-02-07T23:39:00Z', 'files': '[".gitignore"]', 'additions': 116, 'deletions': 0}
-    # result = DB.fetch_commit(git_id, commit_hash)
+    if fo != "json":
+        return ("", "501: only json is supported for format.")
+    else:
+        #result = {'hash': '70f13b111e1147611b70f9c9f1f76ddb00fcbe27', 'repositoryID': 168214867, 'author': 'test', 'message': 'Added gitignore for python to the source directory',
+        #          'date': 20190206, 'timeCommitted': '2019-02-07T23:39:00Z', 'files': '[".gitignore"]', 'additions': 116, 'deletions': 0}
+        result = DB.fetch_commit(repoName, commit_hash)
 
     header = {'Content-Type': 'application/json'}
-    data = json.dumps({"status": "unimplemented", "result": result})
+    data = json.dumps(result)
     return (data, header)
 
 ################################################################################
