@@ -7,6 +7,7 @@ def sprint_planning(project_slug, wiki_slug):
     wiki_content = wikiTextParser.wikiTextParser(project_slug, wiki_slug)
     planning_analysis = []
     retrospective_analysis = []
+    review_analysis = []
     analysis = {}
     meeting_data = {}
     for i in range(1, len(wiki_content)+1):
@@ -18,9 +19,12 @@ def sprint_planning(project_slug, wiki_slug):
             planning_analysis.append(meeting_data["Date"])
         if re.search("Retrospective", meeting_description[0], re.IGNORECASE):
             retrospective_analysis.append(meeting_data["Date"])
+        if re.search("Review", meeting_description[0], re.IGNORECASE):
+            review_analysis.append(meeting_data["Date"])
 
     analysis["sprint_plan_dates"] = planning_analysis
     analysis["sprint_retrospective_dates"] = retrospective_analysis
+    analysis["sprint_review_dates"] = review_analysis
 
     return analysis
 
