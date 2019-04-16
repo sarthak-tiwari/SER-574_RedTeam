@@ -44,6 +44,7 @@ class CreateDB:
 
     def pull_data(self):
         self.db.execute("CREATE TABLE pullData(\n"
+                        "        repositoryID INTEGER,\n"
                         "        requestID TEXT,\n"
                         "        requestTile TEXT,\n"
                         "        author TEXT,\n"

@@ -223,6 +223,17 @@ def store_pull_data(repo_id, pull_no):
     #
     #extract data
 
+    comments_url = data["review_comments_url"]
+    print(comments_url)
+
+    with urllib.request.urlopen(comments_url) as url:
+        comment_data = json.loads(url.read().decode())
+
+    comments = []
+    for comment in comment_data:
+        comments.append(comment['body'])
+    print(comments)
+
     author = data["user"]["login"]                                # TEXT
     request_title = data["body"]
     no_of_comments = data["review_comments"]
@@ -233,19 +244,15 @@ def store_pull_data(repo_id, pull_no):
     head_branch = data["head"]  # Merges into the base
     target_branch = head_branch["label"]
     no_of_reviews = 4
-
-    insert_query = "INSERT INTO pullData(requestID, requestTile, author, noOfComments, targetBranch, noOfReviews ) " \
+    pullComment = comments
+    pull_comment = ''.join(pullComment)
+    # pull_comment = "sample comment"
+    insert_query = "INSERT INTO pullData(requestID, requestTile, author, noOfComments, targetBranch, noOfReviews, commentMessage ) " \
                    "VALUES('"+str(repo_id)+"', '"+request_title+"', '"+author+"', '"+str(
-                       no_of_comments)+"', '"+str(target_branch)+"', '"+str(no_of_reviews)+"')"
-    # "VALUES(?, ?, ?, ?, ?, ?)", (repo_id, request_title, author, str(no_of_comments), target_branch, str(no_of_reviews))
+                       no_of_comments)+"', '"+str(target_branch)+"', '"+str(no_of_reviews)+"', '" + pull_comment + "')"
 
-    # insert_tuple = (repo_id, request_title, author, str(no_of_comments), target_branch, str(no_of_reviews))
-
-    # db.execute(insert_query, insert_tuple)
     db.execute(str(insert_query))
-
-    if db.fetchall():
-        print("store_pull_data: unknown failure.")
+    conn.commit()
 
 
 def store_complexity(repoName):
