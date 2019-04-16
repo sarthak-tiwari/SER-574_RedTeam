@@ -9,23 +9,19 @@ import datetime
 import json
 import sqlite3
 
-import GithubAPI
-from static_code_analysis.CheckStyleManager import CheckStyleManager
+from . import GithubAPI
+from .static_code_analysis.CheckStyleManager import CheckStyleManager
 #import metadata_analysis.commit_frequency as CF
-import db_api as DB
-import db_populate as DP
-import os 
+from . import db_api as DB
+from . import db_populate as DP
 
-#github_api = Blueprint('github_api', __name__,)
-github_api = Flask(__name__)
-github_api.secret_key = os.environ.get("FLASK_SECRET_KEY", "ThisIsTheSuperSecretAndCompletelyUnhackableKey293847923874")
-blueprint = make_github_blueprint(
+github_api = Blueprint('github_api', __name__,)
+github_login = make_github_blueprint(
     client_id="5d45a5aa02a482c56abd",
     client_secret="ac05cfd61eeecd795374868b9a9965ca9999c999",
 )
-github_api.register_blueprint(blueprint, url_prefix="/authorize")
 
-@github_api.route("/", methods=('GET', 'POST'))
+@github_login.route("/", methods=('GET', 'POST'))
 def index():
     if not github.authorized:
         return redirect(url_for("github.login"))

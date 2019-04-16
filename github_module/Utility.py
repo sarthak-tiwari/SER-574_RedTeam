@@ -3,7 +3,7 @@ import datetime
 import http
 import json
 import requests
-import Constants
+from .Constants import Constants
 
 """ This file implements functions serving as helper functions """
 __author__ = 'Sarthak Tiwari'

@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 ################################################################################
 
-from Constants import Constants
-from static_code_analysis.CheckStyleManager import CheckStyleManager
-import GithubAPI
+from .Constants import Constants
+from .static_code_analysis.CheckStyleManager import CheckStyleManager
+from . import GithubAPI
 import sqlite3
 import urllib, json
 import requests

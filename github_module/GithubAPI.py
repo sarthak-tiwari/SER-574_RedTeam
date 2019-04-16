@@ -110,7 +110,7 @@ def process_get_request(endpoint, username=None, token=None):
         return json.loads(requests.get(endpoint + "?client_id=5d45a5aa02a482c56abd&client_secret=ac05cfd61eeecd795374868b9a9965ca9999c999").content)
 
 # print(get_repo("168214867"))
-print(get_all_commits("168214867"))
+# print(get_all_commits("168214867"))
 # print(get_commit("168214867", "70f13b111e1147611b70f9c9f1f76ddb00fcbe27")
 # print(get_commit("168214867", "70f13b111e1147611b70f9c9f1f76ddb00fcbe27", "racuna1", None)
 # print(get_pull_request("168214867", '4'))

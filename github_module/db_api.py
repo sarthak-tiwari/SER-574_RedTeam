@@ -1,9 +1,9 @@
 from datetime import datetime
 import sqlite3
 
-import db_populate
-from Constants import Constants
-import Utility
+from . import db_populate
+from .Constants import Constants
+from . import Utility
 
 """
 This file implements several basic functions for querying and updating the state
