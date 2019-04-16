@@ -50,7 +50,7 @@ def sprintUserStoryInformation():
     return jsonify({'sprint_user_story_info': US_Group1.processSprintUserStory(slug)})
 
 
-@app.route('/user_task_details', methods=['GET'])
+@taiga_api.route('/user_task_details', methods=['GET'])
 def sprintUserTaskDetails():
     slug = request.args.get('slug')
     return jsonify({'sprint_user_task_details': US_Group1.processUserAndTaskDetails(slug)})
