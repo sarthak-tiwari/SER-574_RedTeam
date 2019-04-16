@@ -25,8 +25,8 @@ def get_user_info(access_token):
     return process_get_request(endpoint)
 
 
-def get_user_repos(access_token):
-    endpoint = 'https://api.github.com/user/repos?access_token=' + access_token
+def get_user_repos(git_username):
+    endpoint = 'https://api.github.com/users/' + git_username + 'repos'
     return process_get_request(endpoint)
 
 
