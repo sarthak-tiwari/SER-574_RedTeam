@@ -3,7 +3,7 @@
 
 # from .Constants import Constants
 # from .static_code_analysis.CheckStyleManager import CheckStyleManager
-import GithubAPI
+from . import GithubAPI
 import sqlite3
 import urllib, json
 import requests

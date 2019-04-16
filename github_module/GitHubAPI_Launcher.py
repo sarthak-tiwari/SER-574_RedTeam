@@ -1,7 +1,7 @@
 # Class to launch github api service on flask
 #
-# Author: Sarthak Tiwari, Ruben Acuna
-# E-Mail: sarthak.tiwari@asu.edu, racuna1@asu.edu
+# Author: Sarthak Tiwari, Ruben Acuna, Carnic
+# E-Mail: sarthak.tiwari@asu.edu, racuna1@asu.edu, clnu2@asu.edu
 
 from flask import Blueprint, Flask, request
 import datetime
@@ -12,6 +12,7 @@ from . import GithubAPI
 from .static_code_analysis.CheckStyleManager import CheckStyleManager
 #import metadata_analysis.commit_frequency as CF
 from . import db_api as DB
+from .Constants import Constants
 from . import db_populate as DP
 
 github_api = Blueprint('github_api', __name__,)
@@ -212,14 +213,15 @@ def api_compute_commit_message_quality():
 #################################################################################
 # pull request info
 
-
 @github_api.route('/pull_request/')
 def api_count_pull():
-    conn = sqlite3.connect('database.db')
+    conn = sqlite3.connect(Constants.DATABASE)
     db = conn.cursor()
+    
     db.execute("SELECT * FROM pullData")
     result = db.fetchall()
-    print(result)
+    print(str(result))
+    # return result
     # print(str(result[0][0]))
     pulls_data = []
     for data in result:
@@ -230,6 +232,7 @@ def api_count_pull():
         pull_data['target_branch'] = data[4]
         pull_data['no_of_reviews'] = data[5]
         pulls_data.append(pull_data)
+        print(data[6])
 
     print(pull_data)
     return str(pulls_data), {'Content-Type': 'application/json'}
