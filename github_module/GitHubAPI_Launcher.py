@@ -14,8 +14,8 @@ from static_code_analysis.CheckStyleManager import CheckStyleManager
 import db_api as DB
 import db_populate as DP
 
-github_api = Blueprint('github_api', __name__,)
-
+#github_api = Blueprint('github_api', __name__,)
+github_api = Flask(__name__)
 
 # TODO: these should be somewhere else
 def parse_str_date(str_date):
@@ -323,17 +323,18 @@ def api_get_complexity_of_authors_in_repo():
 
 ################################################################################
 
-# ex: 127.0.0.1:5000/github/pulls/?format=json&query=168214867
+# ex: 127.0.0.1:5000/github/pulls/?format=json&query=168214867&pullID=168214867
 @github_api.route('/pulls/', methods=('GET', 'POST'))
 def api_core_pulls():
 
     fo = request.args.get('format')
     query = request.args.get('query', type=int)
+    pullID = request.args.get('pullID', type=int)
 
     if fo != "json":
         return ("", "501: only json is supported for format.")
     else:
-        result = DB.fetch_pull(query)
+        result = DB.fetch_pull(query, pullID)
 
         header = {'Content-Type': 'application/json'}
         data = json.dumps(result)
@@ -356,5 +357,5 @@ def api_get_commits_on_stories():
     return (data, {'Content-Type': 'application/json'})
 
 if __name__ == '__main__':
-    app.debug = True
-    app.run()
+    github_api.debug = True
+    github_api.run()

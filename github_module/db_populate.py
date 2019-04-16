@@ -121,8 +121,9 @@ def store_commit(db, repo_id, hash):
             "'" + time_committed + "', '" + files_modified + "', " + \
             str(num_additions) + ", " + str(num_deletions) + ", '" + commit_comment + "')"
 
-    db.execute(query)
-    conn.commit()
+    with sqlite3.connect(Constants.DATABASE) as conn:
+        db.execute(query)
+        conn.commit()
 
 
     # store_commit_json(db, repo_id, data)
@@ -155,8 +156,29 @@ def store_all_commits(db, repo_id):
                 "'" + time_committed + "', '" + files_modified + "', " + \
                 str(num_additions) + ", " + str(num_deletions) + ", '" + commit_comment + "')"
 
-        db.execute(query)
-        conn.commit()
+        with sqlite3.connect(Constants.DATABASE) as conn:
+            db.execute(query)
+            conn.commit()
+
+def store_all_pull_requests(db, repo_id):
+    pull_requests = GithubAPI.get_all_pull_requests(repo_id)
+    for data in pull_requests:
+        author = data["user"]["login"]
+        request_title = data["body"]
+        no_of_comments = data["review_comments"]
+
+        # Might need to change DB to have both base and head branch names
+        # Not sure which one target_branch should be for the time being
+        # base_branch = data["base"]  # Usually master
+        head_branch = data["head"]  # Merges into the base
+        target_branch = head_branch["label"]
+        no_of_reviews = 4
+        insert_query = "INSERT INTO pullData(requestID, requestTile, author, noOfComments, targetBranch, noOfReviews ) " \
+                    "VALUES('"+str(repo_id)+"', '"+request_title+"', '"+author+"', '"+str(
+                        no_of_comments)+"', '"+str(target_branch)+"', '"+str(no_of_reviews)+"')"
+        db.execute(str(insert_query))
+        if db.fetchall():
+            print("store_pull_data: unknown failure.")
 
 
 

@@ -28,12 +28,12 @@ def initialize_repo(github_id, access_token=None):
     #0) download and store basic repository/user information
     db_populate.store_repository_info(db, github_id, access_token)
 
-    #1) download and store commit information.
+    #1) download and store commit information with their comments.
     db_populate.store_all_commits(db, github_id)
-    #2) TODO: download and store URL information.
+    #2) download and store URL information.
     db_populate.store_files(db, github_id)
-    #3) TODO: download and store pull request information.
-    #4) TODO: download and store commit comment information.
+    #3) download and store pull request information.
+    db_populate.store_all_pull_requests(db, github_id)
 
     return True
 

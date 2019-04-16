@@ -121,3 +121,5 @@ dmypy.json
 
 # Pycharm Code settings
 .idea/
+
+github_module/database.db-journal
