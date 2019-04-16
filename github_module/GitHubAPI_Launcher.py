@@ -15,7 +15,6 @@ from static_code_analysis.CheckStyleManager import CheckStyleManager
 import db_api as DB
 import db_populate as DP
 import os 
-os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
 
 #github_api = Blueprint('github_api', __name__,)
 github_api = Flask(__name__)
@@ -31,8 +30,9 @@ def index():
     if not github.authorized:
         return redirect(url_for("github.login"))
     resp = github.get("/user")
-    assert resp.ok
-    return "You are @{login} on GitHub".format(login=resp.json()["login"])
+    if resp.ok:
+        return "You are @{login} on GitHub".format(login=resp.json()["login"])
+    return redirect(url_for("github.login"))
 
 # TODO: these should be somewhere else
 def parse_str_date(str_date):
