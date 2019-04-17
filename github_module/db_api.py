@@ -563,4 +563,4 @@ def get_commits_on_stories(taigaSlug):
 # print(fetch_commit(168214867, "70f13b111e1147611b70f9c9f1f76ddb00fcbe27"))
 # print(list_details("SER-574_RedTeam"))
 # print(fetch_commits(168214867))
-initialize_repo("racuna1/ser222-public", username="racuna1", access_token="a93e079c099764ddea9c9b6b6f121c83a4228d2b")
+# initialize_repo("racuna1/ser222-public", username="racuna1", access_token="REPLACEME")
