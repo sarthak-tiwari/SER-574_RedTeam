@@ -64,6 +64,8 @@
         <li data-group="Sprint"  data-item="Date Information"><a href="javascript:navigateTo({category: 'Sprint', method: 'Date Information'}, ['category', 'method'])" data-target="#m-Date Information"><span>Date Information</span></a></li>
         <li data-group="Sprint"  data-item="Sprint Information"><a href="javascript:navigateTo({category: 'Sprint', method: 'Sprint Information'}, ['category', 'method'])" data-target="#m-Sprint Information"><span>Sprint Information</span></a></li>
         <li data-group="Sprint"  data-item="Sprint Total Points"><a href="javascript:navigateTo({category: 'Sprint', method: 'Sprint Total Points'}, ['category', 'method'])" data-target="#m-Sprint Total Points"><span>Sprint Total Points</span></a></li>
+        <li data-group="Sprint"  data-item="Wiki parser"><a href="javascript:navigateTo({category: 'Sprint', method: 'Wiki parser'}, ['category', 'method'])" data-target="#m-Wiki parser"><span>Wiki parser</span></a></li>
+        <li data-group="Sprint"  data-item="Wiki-Sprint analyzer"><a href="javascript:navigateTo({category: 'Sprint', method: 'Wiki-Sprint analyzer'}, ['category', 'method'])" data-target="#m-Wiki-Sprint analyzer"><span>Wiki-Sprint analyzer</span></a></li>
         <li class="separator"></li><li class="nav-header" data-group="Task"><a href="javascript:navigateTo({category: 'Task'}, ['category', 'method', 'type'])" data-target="#c-Task"><h6>Task</h6></a></li>
         <li data-group="Task"  data-item="Initial Task"><a href="javascript:navigateTo({category: 'Task', method: 'Initial Task'}, ['category', 'method'])" data-target="#m-Initial Task"><span>Initial Task</span></a></li>
         <li class="separator"></li><li class="nav-header" data-group="User Story"><a href="javascript:navigateTo({category: 'User Story'}, ['category', 'method', 'type'])" data-target="#c-User Story"><h6>User Story</h6></a></li>
@@ -457,6 +459,70 @@
     <span class="pun">}</span>
   <span class="pun">]</span>
 <span class="pun">}</span></div></div></div>
+                </div>
+            </li>
+            <li class="method item" id="m-Wiki parser" data-method="GET">
+                <h4>Wiki parser</h4><div class="nocontents">no implementation for this version</div>
+                <div class="contents">
+
+<h5 class="title"></h5>
+
+<div class="description stack">
+    
+    <div class="diff_version" data-version="v1.0">To convert MoM from human readable to machine readable</div></div><div class="request stack">
+    <h5><i class="i-request"></i> Request: </h5>
+    <h6>Resource: </h6>
+
+    <code  class="diff_version" data-version="v1.0"><span class="hur">https://peaceful-bastion-96327.herokuapp.com/taiga/wikiPage?projectslug={project}&wiki={wiki-page}</span></code>
+</div>
+
+<div class="response stack">
+    <h5><i class="i-response"></i> Response: </h5>
+</div><div class="stack sample"><div data-version="v1.0">
+
+<h5><i class="i-sample"></i> Sample: </h5>
+<h6>Request: </h6>
+<div class="code"><span class="hme">GET</span> <span class="hur">wikiPage?projectslug={project}&wiki={wiki-page}</span> <span class="hpr">HTTP/1.1</span>
+<span class="hat">Content-Type</span><span class="pun">: </span><span class="hva">application/json; charset=utf-8</span>
+
+</div>
+        <h6>Response: </h6>
+        <div class="code"><span class="hpr">HTTP/1.1</span> <span class="lit">200</span> <span class="str">OK</span>
+<span class="hat">Content-Type</span><span class="pun">: </span><span class="hva">application/json; charset=utf-8</span>
+
+</div></div></div>
+                </div>
+            </li>
+            <li class="method item" id="m-Wiki-Sprint analyzer" data-method="GET">
+                <h4>Wiki-Sprint analyzer</h4><div class="nocontents">no implementation for this version</div>
+                <div class="contents">
+
+<h5 class="title"></h5>
+
+<div class="description stack">
+    
+    <div class="diff_version" data-version="v1.0">To compare date posted on MoM vs dates on taiga scrum board.</div></div><div class="request stack">
+    <h5><i class="i-request"></i> Request: </h5>
+    <h6>Resource: </h6>
+
+    <code  class="diff_version" data-version="v1.0"><span class="hur">https://peaceful-bastion-96327.herokuapp.com/taiga/listSprintDetails?projectslug={project}</span></code>
+</div>
+
+<div class="response stack">
+    <h5><i class="i-response"></i> Response: </h5>
+</div><div class="stack sample"><div data-version="v1.0">
+
+<h5><i class="i-sample"></i> Sample: </h5>
+<h6>Request: </h6>
+<div class="code"><span class="hme">GET</span> <span class="hur">listSprintDetails?projectslug={project}</span> <span class="hpr">HTTP/1.1</span>
+<span class="hat">Content-Type</span><span class="pun">: </span><span class="hva">application/json; charset=utf-8</span>
+
+</div>
+        <h6>Response: </h6>
+        <div class="code"><span class="hpr">HTTP/1.1</span> <span class="lit">200</span> <span class="str">OK</span>
+<span class="hat">Content-Type</span><span class="pun">: </span><span class="hva">application/json; charset=utf-8</span>
+
+</div></div></div>
                 </div>
             </li>
         </ul>

@@ -113,6 +113,45 @@ versions:
               items:
                 type: Closed User Story
 
+      Wiki-Sprint analyzer:
+        category: Sprint
+        uri: listSprintDetails?projectslug={project}
+        description: To compare date posted on MoM vs dates on taiga scrum board.
+        item:
+          request_parameters:
+            project:
+              type: string
+              description: project slug name
+
+          response_body:
+            type: object
+            properties:
+              story:
+                type: array
+                description: Classfies sprint start on the basis of planned start vs actual start date.
+                items:
+                  type:  Sprint User Story
+
+      Wiki parser:
+        category: Sprint
+        uri: wikiPage?projectslug={project}&wiki={wiki-page}
+        description: To convert MoM from human readable to machine readable
+        item:
+          request_parameters:
+            project:
+              type: string
+              description: project slug name & wiki slug name.
+
+          response_body:
+            type: object
+            properties:
+              story:
+                type: array
+                description: Parses MoM posted on a wiki page into keyvalue pairs
+                items:
+                  type: Sprint User Story
+
+
     types:
 
       Story:
