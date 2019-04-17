@@ -197,6 +197,22 @@ def api_get_commit_freq_data():
 ################################################################################
 # Comment Analysis::Commit Messages
 
+# ex: 127.0.0.1:5000/github/messagequality/?format=json&repoName=racuna1/ser222-public
+@github_api.route('/messagequality/', methods=('GET', 'POST'))
+def api_messagequality_ui():
+
+    fo = request.args.get('format')
+    repoName = request.args.get('repoName')
+
+    if fo != "json":
+        return ("", "501: only json is supported for format.")
+    else:
+        result = DB.message_quality(repoName)
+
+        header = {'Content-Type': 'application/json'}
+        data = json.dumps(result)
+        return (data, header)
+
 # ex: 127.0.0.1:5000/github/compute_commit_message_quality?git_id=168214867&commit_hash="70f13b111e1147611b70f9c9f1f76ddb00fcbe27"
 @github_api.route('/compute_commit_message_quality', methods=('GET', 'POST'))
 def api_compute_commit_message_quality():
