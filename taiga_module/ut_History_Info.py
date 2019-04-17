@@ -1,12 +1,10 @@
 import requests
 import json
-#from jwkest.jwk import SYMKey
-#from jwkest.jwe import JWE
+
 from requests.auth import HTTPDigestAuth
 headers = {
     'Content-Type': 'application/json',
 }
-#slug1 = "sarthak-tiwari-ser-574_redteam_team-taiga"
 
 def user_task_info(slug1,sprint_no):
 	sprint_no = int(sprint_no)
@@ -44,9 +42,5 @@ def user_task_info(slug1,sprint_no):
 		utHistory[ut[i]] = tl
 		tmpList = []
 		tl = []
-		#print json.dumps(utHistory, indent=4)
 
 	return utHistory
-
-#print user_story_info(slug1,2)
-#print json.dumps(user_task_info("sarthak-tiwari-ser-574_redteam_team-taiga",2), indent = 4)
