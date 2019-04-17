@@ -166,9 +166,10 @@ def store_pull_data(repo_id, pull_no):
     # TODO: consider case where pull request already has been stored.
     #
     #extract data
+    # print (data)
 
     comments_url = data["review_comments_url"]
-    print(comments_url)
+    # print(comments_url)
 
     with urllib.request.urlopen(comments_url) as url:
         comment_data = json.loads(url.read().decode())
@@ -176,23 +177,28 @@ def store_pull_data(repo_id, pull_no):
     comments = []
     for comment in comment_data:
         comments.append(comment['body'])
-    print(comments)
-
+    # print(comments)
+    count = 0
+    for reviewers in data["requested_reviewers"]:
+        count = count + 1
+    # print (count)
     author = data["user"]["login"]                                # TEXT
     request_title = data["body"]
     no_of_comments = data["review_comments"]
-
+    repository_id = repo_id
+    request_id = data["id"]
+    # print(request_id)
     # Might need to change DB to have both base and head branch names
     # Not sure which one target_branch should be for the time being
     base_branch = data["base"]  # Usually master
     head_branch = data["head"]  # Merges into the base
     target_branch = head_branch["label"]
-    no_of_reviews = 4
+    no_of_reviews = count
     pullComment = comments
     pull_comment = ''.join(pullComment)
     # pull_comment = "sample comment"
-    insert_query = "INSERT INTO pullData(requestID, requestTile, author, noOfComments, targetBranch, noOfReviews, commentMessage ) " \
-                   "VALUES('"+str(repo_id)+"', '"+request_title+"', '"+author+"', '"+str(
+    insert_query = "INSERT INTO pullData(repositoryId, requestID, requestTile, author, noOfComments, targetBranch, noOfReviews, commentMessage ) " \
+                   "VALUES('"+str(repository_id)+"','"+str(request_id)+"', '"+request_title+"', '"+author+"', '"+str(
                        no_of_comments)+"', '"+str(target_branch)+"', '"+str(no_of_reviews)+"', '" + pull_comment + "')"
 
     db.execute(str(insert_query))

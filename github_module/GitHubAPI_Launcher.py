@@ -215,31 +215,32 @@ def api_compute_commit_message_quality():
 
 #################################################################################
 # pull request info
-
-@github_api.route('/pull_request/')
+# ex : http://127.0.0.1:5000/github/pull_request/?repo_id=168214867
+@github_api.route('/pull_request/',  methods=('GET', 'POST'))
 def api_count_pull():
     conn = sqlite3.connect(Constants.DATABASE)
     db = conn.cursor()
-    
-    db.execute("SELECT * FROM pullData")
+    repo_id = request.args.get('repo_id', type=int)
+    db.execute("SELECT * FROM pullData WHERE repositoryID = ?", (repo_id,))
+    # db.execute("SELECT * FROM pullData ")
     result = db.fetchall()
-    print(str(result))
+    # print(str(result))
     # return result
     # print(str(result[0][0]))
     pulls_data = []
     for data in result:
         pull_data = {}
-        pull_data['request_title'] = data[1]
-        pull_data['author'] = data[2]
-        pull_data['no_of_comments'] = data[3]
-        pull_data['target_branch'] = data[4]
-        pull_data['no_of_reviews'] = data[5]
+        pull_data['repository_id'] = data[0]
+        pull_data['request_id'] = data[1]
+        pull_data['request_title'] = data[2]
+        pull_data['author'] = data[3]
+        pull_data['no_of_comments'] = data[4]
+        pull_data['target_branch'] = data[5]
+        pull_data['no_of_reviews'] = data[6]
+        pull_data['comments'] = data[7]
         pulls_data.append(pull_data)
-        print(data[6])
 
-    print(pull_data)
     return str(pulls_data), {'Content-Type': 'application/json'}
-    # return jsonify({'result': pulls_data})
 
 
 #################################################################################
@@ -247,7 +248,7 @@ def api_count_pull():
 
 @github_api.route('/user', methods=('GET', 'POST'))
 def api_count_user():
-    conn = sqlite3.connect('database.db')
+    conn = sqlite3.connect(Constants.DATABASE)
     db = conn.cursor()
     db.execute("SELECT * FROM userProfile")
     result = db.fetchall()

@@ -26,15 +26,20 @@ def initialize_repo(github_id, access_token=None):
     conn = sqlite3.connect(Constants.DATABASE)
     db = conn.cursor()
 
+
     #0) download and store basic repository/user information
     db_populate.store_repository_info(db, github_id, access_token)
-
     #1) TODO: download and store commit information.
     #2) TODO: download and store URL information.
-    #3) TODO: download and store pull request information.
-    #4) TODO: download and store commit comment information.
+    #3) TODO: download and store commit comment information.
+    db_populate.store_commit(db, github_id, hash)
 
     return True
+
+
+def store_pull(github_id, pull_id):
+    # 3) TODO: download and store pull request information.
+    db_populate.store_pull_data(github_id, pull_id)
 
 
 def list_details(query):
