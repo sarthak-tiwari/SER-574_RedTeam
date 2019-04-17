@@ -22,7 +22,7 @@ __author__ = "Joshua Drumm"
 __copyright__ = "Copyright 2019, SER574 Red Team"
 
 
-def store_repository_info(db, repo_id, access_token):
+def store_repository_info(db, repo_id, username, access_token):
     repo_data = GithubAPI.get_repo(repo_id)
 
     clean_query = "DELETE FROM repositories WHERE id = " + str(repo_id)
@@ -39,27 +39,26 @@ def store_repository_info(db, repo_id, access_token):
         print("store_repository_info: unknown failure when adding new data.")
 
     # if authentication given, also update users.
-    if access_token:
-        collab_data = GithubAPI.get_collaborators(access_token, repo_id)
+    collab_data = GithubAPI.get_contributors(repo_id)
 
-        for collaborator in collab_data:
-            githubLogin = collaborator["login"]
-            githubUsername = collaborator["login"]
-            githubProfile = collaborator["html_url"]
-            id = collaborator["id"]
+    for collaborator in collab_data:
+        githubLogin = collaborator["login"]
+        githubUsername = collaborator["login"]
+        githubProfile = collaborator["html_url"]
+        id = collaborator["id"]
 
-            # remove any existing collaborator data
-            clean_query = "DELETE FROM userProfile WHERE id = " + str(id)
-            db.execute(clean_query)
+        # remove any existing collaborator data
+        clean_query = "DELETE FROM userProfile WHERE id = " + str(id)
+        db.execute(clean_query)
 
-            insert_query = "INSERT INTO userProfile(githubLogin, githubUsername, githubProfile, id) VALUES(\"" + \
-                githubLogin+"\", \""+githubUsername + \
-                "\", \""+githubProfile+"\", "+str(id)+")"
+        insert_query = "INSERT INTO userProfile(githubLogin, githubUsername, githubProfile, id) VALUES(\"" + \
+            githubLogin+"\", \""+githubUsername + \
+            "\", \""+githubProfile+"\", "+str(id)+")"
 
-            db.execute(insert_query)
+        db.execute(insert_query)
 
-            if db.fetchall():
-                print("store_repository_info: unknown failure when adding user.")
+        if db.fetchall():
+            print("store_repository_info: unknown failure when adding user.")
 
 
 """
@@ -89,107 +88,39 @@ def store_user_info(db, repo_id):
 
 def store_commit(db, repo_id, hash):
     data = GithubAPI.get_commit(repo_id, hash)
-    # print(data)
+    store_commit_json(db, repo_id, data)
+
+
+def store_commit_json(db, repo_id, data):
+    """
+    Given a commit information dictionary from the GitHub API, will create a new
+    entry in the commit table with it's information. Note that this function
+    will create a  duplicate entry if the commit already has been stored.
+
+    :param db: SQLlite3 database connection
+    :param github_id: id of a git repository (integer).
+    :param data: commit information dictionary (via GitHub API)
+    :return:
+    """
+
+    #comment related
     comments_url = data["comments_url"]
 
-    with urllib.request.urlopen(comments_url) as url:
-        comment_data = json.loads(url.read().decode())
+    comment_data = [] #HACK: rate limiter problem
+    #with urllib.request.urlopen(comments_url) as url:
+    #    comment_data = json.loads(url.read().decode())
 
     comments = []
     for comment in comment_data:
         comments.append(comment['body'])
-    print(comments)
-
-    # extract data
-    hash = data["sha"]  # TEXT
-    author = data["author"]["login"]  # TEXT
-    commit_message = data["commit"]["message"]  # TEXT
-    date = str(data["commit"]["author"]["date"][0:4]) + str(data["commit"]
-                                                            ["author"]["date"][5:7]) + str(
-        data["commit"]["author"]["date"][8:10])
-    time_committed = data["commit"]["author"]["date"]  # BLOB
-    files_modified = (repr([f["filename"]
-                            for f in data["files"]])).replace("'", "\"")  # TEXT
-    num_additions = data["stats"]["additions"]  # INTEGER
-    num_deletions = data["stats"]["deletions"]  # INTEGER"
-    commitComment = comments
-    commit_comment = ''.join(commitComment)
-
-    query = "INSERT INTO commitData(hash, repositoryID, author, commitMessage, " \
-            "timeCommitted, filesModified, noOfAdditions, noOfDeletions, commentMessage) " \
-            "VALUES('" + hash + "', " + str(repo_id) + ", '" + author + "', '" + commit_message + "', " \
-            "'" + time_committed + "', '" + files_modified + "', " + \
-            str(num_additions) + ", " + str(num_deletions) + ", '" + commit_comment + "')"
-
-    with sqlite3.connect(Constants.DATABASE) as conn:
-        db.execute(query)
-        conn.commit()
-
-
-    # store_commit_json(db, repo_id, data)
-
-def store_all_commits(db, repo_id):
-    commits = GithubAPI.get_all_commits_with_comments(repo_id)
-    for data in commits:
-        # extract data
-        comments = []
-        for comment in data["comments"]:
-            comments.append(comment['body'])
-
-        hash = data["sha"]  # TEXT
-        author = data["author"]["login"]  # TEXT
-        commit_message = data["commit"]["message"]  # TEXT
-        date = str(data["commit"]["author"]["date"][0:4]) + str(data["commit"]
-                                                                ["author"]["date"][5:7]) + str(
-            data["commit"]["author"]["date"][8:10])
-        time_committed = data["commit"]["author"]["date"]  # BLOB
-        files_modified = (repr([f["filename"]
-                                for f in data["files"]])).replace("'", "\"")  # TEXT
-        num_additions = data["stats"]["additions"]  # INTEGER
-        num_deletions = data["stats"]["deletions"]  # INTEGER"
-        commitComment = comments
-        commit_comment = ''.join(commitComment)
-
-        query = "INSERT INTO commitData(hash, repositoryID, author, commitMessage, " \
-                "timeCommitted, filesModified, noOfAdditions, noOfDeletions, commentMessage) " \
-                "VALUES('" + hash + "', " + str(repo_id) + ", '" + author + "', '" + commit_message + "', " \
-                "'" + time_committed + "', '" + files_modified + "', " + \
-                str(num_additions) + ", " + str(num_deletions) + ", '" + commit_comment + "')"
-
-        with sqlite3.connect(Constants.DATABASE) as conn:
-            db.execute(query)
-            conn.commit()
-
-def store_all_pull_requests(db, repo_id):
-    pull_requests = GithubAPI.get_all_pull_requests(repo_id)
-    for data in pull_requests:
-        author = data["user"]["login"]
-        request_title = data["body"]
-        no_of_comments = data["review_comments"]
-
-        # Might need to change DB to have both base and head branch names
-        # Not sure which one target_branch should be for the time being
-        # base_branch = data["base"]  # Usually master
-        head_branch = data["head"]  # Merges into the base
-        target_branch = head_branch["label"]
-        no_of_reviews = 4
-        insert_query = "INSERT INTO pullData(requestID, requestTile, author, noOfComments, targetBranch, noOfReviews ) " \
-                    "VALUES('"+str(repo_id)+"', '"+request_title+"', '"+author+"', '"+str(
-                        no_of_comments)+"', '"+str(target_branch)+"', '"+str(no_of_reviews)+"')"
-        db.execute(str(insert_query))
-        if db.fetchall():
-            print("store_pull_data: unknown failure.")
-
-
-
-
-def store_commit_json(db, repo_id, data):
-    # TODO: consider case where commit already has been stored.
 
     #extract data
     hash = data["sha"]                                              # TEXT
     author = data["author"]["login"]                                # TEXT
+    authorID = data["author"]["id"]                                 # INTEGER
     commit_message = data["commit"]["message"]                      # TEXT
+    commit_message = commit_message.replace("'", "")
+    commit_message = commit_message.replace("\n", "")
     date = str(data["commit"]["author"]["date"][0:4])+str(data["commit"]
                                                           ["author"]["date"][5:7])+str(data["commit"]["author"]["date"][8:10])
     time_committed = data["commit"]["author"]["date"]               # BLOB
@@ -197,22 +128,23 @@ def store_commit_json(db, repo_id, data):
                             for f in data["files"]])).replace("'", "\"")  # TEXT
     num_additions = data["stats"]["additions"]                      # INTEGER
     num_deletions = data["stats"]["deletions"]                      # INTEGER"
+    commitComment = comments
+    commit_comment = ''.join(commitComment)
 
+    query = "INSERT INTO commitData(hash, repositoryID, author, authorID, commitMessage, date, " \
+                                   "timeCommitted, filesModified, noOfAdditions, noOfDeletions, commentMessage) " \
+                            "VALUES('"+hash+"', "+str(repo_id)+", '"+author+"', "+str(authorID)+", '"+commit_message+"', "+str(date)+", '"\
+                                    + time_committed+"', '"+files_modified+"', "+str(num_additions)+", "+str(num_deletions)+", '" + commit_comment + "')"
 
-    query = "INSERT INTO commitData(hash, repositoryID, author, commitMessage, " \
-        "timeCommitted, filesModified, noOfAdditions, noOfDeletions) " \
-        "VALUES('"+hash+"', "+str(repo_id)+", '"+author+"', '"+commit_message+"', " \
-        "'"+time_committed+"', '"+files_modified+"', " + \
-            str(num_additions)+", "+str(num_deletions)+")"
-    display_query = "SELECT * FROM commitData"
     db.execute(query)
-    db.execute(display_query)
 
-    if db.fetchall():
+    ret = db.fetchall()
+
+    if ret:
         print("store_commit: unknown failure.")
 
 
-def store_pull_data(repo_id, pull_no):
+def store_pull_data(db, repo_id, pull_no):
     data = GithubAPI.get_pull_request(repo_id, pull_no)
     # print(data)
     # json_name = data['repo']['branches_url']
@@ -222,9 +154,10 @@ def store_pull_data(repo_id, pull_no):
     # TODO: consider case where pull request already has been stored.
     #
     #extract data
+    # print (data)
 
     comments_url = data["review_comments_url"]
-    print(comments_url)
+    # print(comments_url)
 
     with urllib.request.urlopen(comments_url) as url:
         comment_data = json.loads(url.read().decode())
@@ -232,23 +165,28 @@ def store_pull_data(repo_id, pull_no):
     comments = []
     for comment in comment_data:
         comments.append(comment['body'])
-    print(comments)
-
+    # print(comments)
+    count = 0
+    for reviewers in data["requested_reviewers"]:
+        count = count + 1
+    # print (count)
     author = data["user"]["login"]                                # TEXT
     request_title = data["body"]
     no_of_comments = data["review_comments"]
-
+    repository_id = repo_id
+    request_id = data["id"]
+    # print(request_id)
     # Might need to change DB to have both base and head branch names
     # Not sure which one target_branch should be for the time being
     base_branch = data["base"]  # Usually master
     head_branch = data["head"]  # Merges into the base
     target_branch = head_branch["label"]
-    no_of_reviews = 4
+    no_of_reviews = count
     pullComment = comments
     pull_comment = ''.join(pullComment)
     # pull_comment = "sample comment"
-    insert_query = "INSERT INTO pullData(requestID, requestTile, author, noOfComments, targetBranch, noOfReviews, commentMessage ) " \
-                   "VALUES('"+str(repo_id)+"', '"+request_title+"', '"+author+"', '"+str(
+    insert_query = "INSERT INTO pullData(repositoryId, requestID, requestTile, author, noOfComments, targetBranch, noOfReviews, commentMessage ) " \
+                   "VALUES('"+str(repository_id)+"','"+str(request_id)+"', '"+request_title+"', '"+author+"', '"+str(
                        no_of_comments)+"', '"+str(target_branch)+"', '"+str(no_of_reviews)+"', '" + pull_comment + "')"
 
     db.execute(str(insert_query))
@@ -294,7 +232,6 @@ def store_files(db, repo_id):
         db = conn.cursor()
 
         for gitFile in files:
-
             insert_query = 'INSERT INTO codeComplexity(repository, fileName, author, codeLink) VALUES(?, ?, ?, ?);'
 
             insert_tuple = (str(repo_id),
@@ -306,9 +243,35 @@ def store_files(db, repo_id):
     
 
 
-def store_repo(db, repo_id, branch="master"):
+def store_repo_commits(db, repo_id, branch, username, token):
 
-    root = GithubAPI.get_commit(repo_id, branch)
+    #remove any existing commits
+    clean_query = "DELETE FROM commitData WHERE repositoryID = " + str(repo_id)
+    db.execute(clean_query)
+
+    if db.fetchall():
+        print("store_repo_commits: unknown failure when removing old data.")
+
+    commits_on_master = GithubAPI.get_commits_branch(repo_id, branch, username, token)
+
+    for commit in commits_on_master:
+        hash = commit["sha"]
+
+        #check if commit already exists.
+        #display_query = "SELECT hash, repositoryID FROM commitData WHERE commitData.hash=\""+hash+"\""
+        #display_query = "SELECT hash, repositoryID FROM commitData"
+        #db.execute(display_query)
+        #ret = db.fetchall()
+
+        # update DB
+        #print(display_query)
+        complete_data = GithubAPI.get_commit(repo_id, hash, username, token)
+        store_commit_json(db, repo_id, complete_data)
+
+
+
+    """
+    #BFS algorithm for traversing graph from root commit
     root_sha = root["sha"]
 
     seen = [root_sha]
@@ -325,10 +288,23 @@ def store_repo(db, repo_id, branch="master"):
                 if not parent_sha in seen:
                     seen.append(parent_sha)
                     q.append(parent_sha)
-    #debug
-    print(len(seen))
-    print(seen)
+    """
 
+def store_repo_pulls(db, repo_id, branch="master"):
+
+    #remove any existing pulls
+    clean_query = "DELETE FROM pullData WHERE repositoryID = " + str(repo_id)
+    db.execute(clean_query)
+
+    if db.fetchall():
+        print("store_repo_pulls: unknown failure when removing old data.")
+
+    pulls_on_master = GithubAPI.get_pulls_branch(repo_id, branch)
+
+    for pull in pulls_on_master:
+        id = pull["id"]
+
+        store_pull_data(db, repo_id, id)
 
 if __name__ == "__main__":
     conn = sqlite3.connect("database.db")
@@ -343,8 +319,9 @@ if __name__ == "__main__":
     newPull = str(pull_no)
 
     # connect_dbs()
+    store_repo_commits(db, 168214867, "master", "racuna1", "REPLACEME")
     # store_commit(db, repo_id, sample_hash)
-    store_pull_data(repo_id, newPull)
+    # store_pull_data(repo_id, newPull)
     # store_user_info(db, repo_id)
     # display_query = "SELECT * FROM pullData"
     # store_repository_info(db, repo_id, None)

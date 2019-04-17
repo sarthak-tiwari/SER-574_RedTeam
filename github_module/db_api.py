@@ -2,6 +2,7 @@ from datetime import datetime
 import sqlite3
 
 from . import db_populate
+from . import GithubAPI
 from .Constants import Constants
 from . import Utility
 from .metadata_analysis import commit_messages as CM
@@ -12,34 +13,60 @@ of the database.
 """
 __author__ = "Ruben Acuna"
 __author__ = "Sarthak Tiwari"
+__author__ = "Carnic"
 __copyright__ = "Copyright 2019, SER574 Red Team"
 
 
-def initialize_repo(github_id, access_token=None):
+def _get_internal_id(conn, repoName):
+
+    db = conn.cursor()
+
+    username, repo = repoName.split("/")
+
+    display_query = "SELECT repositories.id FROM repositories, userProfile WHERE userProfile.githubLogin = \""+username+"\" AND repositories.owner = userProfile.id AND repositories.name = \""+repo+"\""
+    db.execute(display_query)
+    found = db.fetchall()
+
+    return found[0][0]
+
+
+def initialize_repo_data(git_repo_name, username=None, access_token=None):
     """
     Stores the contents of a specific github repository in the interval
     database. Calling this function is required for all other API functions to
     work.
-    :param github_id: id of a git repository (integer).
+    :param git_repo_name: user and name apth of a git repository (string).
     :return: Success code (boolean).
     """
     conn = sqlite3.connect(Constants.DATABASE)
     db = conn.cursor()
 
-    #0) download and store basic repository/user information
-    db_populate.store_repository_info(db, github_id, access_token)
+    #git_repo_name  --> github_id
+    github_id = GithubAPI.get_repo_friendly(git_repo_name)["id"]
 
-    #1) download and store commit information with their comments.
-    db_populate.store_all_commits(db, github_id)
+    #0) download and store basic repository/user information
+    db_populate.store_repository_info(db, github_id, username, access_token)
+
+    #1) download and store commit information.
+    db_populate.store_repo_commits(db, github_id, "master", username, access_token)
     #2) download and store URL information.
     db_populate.store_files(db, github_id)
     #3) download and store pull request information.
-    db_populate.store_all_pull_requests(db, github_id)
+    db_populate.store_repo_pulls(db, github_id)
+    #3) TODO: download and store commit comment information.
+    #db_populate.store_commit(db, github_id, hash)
+
+    conn.commit()
 
     return True
 
 
-def list_details(query):
+def store_pull(github_id, pull_id):
+    # 3) TODO: download and store pull request information.
+    db_populate.store_pull_data(github_id, pull_id)
+
+
+def list_details(repoName):
     """
     Returns a repository details dictionary for a specific repository. Assumes
     that query refers to a valid git repository which has already been
@@ -58,12 +85,12 @@ def list_details(query):
     :param query: name of a git repository (string).
     :return: A repository details dictionary
     """
-
     conn = sqlite3.connect(Constants.DATABASE)
+    github_id = _get_internal_id(conn, repoName)
     db = conn.cursor()
 
     #fetch main repo information
-    info_query = "SELECT name, owner, id FROM repositories WHERE name=\"" + query + "\""
+    info_query = "SELECT name, owner, id FROM repositories WHERE id=\"" + github_id + "\""
     db.execute(info_query)
     repository_info = db.fetchall()[0]
 
@@ -93,7 +120,7 @@ def list_details(query):
     return details
 
 
-def fetch_commits(github_id):
+def fetch_commits(repoName):
     """
     Returns a repository details dictionary with commit frequency data for a
     specific repository. Assumes that query refers to a valid git repository which has already been
@@ -116,6 +143,7 @@ def fetch_commits(github_id):
     """
 
     conn = sqlite3.connect(Constants.DATABASE)
+    github_id = _get_internal_id(conn, repoName)
     db = conn.cursor()
 
     #fetch main repo information (uses list_details but needs extra look up for id->str)
@@ -225,18 +253,6 @@ def message_quality(repoName):
                                  "messages": inner_messages}
 
     return result
-
-def _get_internal_id(conn, repoName):
-
-    db = conn.cursor()
-
-    username, repo = repoName.split("/")
-
-    display_query = "SELECT repositories.id FROM repositories, userProfile WHERE userProfile.githubLogin = \""+username+"\" AND repositories.owner = userProfile.id AND repositories.name = \""+repo+"\""
-    db.execute(display_query)
-    found = db.fetchall()
-
-    return found[0][0]
 
 
 def fetch_repo_hashes(repoName):
@@ -553,3 +569,11 @@ def get_commits_on_stories(taigaSlug):
 
     return userStories
 
+# print(fetch_repo_hashes(168214867))
+# print(fetch_commit(168214867, "70f13b111e1147611b70f9c9f1f76ddb00fcbe27"))
+# print(list_details("SER-574_RedTeam"))
+# print(fetch_commits(168214867))
+# initialize_repo("racuna1/ser222-public", username="racuna1", access_token="REPLACEME")
+
+#z = message_quality("racuna1/ser222-public")
+#print(z)

@@ -35,6 +35,11 @@ def get_repo(repo_id):
     return process_get_request(endpoint)
 
 
+def get_repo_friendly(git_repo_name):
+    endpoint = 'https://api.github.com/repos/' + git_repo_name
+    return process_get_request(endpoint)
+
+
 def get_all_commits(repo_id):
     endpoint = 'https://api.github.com/repositories/' + str(repo_id) + '/commits'
     return process_get_request(endpoint)
@@ -63,6 +68,43 @@ def get_commit_files(repo_id, commit_sha):
     return get_commit(repo_id, commit_sha)["files"]
 
 
+def get_commits_branch(repo_id, branch, username, token, per_page=100):
+    commits = []
+    page = 0
+
+    while page < 10: #HACK: hard coded limit to prevent infinite loop
+        endpoint = "https://api.github.com/repositories/" + str(repo_id) + "/commits?per_page="+str(per_page)+"&page="+str(page)+"&sha=" + branch
+        page_result = process_get_request(endpoint, username, token)
+
+        if page_result and "documentation_url" not in page_result:
+            commits.extend(page_result)
+        else:
+            break
+
+        page += 1
+
+    return commits
+
+def get_pulls_branch(repo_id, branch="", per_page=100):
+    pulls = []
+    page = 0
+
+    while page < 10: #HACK: hard coded limit to prevent infinite loop
+        endpoint = "https://api.github.com/repositories/" + str(repo_id) + "/pulls?per_page="+str(per_page)+"&page="+str(page)
+        if branch != "":
+            endpoint += "&base=" + branch
+        page_result = process_get_request(endpoint)
+
+        if page_result and "documentation_url" not in page_result:
+            pulls.extend(page_result)
+        else:
+            break
+
+        page += 1
+
+    return pulls
+
+
 def get_all_pull_requests(repo_id):
     endpoint = 'https://api.github.com/repositories/' + str(repo_id) + '/pulls'
     return process_get_request(endpoint)
@@ -76,8 +118,12 @@ def get_pull_request_comments(repo_id, pull_number):
     endpoint = 'https://api.github.com/repositories/' + str(repo_id) + '/pulls/' + pull_number + '/comments'
     return process_get_request(endpoint)
 
-def get_collaborators(access_token, repo_id):
+def get_collaborators(username, access_token, repo_id):
     endpoint = 'https://api.github.com/repositories/' + str(repo_id) + '/collaborators?access_token=' + access_token
+    return process_get_request(endpoint, username, access_token)
+
+def get_contributors(repo_id):
+    endpoint = 'https://api.github.com/repositories/' + str(repo_id) + '/contributors'
     return process_get_request(endpoint)
 
 def get_file(repo_id, file_path):
@@ -96,7 +142,10 @@ def get_all_files_recursive(repo_id, path):
     data_for_other_folders = []
     for files in raw_data:
         if files["type"] == "file":
-            data.append(files["path"])
+            newFile = {}
+            newFile["path"] = files["path"]
+            newFile["download_url"] = files["download_url"]
+            data.append(newFile)
         elif files["type"] == "dir":
             data_for_other_folders.extend(get_all_files_recursive(repo_id, path + "/" + files["name"]))
     
@@ -119,3 +168,4 @@ def process_get_request(endpoint, username=None, token=None):
 # print(get_all_files(168214867))
 # print(user_login())
 # print(get_all_commits_with_comments(168214867))
+# print(get_pulls_branch(168214867))
