@@ -1,12 +1,10 @@
 import requests
 import json
-#from jwkest.jwk import SYMKey
-#from jwkest.jwe import JWE
+
 from requests.auth import HTTPDigestAuth
 headers = {
     'Content-Type': 'application/json',
 }
-#slug1 = "sarthak-tiwari-ser-574_redteam_team-taiga"
 
 def get_modifiedTaskAssignedTo(slug1,sprint_no):
 	sprint_no = int(sprint_no)
@@ -41,7 +39,4 @@ def get_modifiedTaskAssignedTo(slug1,sprint_no):
 		utHistory[ut[i]] = tl
 		tmpList = []
 		tl = []
-	#print (utHistory)
 	return utHistory
-
-#get_modifiedTaskAssignedTo("sarthak-tiwari-ser-574_redteam_team-taiga",2)

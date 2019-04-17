@@ -40,22 +40,18 @@ def user_story_points_info(slug1, sprint_no):
     dic = {}
     lst = []
     sprint_data = milestone_data[sprint_no]
-
     us = []
     for i in sprint_data['user_stories']:
         us.append(i['id'])
         dic['US_name'] = i['subject']
         dic['US_points'] = i['total_points']
-        # dic['US_created_date'] = i['created_date']
-
         response_usid = requests.get("https://api.taiga.io/api/v1/history/userstory/" + str(i['id']), headers=headers)
         us_data = json.loads(response_usid.content)
-
         lst.append(dic)
         dic = {}
 
     dic = {}
     for i in range(len(lst)):
         dic['US ' + str(i + 1)] = lst[i]
-
+        
     return dic
