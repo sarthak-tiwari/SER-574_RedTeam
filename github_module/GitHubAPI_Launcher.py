@@ -35,51 +35,52 @@ def dateobj_to_strdate(date):
 # General DB Access Calls
 
 
-# ex: 127.0.0.1:5000/github/core_initialize_repo?git_id=168214867
+# ex: 127.0.0.1:5000/github/core_initialize_repo?repoName=sarthak-tiwari/SER-574_RedTeam&username=racuna1&access_token=REPLACEME
 @github_api.route('/core_initialize_repo', methods=('GET', 'POST'))
 def api_core_initialize_repo():
-    git_id = request.args.get('git_id', type=int)
+    git_repo_name = request.args.get('repoName')
+    usr = request.args.get('username')
+    acctok = request.args.get('access_token')
 
-    if not git_id:
-        status = "error"
-        result = "Failed to parse git_id parameter."
+    if not git_repo_name:
+        return ("", "501: need git repo slug.")
     else:
         status = "wip"
-        result = DB.initialize_repo_data(git_id)
+        result = DB.initialize_repo_data(git_repo_name, usr, acctok)
 
     header = {'Content-Type': 'application/json'}
     data = json.dumps({"status": status, "result": result})
     return (data, header)
 
 
-# ex: 127.0.0.1:5000/github/listdetails/?format=json&query=SER-574_RedTeam
+# ex: 127.0.0.1:5000/github/listdetails/?format=json&repoName=sarthak-tiwari/SER-574_RedTeam
 @github_api.route('/listdetails/', methods=('GET', 'POST'))
 def api_core_listdetails():
 
     fo = request.args.get('format')
-    query = request.args.get('query')
+    repoName = request.args.get('repoName')
 
     if fo != "json":
         return ("", "501: only json is supported for format.")
     else:
-        result = DB.list_details(query)
+        result = DB.list_details(repoName)
 
         header = {'Content-Type': 'application/json'}
         data = json.dumps(result)
         return (data, header)
 
 
-# ex: 127.0.0.1:5000/github/commits/?format=json&query=168214867
+# ex: 127.0.0.1:5000/github/commits/?format=json&repoName=sarthak-tiwari/SER-574_RedTeam
 @github_api.route('/commits/', methods=('GET', 'POST'))
 def api_core_commits():
 
     fo = request.args.get('format')
-    query = request.args.get('query', type=int)
+    repoName = request.args.get('repoName')
 
     if fo != "json":
         return ("", "501: only json is supported for format.")
     else:
-        result = DB.fetch_commits(query)
+        result = DB.fetch_commits(repoName)
 
         header = {'Content-Type': 'application/json'}
         data = json.dumps(result)
@@ -196,6 +197,22 @@ def api_get_commit_freq_data():
 
 ################################################################################
 # Comment Analysis::Commit Messages
+
+# ex: 127.0.0.1:5000/github/messagequality/?format=json&repoName=racuna1/ser222-public
+@github_api.route('/messagequality/', methods=('GET', 'POST'))
+def api_messagequality_ui():
+
+    fo = request.args.get('format')
+    repoName = request.args.get('repoName')
+
+    if fo != "json":
+        return ("", "501: only json is supported for format.")
+    else:
+        result = DB.message_quality(repoName)
+
+        header = {'Content-Type': 'application/json'}
+        data = json.dumps(result)
+        return (data, header)
 
 # ex: 127.0.0.1:5000/github/compute_commit_message_quality?git_id=168214867&commit_hash="70f13b111e1147611b70f9c9f1f76ddb00fcbe27"
 @github_api.route('/compute_commit_message_quality', methods=('GET', 'POST'))
