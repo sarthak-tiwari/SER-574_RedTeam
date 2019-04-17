@@ -16,6 +16,19 @@ __author__ = "Sarthak Tiwari"
 __copyright__ = "Copyright 2019, SER574 Red Team"
 
 
+def _get_internal_id(conn, repoName):
+
+    db = conn.cursor()
+
+    username, repo = repoName.split("/")
+
+    display_query = "SELECT repositories.id FROM repositories, userProfile WHERE userProfile.githubLogin = \""+username+"\" AND repositories.owner = userProfile.id AND repositories.name = \""+repo+"\""
+    db.execute(display_query)
+    found = db.fetchall()
+
+    return found[0][0]
+
+
 def initialize_repo(git_repo_name, username=None, access_token=None):
     """
     Stores the contents of a specific github repository in the interval
@@ -45,7 +58,7 @@ def initialize_repo(git_repo_name, username=None, access_token=None):
     return True
 
 
-def list_details(query):
+def list_details(repoName):
     """
     Returns a repository details dictionary for a specific repository. Assumes
     that query refers to a valid git repository which has already been
@@ -64,12 +77,12 @@ def list_details(query):
     :param query: name of a git repository (string).
     :return: A repository details dictionary
     """
-
     conn = sqlite3.connect(Constants.DATABASE)
+    github_id = _get_internal_id(conn, repoName)
     db = conn.cursor()
 
     #fetch main repo information
-    info_query = "SELECT name, owner, id FROM repositories WHERE name=\"" + query + "\""
+    info_query = "SELECT name, owner, id FROM repositories WHERE id=\"" + github_id + "\""
     db.execute(info_query)
     repository_info = db.fetchall()[0]
 
@@ -99,7 +112,7 @@ def list_details(query):
     return details
 
 
-def fetch_commits(github_id):
+def fetch_commits(repoName):
     """
     Returns a repository details dictionary with commit frequency data for a
     specific repository. Assumes that query refers to a valid git repository which has already been
@@ -122,6 +135,7 @@ def fetch_commits(github_id):
     """
 
     conn = sqlite3.connect(Constants.DATABASE)
+    github_id = _get_internal_id(conn, repoName)
     db = conn.cursor()
 
     #fetch main repo information (uses list_details but needs extra look up for id->str)
@@ -231,18 +245,6 @@ def message_quality(repoName):
                                  "messages": inner_messages}
 
     return result
-
-def _get_internal_id(conn, repoName):
-
-    db = conn.cursor()
-
-    username, repo = repoName.split("/")
-
-    display_query = "SELECT repositories.id FROM repositories, userProfile WHERE userProfile.githubLogin = \""+username+"\" AND repositories.owner = userProfile.id AND repositories.name = \""+repo+"\""
-    db.execute(display_query)
-    found = db.fetchall()
-
-    return found[0][0]
 
 
 def fetch_repo_hashes(repoName):
@@ -564,3 +566,6 @@ def get_commits_on_stories(taigaSlug):
 # print(list_details("SER-574_RedTeam"))
 # print(fetch_commits(168214867))
 # initialize_repo("racuna1/ser222-public", username="racuna1", access_token="REPLACEME")
+
+z = message_quality("racuna1/ser222-public")
+print(z)

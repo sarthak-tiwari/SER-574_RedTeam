@@ -52,34 +52,34 @@ def api_core_initialize_repo():
     return (data, header)
 
 
-# ex: 127.0.0.1:5000/github/listdetails/?format=json&query=SER-574_RedTeam
+# ex: 127.0.0.1:5000/github/listdetails/?format=json&repoName=sarthak-tiwari/SER-574_RedTeam
 @github_api.route('/listdetails/', methods=('GET', 'POST'))
 def api_core_listdetails():
 
     fo = request.args.get('format')
-    query = request.args.get('query')
+    repoName = request.args.get('repoName')
 
     if fo != "json":
         return ("", "501: only json is supported for format.")
     else:
-        result = DB.list_details(query)
+        result = DB.list_details(repoName)
 
         header = {'Content-Type': 'application/json'}
         data = json.dumps(result)
         return (data, header)
 
 
-# ex: 127.0.0.1:5000/github/commits/?format=json&query=168214867
+# ex: 127.0.0.1:5000/github/commits/?format=json&repoName=sarthak-tiwari/SER-574_RedTeam
 @github_api.route('/commits/', methods=('GET', 'POST'))
 def api_core_commits():
 
     fo = request.args.get('format')
-    query = request.args.get('query', type=int)
+    repoName = request.args.get('repoName')
 
     if fo != "json":
         return ("", "501: only json is supported for format.")
     else:
-        result = DB.fetch_commits(query)
+        result = DB.fetch_commits(repoName)
 
         header = {'Content-Type': 'application/json'}
         data = json.dumps(result)
