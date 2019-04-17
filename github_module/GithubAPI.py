@@ -93,9 +93,9 @@ def get_pull_request_comments(repo_id, pull_number):
     endpoint = 'https://api.github.com/repositories/' + str(repo_id) + '/pulls/' + pull_number + '/comments'
     return process_get_request(endpoint)
 
-def get_collaborators(access_token, repo_id):
+def get_collaborators(username, access_token, repo_id):
     endpoint = 'https://api.github.com/repositories/' + str(repo_id) + '/collaborators?access_token=' + access_token
-    return process_get_request(endpoint)
+    return process_get_request(endpoint, username, access_token)
 
 def get_file(repo_id, file_path):
     endpoint = 'https://api.github.com/repositories/' + str(repo_id) + '/contents/' + file_path + '?ref=master'

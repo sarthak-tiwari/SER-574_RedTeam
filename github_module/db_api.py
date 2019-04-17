@@ -31,7 +31,7 @@ def initialize_repo(git_repo_name, username=None, access_token=None):
     github_id = GithubAPI.get_repo_friendly(git_repo_name)["id"]
 
     #0) download and store basic repository/user information
-    db_populate.store_repository_info(db, github_id, access_token)
+    db_populate.store_repository_info(db, github_id, username, access_token)
 
     #1) download and store commit information.
     db_populate.store_repo_commits(db, github_id, "master", username, access_token)
@@ -563,4 +563,4 @@ def get_commits_on_stories(taigaSlug):
 # print(fetch_commit(168214867, "70f13b111e1147611b70f9c9f1f76ddb00fcbe27"))
 # print(list_details("SER-574_RedTeam"))
 # print(fetch_commits(168214867))
-# initialize_repo("sarthak-tiwari/ser-574_Assignment-1", username="racuna1", access_token="REPLACEME")
+initialize_repo("racuna1/ser222-public", username="racuna1", access_token="a93e079c099764ddea9c9b6b6f121c83a4228d2b")

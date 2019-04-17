@@ -21,7 +21,7 @@ __author__ = "Sarthak Tiwari"
 __copyright__ = "Copyright 2019, SER574 Red Team"
 
 
-def store_repository_info(db, repo_id, access_token):
+def store_repository_info(db, repo_id, username, access_token):
     repo_data = GithubAPI.get_repo(repo_id)
 
     clean_query = "DELETE FROM repositories WHERE id = " + str(repo_id)
@@ -39,7 +39,7 @@ def store_repository_info(db, repo_id, access_token):
 
     # if authentication given, also update users.
     if access_token:
-        collab_data = GithubAPI.get_collaborators(access_token, repo_id)
+        collab_data = GithubAPI.get_collaborators(username, access_token, repo_id)
 
         for collaborator in collab_data:
             githubLogin = collaborator["login"]
@@ -106,8 +106,9 @@ def store_commit_json(db, repo_id, data):
     #comment related
     comments_url = data["comments_url"]
 
-    with urllib.request.urlopen(comments_url) as url:
-        comment_data = json.loads(url.read().decode())
+    comment_data = [] #HACK: rate limiter problem
+    #with urllib.request.urlopen(comments_url) as url:
+    #    comment_data = json.loads(url.read().decode())
 
     comments = []
     for comment in comment_data:
@@ -118,6 +119,8 @@ def store_commit_json(db, repo_id, data):
     author = data["author"]["login"]                                # TEXT
     authorID = data["author"]["id"]                                 # INTEGER
     commit_message = data["commit"]["message"]                      # TEXT
+    commit_message = commit_message.replace("'", "")
+    commit_message = commit_message.replace("\n", "")
     date = str(data["commit"]["author"]["date"][0:4])+str(data["commit"]
                                                           ["author"]["date"][5:7])+str(data["commit"]["author"]["date"][8:10])
     time_committed = data["commit"]["author"]["date"]               # BLOB
