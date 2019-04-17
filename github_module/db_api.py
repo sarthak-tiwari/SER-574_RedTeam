@@ -2,6 +2,7 @@ from datetime import datetime
 import sqlite3
 
 from . import db_populate
+from . import GithubAPI
 from .Constants import Constants
 from . import Utility
 from .metadata_analysis import commit_messages as CM
@@ -15,24 +16,31 @@ __author__ = "Sarthak Tiwari"
 __copyright__ = "Copyright 2019, SER574 Red Team"
 
 
-def initialize_repo(github_id, access_token=None):
+def initialize_repo(git_repo_name, username=None, access_token=None):
     """
     Stores the contents of a specific github repository in the interval
     database. Calling this function is required for all other API functions to
     work.
-    :param github_id: id of a git repository (integer).
+    :param git_repo_name: user and name apth of a git repository (string).
     :return: Success code (boolean).
     """
     conn = sqlite3.connect(Constants.DATABASE)
     db = conn.cursor()
 
+    #git_repo_name  --> github_id
+    github_id = GithubAPI.get_repo_friendly(git_repo_name)["id"]
+
     #0) download and store basic repository/user information
     db_populate.store_repository_info(db, github_id, access_token)
 
-    #1) TODO: download and store commit information.
+    #1) download and store commit information.
+    db_populate.store_repo_commits(db, github_id, "master", username, access_token)
+
     #2) TODO: download and store URL information.
     #3) TODO: download and store pull request information.
     #4) TODO: download and store commit comment information.
+
+    conn.commit()
 
     return True
 
@@ -551,3 +559,8 @@ def get_commits_on_stories(taigaSlug):
 
     return userStories
 
+# print(fetch_repo_hashes(168214867))
+# print(fetch_commit(168214867, "70f13b111e1147611b70f9c9f1f76ddb00fcbe27"))
+# print(list_details("SER-574_RedTeam"))
+# print(fetch_commits(168214867))
+# initialize_repo("sarthak-tiwari/ser-574_Assignment-1", username="racuna1", access_token="REPLACEME")

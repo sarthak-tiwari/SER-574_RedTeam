@@ -35,6 +35,11 @@ def get_repo(repo_id):
     return process_get_request(endpoint)
 
 
+def get_repo_friendly(git_repo_name):
+    endpoint = 'https://api.github.com/repos/' + git_repo_name
+    return process_get_request(endpoint)
+
+
 def get_all_commits(repo_id):
     endpoint = 'https://api.github.com/repositories/' + str(repo_id) + '/commits'
     return process_get_request(endpoint)
@@ -54,6 +59,24 @@ def get_all_commits_with_comments(repo_id):
         commit_sha = commit["sha"]
         comments = get_commit_comments(repo_id, commit_sha)
         commit["comments"] = comments
+    return commits
+
+
+def get_commits_branch(repo_id, branch, username, token, per_page=100):
+    commits = []
+    page = 0
+
+    while page < 10: #HACK: hard coded limit to prevent infinite loop
+        endpoint = "https://api.github.com/repositories/" + str(repo_id) + "/commits?per_page="+str(per_page)+"&page="+str(page)+"&sha=" + branch
+        page_result = process_get_request(endpoint, username, token)
+
+        if page_result and "documentation_url" not in page_result:
+            commits.extend(page_result)
+        else:
+            break
+
+        page += 1
+
     return commits
 
 

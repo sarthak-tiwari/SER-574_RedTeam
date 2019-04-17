@@ -88,7 +88,22 @@ def store_user_info(db, repo_id):
 
 def store_commit(db, repo_id, hash):
     data = GithubAPI.get_commit(repo_id, hash)
-    # print(data)
+    store_commit_json(db, repo_id, data)
+
+
+def store_commit_json(db, repo_id, data):
+    """
+    Given a commit information dictionary from the GitHub API, will create a new
+    entry in the commit table with it's information. Note that this function
+    will create a  duplicate entry if the commit already has been stored.
+
+    :param db: SQLlite3 database connection
+    :param github_id: id of a git repository (integer).
+    :param data: commit information dictionary (via GitHub API)
+    :return:
+    """
+
+    #comment related
     comments_url = data["comments_url"]
 
     with urllib.request.urlopen(comments_url) as url:
@@ -97,42 +112,11 @@ def store_commit(db, repo_id, hash):
     comments = []
     for comment in comment_data:
         comments.append(comment['body'])
-    print(comments)
-
-    # extract data
-    hash = data["sha"]  # TEXT
-    author = data["author"]["login"]  # TEXT
-    commit_message = data["commit"]["message"]  # TEXT
-    date = str(data["commit"]["author"]["date"][0:4]) + str(data["commit"]
-                                                            ["author"]["date"][5:7]) + str(
-        data["commit"]["author"]["date"][8:10])
-    time_committed = data["commit"]["author"]["date"]  # BLOB
-    files_modified = (repr([f["filename"]
-                            for f in data["files"]])).replace("'", "\"")  # TEXT
-    num_additions = data["stats"]["additions"]  # INTEGER
-    num_deletions = data["stats"]["deletions"]  # INTEGER"
-    commitComment = comments
-    commit_comment = ''.join(commitComment)
-
-    query = "INSERT INTO commitData(hash, repositoryID, author, commitMessage, " \
-            "timeCommitted, filesModified, noOfAdditions, noOfDeletions, commentMessage) " \
-            "VALUES('" + hash + "', " + str(repo_id) + ", '" + author + "', '" + commit_message + "', " \
-            "'" + time_committed + "', '" + files_modified + "', " + \
-            str(num_additions) + ", " + str(num_deletions) + ", '" + commit_comment + "')"
-
-    db.execute(query)
-    conn.commit()
-
-
-    # store_commit_json(db, repo_id, data)
-
-
-def store_commit_json(db, repo_id, data):
-    # TODO: consider case where commit already has been stored.
 
     #extract data
     hash = data["sha"]                                              # TEXT
     author = data["author"]["login"]                                # TEXT
+    authorID = data["author"]["id"]                                 # INTEGER
     commit_message = data["commit"]["message"]                      # TEXT
     date = str(data["commit"]["author"]["date"][0:4])+str(data["commit"]
                                                           ["author"]["date"][5:7])+str(data["commit"]["author"]["date"][8:10])
@@ -141,18 +125,19 @@ def store_commit_json(db, repo_id, data):
                             for f in data["files"]])).replace("'", "\"")  # TEXT
     num_additions = data["stats"]["additions"]                      # INTEGER
     num_deletions = data["stats"]["deletions"]                      # INTEGER"
+    commitComment = comments
+    commit_comment = ''.join(commitComment)
 
+    query = "INSERT INTO commitData(hash, repositoryID, author, authorID, commitMessage, date, " \
+                                   "timeCommitted, filesModified, noOfAdditions, noOfDeletions, commentMessage) " \
+                            "VALUES('"+hash+"', "+str(repo_id)+", '"+author+"', "+str(authorID)+", '"+commit_message+"', "+str(date)+", '"\
+                                    + time_committed+"', '"+files_modified+"', "+str(num_additions)+", "+str(num_deletions)+", '" + commit_comment + "')"
 
-    query = "INSERT INTO commitData(hash, repositoryID, author, commitMessage, " \
-        "timeCommitted, filesModified, noOfAdditions, noOfDeletions) " \
-        "VALUES('"+hash+"', "+str(repo_id)+", '"+author+"', '"+commit_message+"', " \
-        "'"+time_committed+"', '"+files_modified+"', " + \
-            str(num_additions)+", "+str(num_deletions)+")"
-    display_query = "SELECT * FROM commitData"
     db.execute(query)
-    db.execute(display_query)
 
-    if db.fetchall():
+    ret = db.fetchall()
+
+    if ret:
         print("store_commit: unknown failure.")
 
 
@@ -233,9 +218,35 @@ def store_complexity(repoName):
             db.execute(updateQuery, updateTuple)
 
 
-def store_repo(db, repo_id, branch="master"):
+def store_repo_commits(db, repo_id, branch, username, token):
 
-    root = GithubAPI.get_commit(repo_id, branch)
+    #remove any existing commits
+    clean_query = "DELETE FROM commitData WHERE repositoryID = " + str(repo_id)
+    db.execute(clean_query)
+
+    if db.fetchall():
+        print("store_repo_commits: unknown failure when removing old data.")
+
+    commits_on_master = GithubAPI.get_commits_branch(repo_id, branch, username, token)
+
+    for commit in commits_on_master:
+        hash = commit["sha"]
+
+        #check if commit already exists.
+        #display_query = "SELECT hash, repositoryID FROM commitData WHERE commitData.hash=\""+hash+"\""
+        #display_query = "SELECT hash, repositoryID FROM commitData"
+        #db.execute(display_query)
+        #ret = db.fetchall()
+
+        # update DB
+        #print(display_query)
+        complete_data = GithubAPI.get_commit(repo_id, hash, username, token)
+        store_commit_json(db, repo_id, complete_data)
+
+
+
+    """
+    #BFS algorithm for traversing graph from root commit
     root_sha = root["sha"]
 
     seen = [root_sha]
@@ -252,9 +263,7 @@ def store_repo(db, repo_id, branch="master"):
                 if not parent_sha in seen:
                     seen.append(parent_sha)
                     q.append(parent_sha)
-    #debug
-    print(len(seen))
-    print(seen)
+    """
 
 
 if __name__ == "__main__":
@@ -270,6 +279,7 @@ if __name__ == "__main__":
     newPull = str(pull_no)
 
     # connect_dbs()
+    store_repo_commits(db, 168214867, "master", "racuna1", "REPLACEME")
     # store_commit(db, repo_id, sample_hash)
     store_pull_data(repo_id, newPull)
     # store_user_info(db, repo_id)
