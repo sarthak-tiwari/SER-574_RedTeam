@@ -132,10 +132,10 @@ def get_file(repo_id, file_path):
     raw_data["content"] = base64.b64decode(raw_data["content"]).decode('utf-8')
     return raw_data
 
-def get_all_files(repo_id):
-    return get_all_files_recursive(repo_id, '')
+def get_all_files(repo_id, filter = ""):
+    return get_all_files_recursive(repo_id, '', filter)
 
-def get_all_files_recursive(repo_id, path):
+def get_all_files_recursive(repo_id, path, filter):
     endpoint = 'https://api.github.com/repositories/' + str(repo_id) + '/contents' + str(path)
     raw_data = process_get_request(endpoint)
     data = []
@@ -145,9 +145,17 @@ def get_all_files_recursive(repo_id, path):
             newFile = {}
             newFile["path"] = files["path"]
             newFile["download_url"] = files["download_url"]
-            data.append(newFile)
+            if filter != "":
+                try:
+                    filename, ext = newFile["path"].split(".")
+                    if ext == filter:
+                        data.append(newFile)
+                except:
+                    pass
+            else:
+                data.append(newFile)
         elif files["type"] == "dir":
-            data_for_other_folders.extend(get_all_files_recursive(repo_id, path + "/" + files["name"]))
+            data_for_other_folders.extend(get_all_files_recursive(repo_id, path + "/" + files["name"], filter))
     
     data.extend(data_for_other_folders)
     return data
@@ -165,7 +173,7 @@ def process_get_request(endpoint, username=None, token=None):
 # print(get_pull_request("168214867", '4'))
 # print(get_all_pull_requests("168214867"))
 # print(get_file(168214867, 'github_module/README'))
-# print(get_all_files(168214867))
+# print(get_all_files(168214867, "java"))
 # print(user_login())
 # print(get_all_commits_with_comments(168214867))
 # print(get_pulls_branch(168214867))

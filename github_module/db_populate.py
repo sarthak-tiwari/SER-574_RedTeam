@@ -228,7 +228,7 @@ def store_complexity(repoName):
 
 
 def store_files(db, repo_id):
-    files = GithubAPI.get_all_files(repo_id)
+    files = GithubAPI.get_all_files(repo_id, "java")
 
     for gitFile in files:
         insert_query = 'INSERT INTO codeComplexity(repository, fileName, author, codeLink) VALUES(?, ?, ?, ?);'
