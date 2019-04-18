@@ -5,7 +5,8 @@ from .Constants import Constants
 from .static_code_analysis.CheckStyleManager import CheckStyleManager
 from . import GithubAPI
 import sqlite3
-import urllib, json
+import urllib
+import json
 import requests
 from pprint import pprint
 import pickle
@@ -106,7 +107,7 @@ def store_commit_json(db, repo_id, data):
     #comment related
     comments_url = data["comments_url"]
 
-    comment_data = [] #HACK: rate limiter problem
+    comment_data = []  # HACK: rate limiter problem
     #with urllib.request.urlopen(comments_url) as url:
     #    comment_data = json.loads(url.read().decode())
 
@@ -132,9 +133,11 @@ def store_commit_json(db, repo_id, data):
     commit_comment = ''.join(commitComment)
 
     query = "INSERT INTO commitData(hash, repositoryID, author, authorID, commitMessage, date, " \
-                                   "timeCommitted, filesModified, noOfAdditions, noOfDeletions, commentMessage) " \
-                            "VALUES('"+hash+"', "+str(repo_id)+", '"+author+"', "+str(authorID)+", '"+commit_message+"', "+str(date)+", '"\
-                                    + time_committed+"', '"+files_modified+"', "+str(num_additions)+", "+str(num_deletions)+", '" + commit_comment + "')"
+        "timeCommitted, filesModified, noOfAdditions, noOfDeletions, commentMessage) " \
+        "VALUES('"+hash+"', "+str(repo_id)+", '"+author+"', "+str(authorID)+", '"+commit_message+"', "+str(date)+", '"\
+        + time_committed+"', '"+files_modified+"', " + \
+            str(num_additions)+", "+str(num_deletions) + \
+        ", '" + commit_comment + "')"
 
     db.execute(query)
 
@@ -193,38 +196,35 @@ def store_pull_data(db, repo_id, pull_no):
     conn.commit()
 
 
-def store_complexity(repoName):
+def store_complexity(db, repoName):
 
-    with sqlite3.connect(Constants.DATABASE) as conn:
-        db = conn.cursor()
+    getFileLinkQuery = 'SELECT codeLink FROM codeComplexity WHERE repository="' + repoName + '";'
+    db.execute(getFileLinkQuery)
+    fileLinks = db.fetchall()
 
-        getFileLinkQuery = 'SELECT codeLink FROM codeComplexity WHERE repository="' + repoName + '";'
-        db.execute(getFileLinkQuery)
-        fileLinks = db.fetchall()
+    for row in fileLinks:
+        metrics = CheckStyleManager.getComplexity(row[0])
 
-        for row in fileLinks:
-            metrics = CheckStyleManager.getComplexity(row[0])
+        updateQuery = 'UPDATE codeComplexity SET ' \
+            + 'booleanExpressionComplexity = ?' \
+            + ',classFanOutComplexity = ?' \
+            + ',cyclomaticComplexity = ?' \
+            + ',javaNCSS = ?' \
+            + ',nPathComplexity = ?' \
+            + ',classDataAbstractionCoupling = ?' \
+            + ',javaWarnings = ?' \
+            + ' WHERE codeLink = ?;'
 
-            updateQuery = 'UPDATE codeComplexity SET ' \
-                + 'booleanExpressionComplexity = ?' \
-                + ',classFanOutComplexity = ?' \
-                + ',cyclomaticComplexity = ?' \
-                + ',javaNCSS = ?' \
-                + ',nPathComplexity = ?' \
-                + ',classDataAbstractionCoupling = ?' \
-                + ',javaWarnings = ?' \
-                + ' WHERE codeLink = ?;'
+        updateTuple = (metrics['BooleanExpressionComplexity'],
+                        metrics['ClassFanOutComplexity'],
+                        metrics['CyclomaticComplexity'],
+                        metrics['JavaNCSS'],
+                        metrics['NPathComplexity'],
+                        metrics['ClassDataAbstractionCoupling'],
+                        metrics['JavaWarnings'],
+                        row[0])
 
-            updateTuple = (metrics['BooleanExpressionComplexity'],
-                           metrics['ClassFanOutComplexity'],
-                           metrics['CyclomaticComplexity'],
-                           metrics['JavaNCSS'],
-                           metrics['NPathComplexity'],
-                           metrics['ClassDataAbstractionCoupling'],
-                           metrics['JavaWarnings'],
-                           row[0])
-
-            db.execute(updateQuery, updateTuple)
+        db.execute(updateQuery, updateTuple)
 
 
 def store_files(db, repo_id, repo_slug):
@@ -234,12 +234,11 @@ def store_files(db, repo_id, repo_slug):
         insert_query = 'INSERT INTO codeComplexity(repository, fileName, author, codeLink) VALUES(?, ?, ?, ?);'
 
         insert_tuple = (repo_slug,
-                       gitFile["path"],
-                       "Not yet Supported",
-                       gitFile["download_url"])
+                        gitFile["path"],
+                        "Not yet Supported",
+                        gitFile["download_url"])
 
         db.execute(insert_query, insert_tuple)
-    
 
 
 def store_repo_commits(db, repo_id, branch, username, token):
@@ -251,7 +250,8 @@ def store_repo_commits(db, repo_id, branch, username, token):
     if db.fetchall():
         print("store_repo_commits: unknown failure when removing old data.")
 
-    commits_on_master = GithubAPI.get_commits_branch(repo_id, branch, username, token)
+    commits_on_master = GithubAPI.get_commits_branch(
+        repo_id, branch, username, token)
 
     for commit in commits_on_master:
         hash = commit["sha"]
@@ -266,8 +266,6 @@ def store_repo_commits(db, repo_id, branch, username, token):
         #print(display_query)
         complete_data = GithubAPI.get_commit(repo_id, hash, username, token)
         store_commit_json(db, repo_id, complete_data)
-
-
 
     """
     #BFS algorithm for traversing graph from root commit
@@ -289,6 +287,7 @@ def store_repo_commits(db, repo_id, branch, username, token):
                     q.append(parent_sha)
     """
 
+
 def store_repo_pulls(db, repo_id, branch="master"):
 
     #remove any existing pulls
@@ -304,6 +303,7 @@ def store_repo_pulls(db, repo_id, branch="master"):
         id = pull["id"]
 
         store_pull_data(db, repo_id, id)
+
 
 if __name__ == "__main__":
     conn = sqlite3.connect("database.db")

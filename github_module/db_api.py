@@ -46,13 +46,14 @@ def initialize_repo_data(git_repo_name, username=None, access_token=None):
 
         #0) download and store basic repository/user information
         db_populate.store_repository_info(db, github_id, username, access_token)
-
         #1) download and store commit information.
         db_populate.store_repo_commits(db, github_id, "master", username, access_token)
         #2) download and store URL information.
         db_populate.store_files(db, github_id, git_repo_name)
         #3) download and store pull request information.
         db_populate.store_repo_pulls(db, github_id)
+
+        db_populate.store_complexity(db, git_repo_name)
 
     conn.commit()
 
