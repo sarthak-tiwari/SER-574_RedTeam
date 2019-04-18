@@ -382,3 +382,59 @@ versions:
             Ref_Num:
               type: integer
               description: Reference number of the Task.
+
+      User_task_History:
+        category: User Task. 
+        description: History of user tasks to different statuses in a sprint.
+        uri: historyOfTasks?projectslug={project}&sprint={sprintno}
+
+        request_parameters:
+                        project:
+                            type: string
+                            description: project slug name
+                        sprintno:
+                            type: integer
+                            description: sprint number
+
+        response_body:
+                        type: object
+                        properties:
+                            task:
+                                type: List
+                                description: List of tasks and the dates when they were moved to different status.
+                                items:
+                                    type: Date
+
+      User_task_Information:
+        category: User Task. 
+        description: user Task information for a particular sprint.
+        uri: User_task_Information?projectslug={project}&sprint={sprintno}
+
+        request_parameters:
+                        project:
+                            type: string
+                            description: project slug name
+                        sprintno:
+                            type: integer
+                            description: sprint number
+
+        response_body:
+                        type: object
+                        properties:
+                            task:
+                                type: Integer
+                                description: Task number in a particular sprint
+                                items:
+                                    type: List
+                                    description: Information about a Task in that sprint.
+                                    properties:
+                                        user_task:
+                                          type: String
+                                          description: User_task name.
+                                        user_task_created_at:
+                                          type: Date
+                                          description: user_task created date.
+
+
+
+
