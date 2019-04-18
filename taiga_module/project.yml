@@ -435,93 +435,93 @@ versions:
                                           type: Date
                                           description: user_task created date.
                                          
-Team_members_info:
-        category: team info. 
-        description: Information about team members working.
-        uri: teammemberinfo?projectslug={project}
+        Team_members_info:
+                category: team info. 
+                description: Information about team members working.
+                uri: teammemberinfo?projectslug={project}
 
-         request_parameters:
-                        project:
-                            type: string
-                            description: project slug name
-                        
-
-         response_body:
-                        type: object
-                        properties:
-                            user_details:
-                                name: name of user
-                                username: username of the user
-                                role_name: role of the member
-                                full_name_display: display name on taiga
-                                id: taiga id
+                 request_parameters:
+                                project:
+                                    type: string
+                                    description: project slug name
 
 
-User_Story_Points_Information:
-        category: User story points information. 
-        description: user Task information for a particular sprint.
-        uri: memberuserstorypointsinfo?projectslug={project}&sprint={sprintno}
-
-        request_parameters:
-                        project:
-                            type: string
-                            description: project slug name
-                        sprintno:
-                            type: integer
-                            description: sprint number
-
-        response_body:
-                        type: object
-                        properties:
-                            Story:
-                                type: Integer
-                                description: User Story number in a particular sprint
-                                items:
-                                    type: List
-                                    description: Information about User Story in that sprint.
-                                    properties:
-                                        User_Story:
-                                          US_name: String
-                                          US_points: User Story points.
-                                          Task:
-                                            assigned to: task assigned which user.
-                                        user_story_created_at:
-                                          type: Date
-                                          description: user_story created date.
+                 response_body:
+                                type: object
+                                properties:
+                                    user_details:
+                                        name: name of user
+                                        username: username of the user
+                                        role_name: role of the member
+                                        full_name_display: display name on taiga
+                                        id: taiga id
 
 
+        User_Story_Points_Information:
+                category: User story points information. 
+                description: user Task information for a particular sprint.
+                uri: memberuserstorypointsinfo?projectslug={project}&sprint={sprintno}
 
-User_Task_progress_with_days_info:
-        category: User tasks progress and days array. 
-        description: User tasks progress and days array in particular sprint.
-        uri: UserTaskchangestatus?projectslug={project}&sprint={sprintno}
+                request_parameters:
+                                project:
+                                    type: string
+                                    description: project slug name
+                                sprintno:
+                                    type: integer
+                                    description: sprint number
 
-        request_parameters:
-                        project:
-                            type: string
-                            description: project slug name
-                        sprintno:
-                            type: integer
-                            description: sprint number
+                response_body:
+                                type: object
+                                properties:
+                                    Story:
+                                        type: Integer
+                                        description: User Story number in a particular sprint
+                                        items:
+                                            type: List
+                                            description: Information about User Story in that sprint.
+                                            properties:
+                                                User_Story:
+                                                  US_name: String
+                                                  US_points: User Story points.
+                                                  Task:
+                                                    assigned to: task assigned which user.
+                                                user_story_created_at:
+                                                  type: Date
+                                                  description: user_story created date.
 
-        response_body:
-                        type: object
-                        properties:
-                            Story:
-                                type: Integer
-                                description: User Story number in a particular sprint
-                                items:
-                                    type: List
-                                    description: Information about User Story in that sprint.
-                                    properties:
-                                        User_Story:
-                                          created_date: String
-                                          status_change:
-                                            New -In progress: date when task was moved to inprogress
-                                            In progress- Ready for test: date when task was moved to ready to test
-                                            Ready for test- Closed: date when task was moved to ready to closed
-                                        Days:
-                                          [Array with number of days spent at each stage]
+
+
+        User_Task_progress_with_days_info:
+                category: User tasks progress and days array. 
+                description: User tasks progress and days array in particular sprint.
+                uri: UserTaskchangestatus?projectslug={project}&sprint={sprintno}
+
+                request_parameters:
+                                project:
+                                    type: string
+                                    description: project slug name
+                                sprintno:
+                                    type: integer
+                                    description: sprint number
+
+                response_body:
+                                type: object
+                                properties:
+                                    Story:
+                                        type: Integer
+                                        description: User Story number in a particular sprint
+                                        items:
+                                            type: List
+                                            description: Information about User Story in that sprint.
+                                            properties:
+                                                User_Story:
+                                                  created_date: String
+                                                  status_change:
+                                                    New -In progress: date when task was moved to inprogress
+                                                    In progress- Ready for test: date when task was moved to ready to test
+                                                    Ready for test- Closed: date when task was moved to ready to closed
+                                                Days:
+                                                  [Array with number of days spent at each stage]
 
 
 
