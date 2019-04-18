@@ -38,23 +38,21 @@ def initialize_repo_data(git_repo_name, username=None, access_token=None):
     :param git_repo_name: user and name apth of a git repository (string).
     :return: Success code (boolean).
     """
-    conn = sqlite3.connect(Constants.DATABASE)
-    db = conn.cursor()
+    with sqlite3.connect(Constants.DATABASE) as conn:
+        db = conn.cursor()
 
-    #git_repo_name  --> github_id
-    github_id = GithubAPI.get_repo_friendly(git_repo_name)["id"]
+        #git_repo_name  --> github_id
+        github_id = GithubAPI.get_repo_friendly(git_repo_name)["id"]
 
-    #0) download and store basic repository/user information
-    db_populate.store_repository_info(db, github_id, username, access_token)
+        #0) download and store basic repository/user information
+        db_populate.store_repository_info(db, github_id, username, access_token)
 
-    #1) download and store commit information.
-    db_populate.store_repo_commits(db, github_id, "master", username, access_token)
-    #2) download and store URL information.
-    db_populate.store_files(db, github_id)
-    #3) download and store pull request information.
-    db_populate.store_repo_pulls(db, github_id)
-    #3) TODO: download and store commit comment information.
-    #db_populate.store_commit(db, github_id, hash)
+        #1) download and store commit information.
+        db_populate.store_repo_commits(db, github_id, "master", username, access_token)
+        #2) download and store URL information.
+        db_populate.store_files(db, github_id)
+        #3) download and store pull request information.
+        db_populate.store_repo_pulls(db, github_id)
 
     conn.commit()
 
