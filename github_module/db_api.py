@@ -50,7 +50,7 @@ def initialize_repo_data(git_repo_name, username=None, access_token=None):
         #1) download and store commit information.
         db_populate.store_repo_commits(db, github_id, "master", username, access_token)
         #2) download and store URL information.
-        db_populate.store_files(db, github_id)
+        db_populate.store_files(db, github_id, git_repo_name)
         #3) download and store pull request information.
         db_populate.store_repo_pulls(db, github_id)
 

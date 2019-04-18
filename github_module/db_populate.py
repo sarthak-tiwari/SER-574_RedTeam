@@ -227,13 +227,13 @@ def store_complexity(repoName):
             db.execute(updateQuery, updateTuple)
 
 
-def store_files(db, repo_id):
+def store_files(db, repo_id, repo_slug):
     files = GithubAPI.get_all_files(repo_id, "java")
 
     for gitFile in files:
         insert_query = 'INSERT INTO codeComplexity(repository, fileName, author, codeLink) VALUES(?, ?, ?, ?);'
 
-        insert_tuple = (str(repo_id),
+        insert_tuple = (repo_slug,
                        gitFile["path"],
                        "Not yet Supported",
                        gitFile["download_url"])
