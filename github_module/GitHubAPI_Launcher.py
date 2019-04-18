@@ -100,7 +100,7 @@ def api_core_commits():
         return (data, header)
 
 
-# ex: 127.0.0.1:5000/github/fetch_repo_hashes/?format=json&repoName="sarthak-tiwari/SER-574_RedTeam"
+# ex: 127.0.0.1:5000/github/fetch_repo_hashes/?format=json&repoName=sarthak-tiwari/SER-574_RedTeam
 @github_api.route('/fetch_repo_hashes/', methods=('GET', 'POST'))
 def api_core_fetch_repo_hashes():
     fo = request.args.get('format')
@@ -118,7 +118,7 @@ def api_core_fetch_repo_hashes():
     return (data, header)
 
 
-# ex: 127.0.0.1:5000/github/fetch_commit/?format=json&repoName="sarthak-tiwari/SER-574_RedTeam"&commit_hash="  "
+# ex: 127.0.0.1:5000/github/fetch_commit/?format=json&repoName=sarthak-tiwari/SER-574_RedTeam&commit_hash=70f13b111e1147611b70f9c9f1f76ddb00fcbe27
 @github_api.route('/fetch_commit/', methods=('GET', 'POST'))
 def api_core_fetch_commit():
     fo = request.args.get('format')

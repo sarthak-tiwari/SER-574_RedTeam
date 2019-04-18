@@ -90,7 +90,7 @@ def list_details(repoName):
     db = conn.cursor()
 
     #fetch main repo information
-    info_query = "SELECT name, owner, id FROM repositories WHERE id=\"" + github_id + "\""
+    info_query = "SELECT name, owner, id FROM repositories WHERE id=\"" + str(github_id) + "\""
     db.execute(info_query)
     repository_info = db.fetchall()[0]
 
@@ -150,7 +150,7 @@ def fetch_commits(repoName):
     info_query = "SELECT name FROM repositories WHERE id=" + str(github_id)
     db.execute(info_query)
     repo_name = db.fetchall()[0][0]
-    result = list_details(repo_name)
+    result = list_details(repoName)
 
     #fetch commit information
     commit_query = "SELECT authorID, commitMessage, date, timeCommitted, filesModified, noOfAdditions, noOfDeletions FROM commitData WHERE repositoryID=" + \
@@ -219,7 +219,7 @@ def message_quality(repoName):
     info_query = "SELECT name FROM repositories WHERE id=" + str(github_id)
     db.execute(info_query)
     repo_name = db.fetchall()[0][0]
-    result = list_details(repo_name)
+    result = list_details(repoName)
 
     # fetch pull request information
     pr_query = "SELECT repositoryID, requestID, requestTile, author, noOfComments, targetBranch, noOfReviews, commentMessage FROM pullData WHERE repositoryID=" + \
