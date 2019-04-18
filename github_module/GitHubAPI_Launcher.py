@@ -1,20 +1,36 @@
 # Class to launch github api service on flask
 #
-# Author: Sarthak Tiwari, Ruben Acuna
-# E-Mail: sarthak.tiwari@asu.edu, racuna1@asu.edu
+# Author: Sarthak Tiwari, Ruben Acuna, Carnic
+# E-Mail: sarthak.tiwari@asu.edu, racuna1@asu.edu, clnu2@asu.edu
 
-from flask import Blueprint, Flask, request
+from flask import Blueprint, Flask, request, redirect, url_for
+from flask_dance.contrib.github import make_github_blueprint, github
 import datetime
 import json
 import sqlite3
-import GithubAPI
 
+from . import GithubAPI
 from .static_code_analysis.CheckStyleManager import CheckStyleManager
 #import metadata_analysis.commit_frequency as CF
 from . import db_api as DB
+# import db_api 
+from .Constants import Constants
+from . import db_populate as DP
 
 github_api = Blueprint('github_api', __name__,)
+github_login = make_github_blueprint(
+    client_id="5d45a5aa02a482c56abd",
+    client_secret="ac05cfd61eeecd795374868b9a9965ca9999c999",
+)
 
+@github_login.route("/", methods=('GET', 'POST'))
+def index():
+    if not github.authorized:
+        return redirect(url_for("github.login"))
+    resp = github.get("/user")
+    if resp.ok:
+        return "You are @{login} on GitHub".format(login=resp.json()["login"])
+    return redirect(url_for("github.login"))
 
 # TODO: these should be somewhere else
 def parse_str_date(str_date):
@@ -33,86 +49,92 @@ def dateobj_to_strdate(date):
 # General DB Access Calls
 
 
-# ex: 127.0.0.1:5000/github/core_initialize_repo?git_id=168214867
+# ex: 127.0.0.1:5000/github/core_initialize_repo?repoName=sarthak-tiwari/SER-574_RedTeam&username=racuna1&access_token=REPLACEME
 @github_api.route('/core_initialize_repo', methods=('GET', 'POST'))
 def api_core_initialize_repo():
-    git_id = request.args.get('git_id', type=int)
+    git_repo_name = request.args.get('repoName')
+    usr = request.args.get('username')
+    acctok = request.args.get('access_token')
 
-    if not git_id:
-        status = "error"
-        result = "Failed to parse git_id parameter."
+    if not git_repo_name:
+        return ("", "501: need git repo slug.")
     else:
         status = "wip"
-        result = DB.initialize_repo_data(git_id)
+        result = DB.initialize_repo_data(git_repo_name, usr, acctok)
 
     header = {'Content-Type': 'application/json'}
     data = json.dumps({"status": status, "result": result})
     return (data, header)
 
 
-# ex: 127.0.0.1:5000/github/listdetails/?format=json&query=SER-574_RedTeam
+# ex: 127.0.0.1:5000/github/listdetails/?format=json&repoName=sarthak-tiwari/SER-574_RedTeam
 @github_api.route('/listdetails/', methods=('GET', 'POST'))
 def api_core_listdetails():
 
     fo = request.args.get('format')
-    query = request.args.get('query')
+    repoName = request.args.get('repoName')
 
     if fo != "json":
         return ("", "501: only json is supported for format.")
     else:
-        result = DB.list_details(query)
+        result = DB.list_details(repoName)
 
         header = {'Content-Type': 'application/json'}
         data = json.dumps(result)
         return (data, header)
 
 
-# ex: 127.0.0.1:5000/github/commits/?format=json&query=168214867
+# ex: 127.0.0.1:5000/github/commits/?format=json&repoName=sarthak-tiwari/SER-574_RedTeam
 @github_api.route('/commits/', methods=('GET', 'POST'))
 def api_core_commits():
 
     fo = request.args.get('format')
-    query = request.args.get('query', type=int)
+    repoName = request.args.get('repoName')
 
     if fo != "json":
         return ("", "501: only json is supported for format.")
     else:
-        result = DB.fetch_commits(query)
+        result = DB.fetch_commits(repoName)
 
         header = {'Content-Type': 'application/json'}
         data = json.dumps(result)
         return (data, header)
 
 
-# ex: 127.0.0.1:5000/github/core_fetch_repo_hashes?git_id=168214867
-@github_api.route('/core_fetch_repo_hashes', methods=('GET', 'POST'))
+# ex: 127.0.0.1:5000/github/fetch_repo_hashes/?format=json&repoName=sarthak-tiwari/SER-574_RedTeam
+@github_api.route('/fetch_repo_hashes/', methods=('GET', 'POST'))
 def api_core_fetch_repo_hashes():
-    git_id = request.args.get('git_id', type=int)
+    fo = request.args.get('format')
+    repoName = request.args.get('repoName')
 
-    if not git_id:
-        status = "error"
-        result = "Failed to parse git_id parameter."
+    if fo != "json":
+        return ("", "501: only json is supported for format.")
     else:
-        status = "unimplemented"
-        result = ['70f13b111e1147611b70f9c9f1f76ddb00fcbe27', '70f13b111e1147611b70f9c9f1f76ddb00fcbe28', '70f13b111e1147611b70f9c9f1f76ddb00fcbe29', '70f13b111e1147611b70f9c9f1f76ddb00fcbe2a', '70f13b111e1147611b70f9c9f1f76ddb00fcbe2b']
-        # result = DB.fetch_repo_hashes(git_id)
+        #result = {"hashes" : ['70f13b111e1147611b70f9c9f1f76ddb00fcbe27', '70f13b111e1147611b70f9c9f1f76ddb00fcbe28',
+        #          '70f13b111e1147611b70f9c9f1f76ddb00fcbe29', '70f13b111e1147611b70f9c9f1f76ddb00fcbe2a', '70f13b111e1147611b70f9c9f1f76ddb00fcbe2b']}
+        result = DB.fetch_repo_hashes(repoName)
 
     header = {'Content-Type': 'application/json'}
-    data = json.dumps({"status": status, "result": result})
+    data = json.dumps(result)
     return (data, header)
 
 
-# ex: 127.0.0.1:5000/github/core_fetch_commit?git_id=168214867&commit_hash="70f13b111e1147611b70f9c9f1f76ddb00fcbe27"
-@github_api.route('/core_fetch_commit', methods=('GET', 'POST'))
+# ex: 127.0.0.1:5000/github/fetch_commit/?format=json&repoName=sarthak-tiwari/SER-574_RedTeam&commit_hash=70f13b111e1147611b70f9c9f1f76ddb00fcbe27
+@github_api.route('/fetch_commit/', methods=('GET', 'POST'))
 def api_core_fetch_commit():
-    git_id = request.args.get('git_id', type=int)
+    fo = request.args.get('format')
+    repoName = request.args.get('repoName')
     commit_hash = request.args.get('commit_hash')
 
-    result = {'hash': '70f13b111e1147611b70f9c9f1f76ddb00fcbe27', 'repositoryID': 168214867, 'author': 'test', 'message': 'Added gitignore for python to the source directory', 'date': 20190206, 'timeCommitted': '2019-02-07T23:39:00Z', 'files': '[".gitignore"]', 'additions': 116, 'deletions': 0}
-    # result = DB.fetch_commit(git_id, commit_hash)
+    if fo != "json":
+        return ("", "501: only json is supported for format.")
+    else:
+        #result = {'hash': '70f13b111e1147611b70f9c9f1f76ddb00fcbe27', 'repositoryID': 168214867, 'author': 'test', 'message': 'Added gitignore for python to the source directory',
+        #          'date': 20190206, 'timeCommitted': '2019-02-07T23:39:00Z', 'files': '[".gitignore"]', 'additions': 116, 'deletions': 0}
+        result = DB.fetch_commit(repoName, commit_hash)
 
     header = {'Content-Type': 'application/json'}
-    data = json.dumps({"status": "unimplemented", "result": result})
+    data = json.dumps(result)
     return (data, header)
 
 ################################################################################
@@ -158,7 +180,8 @@ def api_get_commit_counts_interval():
     interval_start = parse_str_date(request.args.get('interval_start'))
     interval_end = parse_str_date(request.args.get('interval_end'))
 
-    result = [0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    result = [0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0,
+              0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
     # result = CF.get_commit_counts_interval(git_id, username, interval_start, interval_end)
 
     header = {'Content-Type': 'application/json'}
@@ -173,7 +196,8 @@ def api_get_commit_freq_data():
     interval_start = parse_str_date(request.args.get('interval_start'))
     interval_end = parse_str_date(request.args.get('interval_end'))
 
-    result = [{'usernames': ['test', 'sarthak-tiwari'], 'date': datetime.datetime(2019, 2, 1, 0, 0), 'commit_count': {'test': 0, 'sarthak-tiwari': 0}}, {'usernames': ['test', 'sarthak-tiwari'], 'date': datetime.datetime(2019, 2, 2, 0, 0), 'commit_count': {'test': 0, 'sarthak-tiwari': 0}}, {'usernames': ['test', 'sarthak-tiwari'], 'date': datetime.datetime(2019, 2, 3, 0, 0), 'commit_count': {'test': 0, 'sarthak-tiwari': 0}}, {'usernames': ['test', 'sarthak-tiwari'], 'date': datetime.datetime(2019, 2, 4, 0, 0), 'commit_count': {'test': 0, 'sarthak-tiwari': 0}}, {'usernames': ['test', 'sarthak-tiwari'], 'date': datetime.datetime(2019, 2, 5, 0, 0), 'commit_count': {'test': 0, 'sarthak-tiwari': 0}}, {'usernames': ['test', 'sarthak-tiwari'], 'date': datetime.datetime(2019, 2, 6, 0, 0), 'commit_count': {'test': 1, 'sarthak-tiwari': 0}}, {'usernames': ['test', 'sarthak-tiwari'], 'date': datetime.datetime(2019, 2, 7, 0, 0), 'commit_count': {'test': 0, 'sarthak-tiwari': 4}}, {'usernames': ['test', 'sarthak-tiwari'], 'date': datetime.datetime(2019, 2, 8, 0, 0), 'commit_count': {'test': 0, 'sarthak-tiwari': 0}}, {'usernames': ['test', 'sarthak-tiwari'], 'date': datetime.datetime(2019, 2, 9, 0, 0), 'commit_count': {'test': 0, 'sarthak-tiwari': 0}}, {'usernames': ['test', 'sarthak-tiwari'], 'date': datetime.datetime(2019, 2, 10, 0, 0), 'commit_count': {'test': 0, 'sarthak-tiwari': 0}}, {'usernames': ['test', 'sarthak-tiwari'], 'date': datetime.datetime(2019, 2, 11, 0, 0), 'commit_count': {'test': 0, 'sarthak-tiwari': 0}}, {'usernames': ['test', 'sarthak-tiwari'], 'date': datetime.datetime(2019, 2, 12, 0, 0), 'commit_count': {'test': 0, 'sarthak-tiwari': 0}}, {'usernames': ['test', 'sarthak-tiwari'], 'date': datetime.datetime(2019, 2, 13, 0, 0), 'commit_count': {'test': 0, 'sarthak-tiwari': 0}}, {'usernames': ['test', 'sarthak-tiwari'], 'date': datetime.datetime(2019, 2, 14, 0, 0), 'commit_count': {'test': 0, 'sarthak-tiwari': 0}}]
+    result = [{'usernames': ['test', 'sarthak-tiwari'], 'date': datetime.datetime(2019, 2, 1, 0, 0), 'commit_count': {'test': 0, 'sarthak-tiwari': 0}}, {'usernames': ['test', 'sarthak-tiwari'], 'date': datetime.datetime(2019, 2, 2, 0, 0), 'commit_count': {'test': 0, 'sarthak-tiwari': 0}}, {'usernames': ['test', 'sarthak-tiwari'], 'date': datetime.datetime(2019, 2, 3, 0, 0), 'commit_count': {'test': 0, 'sarthak-tiwari': 0}}, {'usernames': ['test', 'sarthak-tiwari'], 'date': datetime.datetime(2019, 2, 4, 0, 0), 'commit_count': {'test': 0, 'sarthak-tiwari': 0}}, {'usernames': ['test', 'sarthak-tiwari'], 'date': datetime.datetime(2019, 2, 5, 0, 0), 'commit_count': {'test': 0, 'sarthak-tiwari': 0}}, {'usernames': ['test', 'sarthak-tiwari'], 'date': datetime.datetime(2019, 2, 6, 0, 0), 'commit_count': {'test': 1, 'sarthak-tiwari': 0}}, {'usernames': ['test', 'sarthak-tiwari'], 'date': datetime.datetime(2019, 2, 7, 0, 0), 'commit_count': {'test': 0, 'sarthak-tiwari': 4}}, {
+        'usernames': ['test', 'sarthak-tiwari'], 'date': datetime.datetime(2019, 2, 8, 0, 0), 'commit_count': {'test': 0, 'sarthak-tiwari': 0}}, {'usernames': ['test', 'sarthak-tiwari'], 'date': datetime.datetime(2019, 2, 9, 0, 0), 'commit_count': {'test': 0, 'sarthak-tiwari': 0}}, {'usernames': ['test', 'sarthak-tiwari'], 'date': datetime.datetime(2019, 2, 10, 0, 0), 'commit_count': {'test': 0, 'sarthak-tiwari': 0}}, {'usernames': ['test', 'sarthak-tiwari'], 'date': datetime.datetime(2019, 2, 11, 0, 0), 'commit_count': {'test': 0, 'sarthak-tiwari': 0}}, {'usernames': ['test', 'sarthak-tiwari'], 'date': datetime.datetime(2019, 2, 12, 0, 0), 'commit_count': {'test': 0, 'sarthak-tiwari': 0}}, {'usernames': ['test', 'sarthak-tiwari'], 'date': datetime.datetime(2019, 2, 13, 0, 0), 'commit_count': {'test': 0, 'sarthak-tiwari': 0}}, {'usernames': ['test', 'sarthak-tiwari'], 'date': datetime.datetime(2019, 2, 14, 0, 0), 'commit_count': {'test': 0, 'sarthak-tiwari': 0}}]
     # result = CF.get_commit_freq_data(git_id, interval_start, interval_end)
 
     #repack python datetime objects
@@ -187,6 +211,22 @@ def api_get_commit_freq_data():
 
 ################################################################################
 # Comment Analysis::Commit Messages
+
+# ex: 127.0.0.1:5000/github/messagequality/?format=json&repoName=racuna1/ser222-public
+@github_api.route('/messagequality/', methods=('GET', 'POST'))
+def api_messagequality_ui():
+
+    fo = request.args.get('format')
+    repoName = request.args.get('repoName')
+
+    if fo != "json":
+        return ("", "501: only json is supported for format.")
+    else:
+        result = DB.message_quality(repoName)
+
+        header = {'Content-Type': 'application/json'}
+        data = json.dumps(result)
+        return (data, header)
 
 # ex: 127.0.0.1:5000/github/compute_commit_message_quality?git_id=168214867&commit_hash="70f13b111e1147611b70f9c9f1f76ddb00fcbe27"
 @github_api.route('/compute_commit_message_quality', methods=('GET', 'POST'))
@@ -204,43 +244,73 @@ def api_compute_commit_message_quality():
 ################################################################################
 # Comment Analysis::Comments
 
-
-@app.route('/github/pull_request', methods=('GET', 'POST'))
+#################################################################################
+# pull request info
+# ex : http://127.0.0.1:5000/github/pull_request/?repoName=ser-574_Assignment-1
+@github_api.route('/pull_request/',  methods=('GET', 'POST'))
 def api_count_pull():
-    conn = sqlite3.connect('database.db')
+    conn = sqlite3.connect(Constants.DATABASE)
     db = conn.cursor()
-    db.execute("SELECT * FROM pullData")
+    repoName = request.args.get('repoName', type = str)
+    db.execute("SELECT repositories.id FROM repositories WHERE repositories.name = ?", (repoName,))
+    github_id = db.fetchall()
+    repo_id = github_id[0][0]
+    print(repo_id)
+    # db.execute("SELECT pulldata.requestID FROM pullData WHERE pullData.repositoryID = ?", (repo_id,))
+    db.execute("SELECT * FROM pullData WHERE pullData.repositoryID = ?", (repo_id,))
+    conn.commit()
     result = db.fetchall()
+    # return str(result)
     pulls_data = []
     for data in result:
         pull_data = {}
-        pull_data['request_title']: data.requestTile
-        pull_data['author']: data.author
-        pull_data['no_of_comments']: data.noOfComments
-        pull_data['target_branch']: data.targetBranch
-        pull_data['no_of_reviews']: data.noOfReviews
+        pull_data['repository_id'] = data[0]
+        pull_data['request_id'] = data[1]
+        pull_data['request_title'] = data[2]
+        pull_data['author'] = data[3]
+        pull_data['no_of_comments'] = data[4]
+        pull_data['target_branch'] = data[5]
+        pull_data['no_of_reviews'] = data[6]
+        pull_data['comments'] = data[7]
         pulls_data.append(pull_data)
-    return jsonify({'result': pulls_data})
+
+    return str(pulls_data), {'Content-Type': 'application/json'}
 
 
-@app.route('/github/user', methods=('GET', 'POST'))
-def api_count_pull():
-    conn = sqlite3.connect('database.db')
+#################################################################################
+# user info
+
+@github_api.route('/user', methods=('GET', 'POST'))
+def api_count_user():
+    conn = sqlite3.connect(Constants.DATABASE)
     db = conn.cursor()
     db.execute("SELECT * FROM userProfile")
     result = db.fetchall()
+    print(result)
     users_data = []
     for data in result:
         user_data = {}
-        user_data['github_login']: data.githubLogin
-        user_data['github_username']: data.githubUsername
-        user_data['github_profile']: data.githubProfile
+        # user_data['github_login'] = data[1]
+        user_data['github_username'] = data[1]
+        user_data['github_profile'] = data[2]
         users_data.append(user_data)
-    return jsonify({'result': users_data})
+
+    return str(users_data), {'Content-Type': 'application/json'}
+    # return jsonify({'result': users_data})
 
 
 ################################################################################
 # Code Analysis
+
+# ex: 127.0.0.1:5000/github/baseline_for_complexity"
+# Returns baseline values for code complexity metrices.
+@github_api.route('/baseline_for_complexity', methods=('GET', 'POST'))
+def api_get_baseline_for_complexity():
+
+    baselineData = CheckStyleManager.getBaselineForComplexities()
+    data = json.dumps(baselineData)
+
+    return (data, {'Content-Type': 'application/json'})
 
 # ex: 127.0.0.1:5000/github/complexity_of_file?repoName="someRepo"&fileName="package/another/abc.java"
 # Returns code complexity of fileName present in repoName.
@@ -250,7 +320,8 @@ def api_get_complexity_of_file():
     fileName = request.args.get('filename')
 
     complexityData = DB.get_complexity_of_file(repoName, fileName)
-    data = json.dumps(complexityData)
+    baselineData = CheckStyleManager.getBaselineForComplexities()
+    data = json.dumps({'complexities' : complexityData, 'baselines' : baselineData})
 
     return (data, {'Content-Type': 'application/json'})
 
@@ -261,7 +332,8 @@ def api_get_complexity_of_files_in_repo():
     repoName = request.args.get('reponame')
 
     complexityData = DB.get_complexity_of_files_in_repo(repoName)
-    data = json.dumps(complexityData)
+    baselineData = CheckStyleManager.getBaselineForComplexities()
+    data = json.dumps({'complexities' : complexityData, 'baselines' : baselineData})
 
     return (data, {'Content-Type': 'application/json'})
 
@@ -273,7 +345,8 @@ def api_get_complexity_by_author():
     authorName = request.args.get('authorname')
 
     complexityData = DB.get_complexity_by_author(repoName, authorName)
-    data = json.dumps(complexityData)
+    baselineData = CheckStyleManager.getBaselineForComplexities()
+    data = json.dumps({'complexities' : complexityData, 'baselines' : baselineData})
 
     return (data, {'Content-Type': 'application/json'})
 
@@ -284,22 +357,46 @@ def api_get_complexity_of_authors_in_repo():
     repoName = request.args.get('reponame')
 
     complexityData = DB.get_complexity_of_authors_in_repo(repoName)
-    data = json.dumps(complexityData)
-    
+    baselineData = CheckStyleManager.getBaselineForComplexities()
+    data = json.dumps({'complexities' : complexityData, 'baselines' : baselineData})
+
     return (data, {'Content-Type': 'application/json'})
 
 ################################################################################
 
-@github_api.route('/', methods=('GET', 'POST'))
-def test():
-    filename = request.args.get('filename')
+# ex: 127.0.0.1:5000/github/pulls/?format=json&query=168214867&pullID=168214867
+@github_api.route('/pulls/', methods=('GET', 'POST'))
+def api_core_pulls():
 
-    header = {'Content-Type': 'application/json'}
-    metrics = CheckStyleManager.getDummyComplexities(filename)
-    data = json.dumps({"filename": filename, "metrics": metrics})
-    return (data, header)
+    fo = request.args.get('format')
+    query = request.args.get('query', type=int)
+    pullID = request.args.get('pullID', type=int)
 
+    if fo != "json":
+        return ("", "501: only json is supported for format.")
+    else:
+        result = DB.fetch_pull(query, pullID)
+
+        header = {'Content-Type': 'application/json'}
+        data = json.dumps(result)
+        return (data, header)
+
+################################################################################
+# GitHub - Taiga Overlap
+
+# ex: 127.0.0.1:5000/github/commits_on_stories?projectSlug="someSlug"&repoName="someRepo"
+# Returns commit information in someRepo for each user story in the project with someSlug
+@github_api.route('/commits_on_stories', methods=('GET', 'POST'))
+def api_get_commits_on_stories():
+    projectSlug = request.args.get('projectSlug')
+    repoName = request.args.get('repoName')
+
+    commitOnStoryData = DB.get_commits_on_stories(projectSlug)
+    
+    data = json.dumps(commitOnStoryData)
+
+    return (data, {'Content-Type': 'application/json'})
 
 if __name__ == '__main__':
-    app.debug = True
-    app.run()
+    github_api.debug = True
+    github_api.run()

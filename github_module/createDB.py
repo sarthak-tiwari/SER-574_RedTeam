@@ -34,23 +34,24 @@ class CreateDB:
                         "    author TEXT,\n"
                         "    authorID INTEGER, \n"
                         "    commitMessage TEXT,\n"
-                        "    commentMessage TEXT,\n"
                         "    date INTEGER,\n"
                         "    timeCommitted BLOB,\n"
                         "    filesModified TEXT,\n"
                         "    noOfAdditions INTEGER,\n"
-                        "    noOfDeletions INTEGER\n"
+                        "    noOfDeletions INTEGER,\n"
                         "    commentMessage TEXT\n"
                         "    )")
 
     def pull_data(self):
         self.db.execute("CREATE TABLE pullData(\n"
+                        "        repositoryID INTEGER,\n"
                         "        requestID TEXT,\n"
                         "        requestTile TEXT,\n"
                         "        author TEXT,\n"
                         "        noOfComments INTEGER,\n"
                         "        targetBranch TEXT,\n"
-                        "        noOfReviews INTEGER\n"
+                        "        noOfReviews INTEGER,\n"
+                        "        commentMessage TEXT\n"
                         "        )")
 
     def code_complexity(self):
