@@ -13,6 +13,7 @@ from . import GithubAPI
 from .static_code_analysis.CheckStyleManager import CheckStyleManager
 #import metadata_analysis.commit_frequency as CF
 from . import db_api as DB
+# import db_api 
 from .Constants import Constants
 from . import db_populate as DP
 
@@ -245,18 +246,21 @@ def api_compute_commit_message_quality():
 
 #################################################################################
 # pull request info
-# ex : http://127.0.0.1:5000/github/pull_request/?repo_id=168214867
+# ex : http://127.0.0.1:5000/github/pull_request/?repoName=ser-574_Assignment-1
 @github_api.route('/pull_request/',  methods=('GET', 'POST'))
 def api_count_pull():
     conn = sqlite3.connect(Constants.DATABASE)
     db = conn.cursor()
-    repo_id = request.args.get('repo_id', type=int)
-    db.execute("SELECT * FROM pullData WHERE repositoryID = ?", (repo_id,))
-    # db.execute("SELECT * FROM pullData ")
+    repoName = request.args.get('repoName', type = str)
+    db.execute("SELECT repositories.id FROM repositories WHERE repositories.name = ?", (repoName,))
+    github_id = db.fetchall()
+    repo_id = github_id[0][0]
+    print(repo_id)
+    # db.execute("SELECT pulldata.requestID FROM pullData WHERE pullData.repositoryID = ?", (repo_id,))
+    db.execute("SELECT * FROM pullData WHERE pullData.repositoryID = ?", (repo_id,))
+    conn.commit()
     result = db.fetchall()
-    # print(str(result))
-    # return result
-    # print(str(result[0][0]))
+    # return str(result)
     pulls_data = []
     for data in result:
         pull_data = {}
