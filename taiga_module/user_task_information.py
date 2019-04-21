@@ -1,12 +1,9 @@
 import requests
 import json
-#from jwkest.jwk import SYMKey
-#from jwkest.jwe import JWE
 
 headers = {
     'Content-Type': 'application/json',
 }
-#slug1 = "sarthak-tiwari-ser-574_redteam_team-taiga"
 
 def user_story_info(slug1,sprint_no):
 	projectinfo = "https://api.taiga.io/api/v1/projects/by_slug?slug="

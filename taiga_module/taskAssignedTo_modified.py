@@ -1,14 +1,13 @@
 import requests
 import json
-#from jwkest.jwk import SYMKey
-#from jwkest.jwe import JWE
+
 from requests.auth import HTTPDigestAuth
 headers = {
     'Content-Type': 'application/json',
 }
-#slug1 = "sarthak-tiwari-ser-574_redteam_team-taiga"
 
 def get_modifiedTaskAssignedTo(slug1,sprint_no):
+	sprint_no = int(sprint_no)
 	projectinfo = "https://api.taiga.io/api/v1/projects/by_slug?slug="
 	response_project_data = requests.get(projectinfo+slug1, headers=headers)
 	project_data = json.loads(response_project_data.content)
@@ -40,7 +39,4 @@ def get_modifiedTaskAssignedTo(slug1,sprint_no):
 		utHistory[ut[i]] = tl
 		tmpList = []
 		tl = []
-	#print (utHistory)
 	return utHistory
-
-#get_modifiedTaskAssignedTo("sarthak-tiwari-ser-574_redteam_team-taiga",2)

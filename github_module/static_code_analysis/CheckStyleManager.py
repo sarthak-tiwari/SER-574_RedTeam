@@ -10,8 +10,10 @@ import requests
 import os
 from pathlib import Path
 
+
 class CheckStyleManager:
 
+    # Fetches file from GitHub and create a copy of it in local folder for analysis
     @staticmethod
     def fetchAndCreateFile(fileLink):
 
@@ -20,6 +22,7 @@ class CheckStyleManager:
         with open(str(Path(__file__).parent.resolve()) + '/TestFile/' + fileName, 'w+') as newFile:
             newFile.write(fileContent)
 
+    # method to calculate complexity of the file specified once fetched
     @staticmethod
     def getStaticComplexityMetrices(fileName):
 
@@ -46,6 +49,7 @@ class CheckStyleManager:
 
         return metrics
 
+    # Method to calculate the count of java format warnings generated for that file
     @staticmethod
     def getJavaWarningCount(fileName):
 
@@ -61,6 +65,7 @@ class CheckStyleManager:
 
         return count
 
+    # Driver method which syncs all the other methods
     @staticmethod
     def getComplexity(fileLink):
 
@@ -73,26 +78,17 @@ class CheckStyleManager:
         metrics = CheckStyleManager.getStaticComplexityMetrices(fileName)
         metrics['JavaWarnings'] = CheckStyleManager.getJavaWarningCount(
             fileName)
-        
+
         os.remove(path + '/TestFile/' + fileName)
 
         return metrics
 
+    # Method that returns the baseline values for all the metrices
     @staticmethod
     def getBaselineForComplexities():
 
-        #TODO: Return baseline values for different complexities
-
-        metrics = {'BooleanExpressionComplexity': 2, 'ClassFanOutComplexity': 10,
-                   'CyclomaticComplexity': 3, 'JavaNCSS': 50, 'NPathComplexity': 3,
-                   'ClassDataAbstractionCoupling': 6}
+        metrics = {'booleanExpressionComplexity': 3, 'classFanOutComplexity': 20,
+                   'cyclomaticComplexity': 10, 'javaNCSS': 50, 'nPathComplexity': 200,
+                   'classDataAbstractionCoupling': 7}
 
         return metrics
-
-
-# print(CheckStyleManager.getComplexity(
-#     'https://raw.githubusercontent.com/sarthak-tiwari/SER-574_RedTeam/master/github_module/static_code_analysis/DummyTestFiles/Frame_81.java'))
-# metrices = CheckStyleManager.getComplexities(
-#    'abc', ['Frame_81.java', 'Panel_59.java'])
-# print(metrices)
-
