@@ -9,7 +9,7 @@ Click==7.0
 cloudpickle==0.7.0
 colorama==0.3.9
 cycler==0.10.0
-dask==1.1.0
+dask==2021.10.0
 decorator==4.3.2
 defusedxml==0.5.0
 Deprecated==1.2.3
